@@ -201,7 +201,7 @@ export function CommonForm<T extends Record<string, any>>({
         }
       }, 300);
     },
-    [errors, fields]
+    [errors, fields],
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -290,7 +290,7 @@ export function CommonForm<T extends Record<string, any>>({
   const renderField = (field: FormField) => {
     const value = formData[field.name];
     const error = errors[field.name];
-const hasValue = value != null && value !== "";
+    const hasValue = value != null && value !== "";
 
     if (field.dependsOn) {
       const dependentValue = formData[field.dependsOn.field];
@@ -320,7 +320,7 @@ const hasValue = value != null && value !== "";
                 "focus:border-primary focus:ring-2 focus:ring-primary/20",
                 "hover:border-muted-foreground/40",
                 error &&
-                  "border-destructive focus:border-destructive focus:ring-destructive/20"
+                  "border-destructive focus:border-destructive focus:ring-destructive/20",
               )}
             />
             {hasValue && !error && (
@@ -355,8 +355,8 @@ const hasValue = value != null && value !== "";
                     ? "text"
                     : "password"
                   : field.type === "email"
-                  ? "email"
-                  : "text"
+                    ? "email"
+                    : "text"
               }
               value={value || ""}
               onChange={(e) => handleChange(field.name, e.target.value)}
@@ -368,7 +368,7 @@ const hasValue = value != null && value !== "";
                 "focus:border-primary focus:ring-2 focus:ring-primary/20",
                 "hover:border-muted-foreground/40",
                 error &&
-                  "border-destructive focus:border-destructive focus:ring-destructive/20"
+                  "border-destructive focus:border-destructive focus:ring-destructive/20",
               )}
             />
 
@@ -414,7 +414,7 @@ const hasValue = value != null && value !== "";
               onChange={(e) =>
                 handleChange(
                   field.name,
-                  e.target.value ? Number(e.target.value) : ""
+                  e.target.value ? Number(e.target.value) : "",
                 )
               }
               placeholder={field.placeholder}
@@ -425,7 +425,7 @@ const hasValue = value != null && value !== "";
                 "focus:border-primary focus:ring-2 focus:ring-primary/20",
                 "hover:border-muted-foreground/40",
                 error &&
-                  "border-destructive focus:border-destructive focus:ring-destructive/20"
+                  "border-destructive focus:border-destructive focus:ring-destructive/20",
               )}
             />
             {hasValue && !error && (
@@ -454,7 +454,7 @@ const hasValue = value != null && value !== "";
                 "focus:border-primary focus:ring-2 focus:ring-primary/20",
                 "hover:border-muted-foreground/40",
                 error &&
-                  "border-destructive focus:border-destructive focus:ring-destructive/20"
+                  "border-destructive focus:border-destructive focus:ring-destructive/20",
               )}
             />
             {hasValue && !error && (
@@ -479,7 +479,7 @@ const hasValue = value != null && value !== "";
                 "focus:border-primary focus:ring-2 focus:ring-primary/20",
                 "hover:border-muted-foreground/40",
                 error &&
-                  "border-destructive focus:border-destructive focus:ring-destructive/20"
+                  "border-destructive focus:border-destructive focus:ring-destructive/20",
               )}
             >
               <SelectValue placeholder={field.placeholder || "Chọn..."} />
@@ -523,7 +523,7 @@ const hasValue = value != null && value !== "";
                 className={cn(
                   "w-full h-11 rounded-lg border justify-start text-left font-normal transition-all duration-200",
                   !dateObj && "text-muted-foreground/50",
-                  error && "border-destructive"
+                  error && "border-destructive",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground/60" />
@@ -543,6 +543,10 @@ const hasValue = value != null && value !== "";
                     handleChange(field.name, format(date, "dd/MM/yyyy"));
                   }
                 }}
+                captionLayout="dropdown"
+                fromYear={1950}
+                toYear={new Date().getFullYear()}
+                defaultMonth={value || new Date(2000, 0)}
                 initialFocus
                 locale={vi}
               />
@@ -574,7 +578,7 @@ const hasValue = value != null && value !== "";
               "relative border-2 border-dashed rounded-lg transition-all duration-200",
               "hover:border-primary/50 hover:bg-muted/30",
               isDragging && "border-primary bg-primary/5",
-              error && "border-destructive"
+              error && "border-destructive",
             )}
           >
             <input
@@ -632,7 +636,7 @@ const hasValue = value != null && value !== "";
         className={cn(
           "max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl border shadow-lg p-0",
           "animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-4 duration-300",
-          submitStatus === "error" && "animate-shake"
+          submitStatus === "error" && "animate-shake",
         )}
       >
         <div className="overflow-y-auto max-h-[90vh] p-8">
@@ -674,7 +678,7 @@ const hasValue = value != null && value !== "";
                     key={field.name}
                     className={cn(
                       "space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300",
-                      field.gridColumn && `md:col-${field.gridColumn}`
+                      field.gridColumn && `md:col-${field.gridColumn}`,
                     )}
                     style={
                       field.gridColumn
@@ -722,7 +726,7 @@ const hasValue = value != null && value !== "";
                 type="submit"
                 disabled={isSubmitting || isLoading}
                 className={cn(
-                  "h-10 px-6 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow transition-all duration-200 font-medium"
+                  "h-10 px-6 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow transition-all duration-200 font-medium",
                 )}
               >
                 {isSubmitting || isLoading ? (

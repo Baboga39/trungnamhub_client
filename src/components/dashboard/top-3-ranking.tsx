@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Medal, Crown, Star } from "lucide-react";
+import { Medal, Crown, Star, TrendingUp } from "lucide-react";
 import { fetchTop3Ranking } from "@/features/dashboard/dashboardThunks";
 
 interface ApiItem {
@@ -49,13 +49,70 @@ export function Top3Ranking() {
   const dispatch = useDispatch();
   const { top3Ranking, loading } = useSelector((state: any) => state.dashboard);
 
+  console.log("Top 3 Ranking Data:", top3Ranking);
+
   useEffect(() => {
     dispatch(fetchTop3Ranking() as any);
   }, [dispatch]);
 
-  if (loading || !top3Ranking || top3Ranking.length < 3) {
+  if (loading) {
     return (
-      <div className="h-64 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl animate-pulse" />
+      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-8 shadow-lg overflow-hidden">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Top 3 Xuất Sắc
+            </h3>
+            <p className="text-sm text-slate-600 mt-1">
+              Các đoàn sinh có điểm cao nhất
+            </p>
+          </div>
+          <Star className="w-6 h-6 text-amber-400" />
+        </div>
+        <div className="h-80 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl animate-pulse" />
+      </div>
+    );
+  }
+
+  if (!top3Ranking || top3Ranking.length < 3) {
+    return (
+      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-8 shadow-lg overflow-hidden">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Top 3 Xuất Sắc
+            </h3>
+            <p className="text-sm text-slate-600 mt-1">
+              Các đoàn sinh có điểm cao nhất
+            </p>
+          </div>
+          <Star className="w-6 h-6 text-amber-400" />
+        </div>
+
+        <div className="flex flex-col items-center justify-center h-80 gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-200 to-purple-200 rounded-full blur-xl opacity-50" />
+            <div className="relative bg-white rounded-full p-6 shadow-xl">
+              <TrendingUp className="w-12 h-12 text-slate-300" />
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <h4 className="text-lg font-bold text-slate-700 mb-2">
+              Chưa có dữ liệu
+            </h4>
+            <p className="text-sm text-slate-500 max-w-xs">
+              Dữ liệu xếp hạng sẽ xuất hiện khi có đủ 3 thành viên tham gia
+            </p>
+          </div>
+
+          <div className="flex gap-2 mt-4">
+            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse" />
+          </div>
+        </div>
+      </div>
     );
   }
 

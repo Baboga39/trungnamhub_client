@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { AlertTriangle, TrendingDown, UserX } from "lucide-react"
+import { AlertTriangle, TrendingDown, UserX, CheckCircle } from "lucide-react"
 import { fetchRiskMembers } from "@/features/dashboard/dashboardThunks"
 
 type RiskMember = {
@@ -68,7 +68,15 @@ export function RiskMembers() {
 
       <CardContent>
         {loading ? (
-          <div className="text-center py-8 text-gray-400">Đang tải...</div>
+          <div className="flex flex-col items-center justify-center py-12 gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-200 to-orange-200 rounded-full blur-xl opacity-50" />
+              <div className="relative bg-white rounded-full p-6 shadow-xl">
+                <AlertTriangle className="w-8 h-8 text-slate-300 animate-pulse" />
+              </div>
+            </div>
+            <p className="text-sm text-gray-500">Đang tải dữ liệu...</p>
+          </div>
         ) : riskMembers?.length > 0 ? (
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {riskMembers.map((member: RiskMember) => (
@@ -113,8 +121,28 @@ export function RiskMembers() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-400">
-            Không có đoàn sinh nào cần quan tâm
+          <div className="flex flex-col items-center justify-center py-12 gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-200 to-emerald-200 rounded-full blur-xl opacity-50" />
+              <div className="relative bg-white rounded-full p-6 shadow-xl">
+                <CheckCircle className="w-12 h-12 text-green-500" />
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <h4 className="text-lg font-bold text-slate-700 mb-2">
+                Tất cả bình yên
+              </h4>
+              <p className="text-sm text-slate-500 max-w-xs">
+                Không có đoàn sinh nào cần quan tâm lúc này. Tình hình học tập và chuyên cần rất tốt!
+              </p>
+            </div>
+
+            <div className="flex gap-2 mt-4">
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 animate-pulse" />
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 animate-pulse" />
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 animate-pulse" />
+            </div>
           </div>
         )}
       </CardContent>

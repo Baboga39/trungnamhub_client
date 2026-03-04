@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Card } from "@/components/ui/card"
-import { Trophy, TrendingUp, TrendingDown, Minus } from "lucide-react"
+import { Trophy, TrendingUp, TrendingDown, Minus, Zap } from "lucide-react"
 import { fetchRanking } from "@/features/dashboard/dashboardThunks"
 import { motion } from "framer-motion"
 
@@ -15,8 +15,59 @@ export function EnhancedRankingTable() {
     dispatch(fetchRanking({ limit: 10 }))
   }, [dispatch])
 
-  if (loading || !ranking) {
-    return <Card className="p-6 animate-pulse h-80" />
+  if (loading) {
+    return (
+      <Card className="p-6 bg-white/70 backdrop-blur-xl shadow-2xl rounded-2xl">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
+            <Trophy className="h-6 w-6 text-white animate-pulse" />
+          </div>
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-amber-500 to-red-500 bg-clip-text text-transparent">
+            Bảng xếp hạng thi đua
+          </h3>
+        </div>
+        <div className="h-64 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl animate-pulse" />
+      </Card>
+    )
+  }
+
+  if (!ranking || ranking.length === 0) {
+    return (
+      <Card className="p-6 bg-white/70 backdrop-blur-xl shadow-2xl rounded-2xl">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
+            <Trophy className="h-6 w-6 text-white" />
+          </div>
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-amber-500 to-red-500 bg-clip-text text-transparent">
+            Bảng xếp hạng thi đua
+          </h3>
+        </div>
+
+        <div className="flex flex-col items-center justify-center py-16 gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-200 to-orange-200 rounded-full blur-xl opacity-50" />
+            <div className="relative bg-white rounded-full p-6 shadow-xl">
+              <Zap className="w-12 h-12 text-amber-500" />
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <h4 className="text-lg font-bold text-slate-700 mb-2">
+              Chưa có dữ liệu xếp hạng
+            </h4>
+            <p className="text-sm text-slate-500 max-w-xs">
+              Dữ liệu bảng xếp hạng sẽ xuất hiện khi có đủ kết quả thi đua từ các đoàn sinh
+            </p>
+          </div>
+
+          <div className="flex gap-2 mt-4">
+            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 animate-pulse" />
+          </div>
+        </div>
+      </Card>
+    )
   }
 
   const maxScore = ranking[0]?.totalScore || 1
