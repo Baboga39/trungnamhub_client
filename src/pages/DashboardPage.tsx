@@ -23,6 +23,7 @@ const quickActions = [
     icon: UserCheck,
     color: "text-green-600",
     bgColor: "bg-green-100",
+    url: "/attendance",
   },
   {
     id: "2",

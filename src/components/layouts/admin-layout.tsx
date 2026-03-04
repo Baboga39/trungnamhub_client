@@ -35,8 +35,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
-
+<Navbar onMenuClick={() => setMobileSidebarOpen(true)} />
       <div className="flex flex-1 relative">
         {/* Mobile sidebar overlay */}
         {mobileSidebarOpen && (
@@ -70,15 +69,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-full backdrop-blur-sm bg-white/80 
+              className="h-12 w-12 rounded-full backdrop-blur-sm bg-white/80 
                          hover:bg-white/90 shadow-md border border-gray-200 
                          transition-all duration-300"
               onClick={handleToggle}
             >
               {sidebarOpen ? (
-                <ChevronLeft className="h-5 w-5 text-slate-700" />
+                <ChevronLeft className="h-6 w-6 text-slate-700" />
               ) : (
-                <ChevronRight className="h-5 w-5 text-slate-700" />
+                <ChevronRight className="h-6 w-6 text-slate-700" />
               )}
             </Button>
           </div>
