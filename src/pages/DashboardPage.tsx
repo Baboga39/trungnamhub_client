@@ -14,6 +14,7 @@ import { GradeTrendTimeline } from "@/components/dashboard/grade-trend-timeline"
 import { SmartKpiCards } from "@/components/dashboard/smart-kpi-cards"
 import { Top3Ranking } from "@/components/dashboard/top-3-ranking"
 import { fetchDashboardStats } from "../features/dashboard/dashboardThunks"
+import { url } from "zod"
 
 const quickActions = [
   {
@@ -32,6 +33,7 @@ const quickActions = [
     icon: PlusCircle,
     color: "text-blue-600",
     bgColor: "bg-blue-100",
+    url: "/students"
   },
   {
     id: "3",
@@ -40,6 +42,7 @@ const quickActions = [
     icon: Award,
     color: "text-orange-600",
     bgColor: "bg-orange-100",
+    url: "/scores"
   },
   {
     id: "4",

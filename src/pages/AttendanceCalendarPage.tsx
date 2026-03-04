@@ -278,8 +278,7 @@ export default function AttendanceCalendarPage() {
         return "Đi trễ";
       case "excused":
         return "Có phép";
-      case "unexcused":
-        return "Không phép";
+
       default:
         return "";
     }
@@ -419,7 +418,9 @@ export default function AttendanceCalendarPage() {
                           </div>
                         )}
                         {hasAttendance && (
-  <div className="flex sm:hidden gap-1 justify-center mt-auto mb-1">                            {stats.absent > 0 && (
+                          <div className="flex sm:hidden gap-1 justify-center mt-auto mb-1">
+                            {" "}
+                            {stats.absent > 0 && (
                               <div className="h-1 w-1 rounded-full bg-red-500" />
                             )}
                             {stats.late > 0 && (
@@ -502,15 +503,7 @@ export default function AttendanceCalendarPage() {
                       {selectedDateStats.stats.excused}
                     </div>
                   </div>
-                  <div className="p-3 rounded-xl bg-red-50 border-2 border-red-200">
-                    <div className="flex items-center gap-2 text-red-600 text-sm mb-1">
-                      <FileX className="h-4 w-4" />
-                      <span>Không phép</span>
-                    </div>
-                    <div className="text-2xl font-bold text-red-700">
-                      {selectedDateStats.stats.unexcused}
-                    </div>
-                  </div>
+               
                 </div>
                 <Separator />
                 <Tabs defaultValue="all" className="mt-4">
