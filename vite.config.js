@@ -24,19 +24,19 @@ export default defineConfig({
         start_url: "/",
         icons: [
           {
-            src: "/icons/icon-192x192.png",
+            src: "/icons/icon-192x192.jpg",
             sizes: "192x192",
-            type: "image/png",
+            type: "image/jpeg",
           },
           {
-            src: "/icons/icon-512x512.png",
+            src: "/icons/icon-512x512.jpg",
             sizes: "512x512",
-            type: "image/png",
+            type: "image/jpeg",
           },
           {
-            src: "/icons/icon-512x512.png",
+            src: "/icons/icon-512x512.jpg",
             sizes: "512x512",
-            type: "image/png",
+            type: "image/jpeg",
             purpose: "any maskable",
           },
         ],
