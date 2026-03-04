@@ -1,15 +1,17 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
 
 import NotFoundPage from "./components/common/not-found";
 import { publicRoutes, privateRoutes } from "./routes";
 import MainLayout from "./layouts/MainLayout";
 import { LoadingProvider } from "./components/context/LoadingContext";
 import GlobalLoading from "./components/common/GlobalLoading";
+import { fetchMembersThunk } from "./features/members/memberThunks";
 
-// PrivateRoute component
+// PrivateRoute
 function PrivateRoute({ children }) {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   if (!isAuthenticated) {
@@ -19,16 +21,23 @@ function PrivateRoute({ children }) {
 }
 
 export default function App() {
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchMembersThunk());
+    }
+  }, [isAuthenticated, dispatch]);
+
   return (
     <LoadingProvider>
       <Router>
         <Routes>
-          {/* Public routes */}
           {publicRoutes.map(({ path, element }, idx) => (
             <Route key={idx} path={path} element={element} />
           ))}
 
-          {/* Private routes */}
           {privateRoutes.map(({ path, element }, idx) => (
             <Route
               key={idx}
@@ -41,23 +50,10 @@ export default function App() {
             />
           ))}
 
-          {/* Catch all - Not Found */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
 
-        {/* Toast global */}
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          pauseOnHover
-          draggable
-          theme="light"
-        />
-
-        {/* ✅ Loading Global */}
+        <ToastContainer position="top-right" autoClose={3000} theme="light" />
         <GlobalLoading />
       </Router>
     </LoadingProvider>
