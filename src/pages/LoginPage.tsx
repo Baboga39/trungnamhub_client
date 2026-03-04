@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -11,7 +11,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "../components/ui/Card";
+} from "../components/ui/card";
 import {
   Eye,
   EyeOff,
