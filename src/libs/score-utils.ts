@@ -13,43 +13,47 @@ export function calculateTotalScoreDynamic(
 
   for (const cat of categories) {
     const key = nameMap[cat.name] ?? cat.name;
-    let value = parseFloat(String(formData[key]).replace(/^0+/, "")) || 0; // xử lý "010" → "10"
+
+    const rawValue = formData[key];
+    const value =
+      parseFloat(String(rawValue ?? "").replace(/^0+/, "")) || 0;
+
     weightedSum += value * cat.weight;
     totalWeight += cat.weight;
   }
 
-
-  // ✅ Cộng thưởng / phạt trước khi chia trung bình
   const bonus = Number(formData.bonus) || 0;
   const penalty = Number(formData.penalty) || 0;
+  const activityScore = Number(formData.activityScore) || 0;
 
-  let avgScore = totalWeight > 0 ? (weightedSum + bonus - penalty) / totalWeight : 0;
+  // 1️⃣ tính trung bình trước
+  const avgScore =
+    totalWeight > 0 ? (weightedSum + bonus - penalty) / totalWeight : 0;
 
+  // 2️⃣ cộng điểm hoạt động sau
+  const finalScore = avgScore + activityScore;
 
-  return parseFloat(avgScore.toFixed(1));
+  return parseFloat(finalScore.toFixed(1));
 }
-
-
 
 export function getRank(totalScore: number): string {
-  if (totalScore >= 8) return "Xuất sắc"
-  if (totalScore >= 6.5) return "Khá"
-  if (totalScore >= 5.0) return "Trung bình"
-  return "Yếu"
+  if (totalScore >= 8) return "Xuất sắc";
+  if (totalScore >= 6.5) return "Khá";
+  if (totalScore >= 5.0) return "Trung bình";
+  return "Yếu";
 }
-
 
 export function getRankColor(rank: string): string {
   switch (rank) {
     case "Xuất sắc":
-      return "bg-emerald-100 text-emerald-700 border-emerald-300"
+      return "bg-emerald-100 text-emerald-700 border-emerald-300";
     case "Khá":
-      return "bg-blue-100 text-blue-700 border-blue-300"
+      return "bg-blue-100 text-blue-700 border-blue-300";
     case "Trung bình":
-      return "bg-amber-100 text-amber-700 border-amber-300"
+      return "bg-amber-100 text-amber-700 border-amber-300";
     case "Yếu":
-      return "bg-red-100 text-red-700 border-red-300"
+      return "bg-red-100 text-red-700 border-red-300";
     default:
-      return "bg-slate-100 text-slate-700 border-slate-300"
+      return "bg-slate-100 text-slate-700 border-slate-300";
   }
 }

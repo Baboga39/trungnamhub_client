@@ -26,14 +26,27 @@ export function AttendanceDatePicker({ selectedDate, onSelectDate }: AttendanceD
         >
           <CalendarIcon className="mr-3 h-4 w-4" />
           {selectedDate ? (
-            <span className="text-sm">{format(selectedDate, "EEEE, dd MMMM yyyy", { locale: vi })}</span>
+            <span className="text-sm">
+              {format(selectedDate, "EEEE, dd MMMM yyyy", { locale: vi })}
+            </span>
           ) : (
             <span className="text-sm">Chọn ngày điểm danh</span>
           )}
         </Button>
       </PopoverTrigger>
+
       <PopoverContent className="w-auto p-0 rounded-2xl shadow-xl" align="start">
-        <Calendar mode="single" selected={selectedDate} onSelect={(date) => date && onSelectDate(date)} initialFocus />
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={(date) => date && onSelectDate(date)}
+          initialFocus
+
+          // 🔥 quan trọng
+          captionLayout="dropdown"
+          fromYear={2020}
+          toYear={2035}
+        />
       </PopoverContent>
     </Popover>
   )

@@ -5,8 +5,9 @@ import StudentPage from "../pages/studentPage";
  import AttendancePage from "@/pages/AttendancePage";
  import AttendanceCalendarPage from "@/pages/AttendanceCalendarPage";
  import UserPage from "@/pages/UserPage";
-  import ReportPage from "@/pages/ReportPage";
+  import ActivityPage from "@/pages/ActivityPage";
   import ScorePage from "@/pages/Score";
+import AttendanceActivityPage from "@/pages/ActivityAttendancePage";
 export const publicRoutes = [
   { path: "/login", element: <LoginPage /> },
 ];
@@ -18,6 +19,7 @@ export const privateRoutes = [
   { path: "/attendance", element: <AttendancePage /> },
   { path: "/attendance-calendar", element: <AttendanceCalendarPage /> },
   { path: "/users", element: <UserPage /> },
-  {path:"/reports", element: <ReportPage/>},
-  {path:"/scores", element: <ScorePage/>}
+  {path:"/activity", element: <ActivityPage/>},
+  {path:"/scores", element: <ScorePage/>},
+  {path:"/attendance-activity", element: <AttendanceActivityPage/>}
 ];

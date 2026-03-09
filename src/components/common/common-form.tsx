@@ -109,23 +109,23 @@ export function CommonForm<T extends Record<string, any>>({
   const validationTimers = useRef<Record<string, NodeJS.Timeout>>({});
 
   // Initialize form data when dialog opens or initialData changes
-  useEffect(() => {
-    if (open) {
-      const initialFormData: Record<string, any> = {};
-      fields.forEach((field) => {
-        if (initialData && initialData[field.name] !== undefined) {
-          initialFormData[field.name] = initialData[field.name];
-        } else if (field.defaultValue !== undefined) {
-          initialFormData[field.name] = field.defaultValue;
-        } else {
-          initialFormData[field.name] = field.type === "switch" ? false : "";
-        }
-      });
-      setFormData(initialFormData);
-      setErrors({});
-      setSubmitStatus("idle");
+useEffect(() => {
+  const initialFormData: Record<string, any> = {};
+
+  fields.forEach((field) => {
+    if (initialData && initialData[field.name] !== undefined) {
+      initialFormData[field.name] = initialData[field.name];
+    } else if (field.defaultValue !== undefined) {
+      initialFormData[field.name] = field.defaultValue;
+    } else {
+      initialFormData[field.name] = field.type === "switch" ? false : "";
     }
-  }, [open, initialData, fields]);
+  });
+
+  setFormData(initialFormData);
+  setErrors({});
+  setSubmitStatus("idle");
+}, [initialData, fields]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -546,7 +546,7 @@ export function CommonForm<T extends Record<string, any>>({
                 captionLayout="dropdown"
                 fromYear={1950}
                 toYear={new Date().getFullYear()}
-                defaultMonth={value || new Date(2000, 0)}
+                defaultMonth={dateObj || new Date()}
                 initialFocus
                 locale={vi}
               />

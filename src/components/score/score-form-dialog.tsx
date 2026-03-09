@@ -34,7 +34,6 @@ export function ScoreFormDialog({
   categories,
   members,
 }: ScoreFormDialogProps) {
-  
   const [formData, setFormData] = useState<ScoreFormData>({
     name: "",
     knowledge: 0,
@@ -42,6 +41,8 @@ export function ScoreFormDialog({
     attendance: 0,
     bonus: 0,
     penalty: 0,
+    year: new Date().getFullYear(),
+    quarter: Math.floor(new Date().getMonth() / 3) + 1,
   });
 
   useEffect(() => {
@@ -53,6 +54,10 @@ export function ScoreFormDialog({
         attendance: editingScore.attendance,
         bonus: editingScore.bonus,
         penalty: editingScore.penalty,
+        year: editingScore.year,
+            activityScore: editingScore.activityScore ?? 0,
+
+        quarter: editingScore.quarter,
       });
     } else {
       setFormData({
@@ -61,7 +66,10 @@ export function ScoreFormDialog({
         skill: 0,
         attendance: 0,
         bonus: 0,
+        activityScore: 0,
         penalty: 0,
+        year: new Date().getFullYear(),
+        quarter: Math.floor(new Date().getMonth() / 3) + 1,
       });
     }
   }, [editingScore, open]);
@@ -94,7 +102,8 @@ export function ScoreFormDialog({
             {editingScore ? "Chỉnh sửa điểm" : "Thêm điểm mới"}
           </DialogTitle>
           <DialogDescription>
-            Nhập thông tin điểm thi đua của đoàn sinh. Tổng điểm sẽ được tính tự động.
+            Nhập thông tin điểm thi đua của đoàn sinh. Tổng điểm sẽ được tính tự
+            động.
           </DialogDescription>
         </DialogHeader>
 
@@ -106,7 +115,9 @@ export function ScoreFormDialog({
             <select
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
               disabled={!!editingScore}
               className={`h-11 w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 ${
@@ -123,10 +134,43 @@ export function ScoreFormDialog({
               ))}
             </select>
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold">Năm</Label>
+              <Input
+                type="number"
+                value={formData.year}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    year: Number(e.target.value),
+                  })
+                }
+                className="h-11"
+              />
+            </div>
 
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold">Quý</Label>
+              <select
+                value={formData.quarter}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    quarter: Number(e.target.value),
+                  })
+                }
+                className="h-11 w-full rounded-md border border-slate-300 px-3"
+              >
+                <option value={1}>Quý 1</option>
+                <option value={2}>Quý 2</option>
+                <option value={3}>Quý 3</option>
+                <option value={4}>Quý 4</option>
+              </select>
+            </div>
+          </div>
           {/* --- INPUTS --- */}
           <div className="grid grid-cols-2 gap-4">
-
             <div className="space-y-2">
               <Label htmlFor="knowledge" className="text-sm font-semibold">
                 Kiến thức (HS3)
@@ -141,7 +185,8 @@ export function ScoreFormDialog({
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    knowledge: e.target.value === "" ? "" : Number(e.target.value),
+                    knowledge:
+                      e.target.value === "" ? "" : Number(e.target.value),
                   })
                 }
                 className="h-11"
@@ -183,7 +228,8 @@ export function ScoreFormDialog({
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    attendance: e.target.value === "" ? "" : Number(e.target.value),
+                    attendance:
+                      e.target.value === "" ? "" : Number(e.target.value),
                   })
                 }
                 className="h-11"
@@ -223,14 +269,25 @@ export function ScoreFormDialog({
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    penalty: e.target.value === "" ? "" : Number(e.target.value),
+                    penalty:
+                      e.target.value === "" ? "" : Number(e.target.value),
                   })
                 }
                 className="h-11"
               />
             </div>
-
           </div>
+          <div className="space-y-2">
+  <Label className="text-sm font-semibold">
+    Điểm hoạt động
+  </Label>
+  <Input
+    type="number"
+    value={formData.activityScore}
+    disabled
+    className="h-11 bg-slate-100 text-slate-600 cursor-not-allowed"
+  />
+</div>
 
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-200">
             <div className="flex items-center justify-between mb-2">

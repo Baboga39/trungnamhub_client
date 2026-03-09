@@ -6,15 +6,17 @@ import attendanceReducer from "../features/attendance/attendanceSlice";
 import userReducer from "../features/user/userSlice";
 import scoreReducer from "../features/score/scoreSlice";
 import dashboardReducer from "../features/dashboard/dashboardSlice";
+import activitiesReducer from "../features/activity/activitySlice";
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
-     members: memberReducer,
-     attendance: attendanceReducer,
-     users: userReducer,
-     grades: scoreReducer,
-     dashboard: dashboardReducer,
+    members: memberReducer,
+    attendance: attendanceReducer,
+    users: userReducer,
+    grades: scoreReducer,
+    dashboard: dashboardReducer,
+    activities: activitiesReducer,
   },
 });
 

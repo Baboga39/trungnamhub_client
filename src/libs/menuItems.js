@@ -40,6 +40,14 @@ export const menuItems = [
     category: "Báo cáo",
     description: "Thống kê xếp hạng đoàn sinh",
   },
+
+    {
+    icon: ClipboardCheck,
+    label: "Điểm danh hoạt động",
+    href: "/attendance-activity",
+    category: "Điểm danh hoạt độngđặt",
+    description: "Điểm danh hoạt động",
+  },
   {
     icon: BarChart3,
     label: "Điểm số",
@@ -56,8 +64,8 @@ export const menuItems = [
   },
   {
     icon: BookOpen,
-    label: "Tài liệu",
-    href: "/reports",
+    label: "Hoạt động ",
+    href: "/activity",
     category: "Khác",
     description: "Tài liệu và hướng dẫn sử dụng",
   },
@@ -67,5 +75,5 @@ export const menuItems = [
     href: "/settings",
     category: "Cài đặt",
     description: "Tùy chỉnh hệ thống",
-  },
+  }
 ]

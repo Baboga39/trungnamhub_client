@@ -30,29 +30,44 @@ export default function ScoresTable() {
     dispatch(fetchMembersThunk());
   }, [dispatch]);
 
-  const normalizeKey = (str: string) => str.toLowerCase().replace(/\s+/g, "_");
+  const normalizeKey = (str: string) =>
+    str.toLowerCase().replace(/\s+/g, "_");
+
+  /*
+    API trả dạng:
+    {
+      memberId,
+      year,
+      quarter,
+      mMember,
+      scores: {},
+      activityScore,
+      activityCount
+    }
+  */
 
   const scores = useMemo(() => {
-    const grouped: any = {};
+    return grades.map((g: any) => {
+      const row: any = {
+        id: `${g.memberId}_${g.year}_${g.quarter}`,
+        memberId: g.memberId,
+        year: g.year,
+         name: g.mMember?.name || "",  
+        quarter: g.quarter,
+        mMember: g.mMember,
+        activityBonus: g.activityScore || 0,
+        activityCount: g.activityCount || 0,
+      };
 
-    for (const g of grades) {
-      const key = `${g.memberId}_${g.yearActive}`;
-
-      if (!grouped[key]) {
-        grouped[key] = {
-          id: key,
-          memberId: g.memberId,
-          yearActive: g.yearActive,
-          mMember: g.mMember,
-        };
+      if (g.scores) {
+        Object.entries(g.scores).forEach(([key, value]) => {
+          row[key] = value;
+        });
       }
 
-      const cat = categories.find((c) => c.id === g.categoryId);
-      if (cat) grouped[key][normalizeKey(cat.name)] = g.score;
-    }
-
-    return Object.values(grouped);
-  }, [grades, categories]);
+      return row;
+    });
+  }, [grades]);
 
   const calculateDynamicTotal = (score, categories) => {
     let totalWeighted = 0;
@@ -61,6 +76,7 @@ export default function ScoresTable() {
     categories.forEach((c) => {
       const key = normalizeKey(c.name);
       const value = Number(score[key]) || 0;
+
       totalWeighted += value * c.weight;
       sumWeight += c.weight;
     });
@@ -69,10 +85,44 @@ export default function ScoresTable() {
   };
 
   const processedScores = scores.map((s: any) => {
-    const totalScore = calculateDynamicTotal(s, categories);
+    const baseScore = calculateDynamicTotal(s, categories);
+    const totalScore = baseScore + (s.activityBonus || 0);
+
     const rank = getRank(totalScore);
-    return { ...s, totalScore, rank };
+
+    return {
+      ...s,
+      totalScore,
+      rank,
+      term: `${s.quarter}_${s.year}`,
+    };
   });
+
+  const filterOptions = [
+    {
+      key: "rank",
+      label: "Xếp loại",
+      options: Array.from(new Set(processedScores.map((s) => s.rank))).map(
+        (r) => ({
+          value: r,
+          label: r,
+        }),
+      ),
+    },
+    {
+      key: "term",
+      label: "Kỳ đánh giá",
+      options: Array.from(
+        new Set(processedScores.map((s) => `${s.quarter}_${s.year}`)),
+      ).map((t) => {
+        const [quarter, year] = t.split("_");
+        return {
+          value: t,
+          label: `Q${quarter} - ${year}`,
+        };
+      }),
+    },
+  ];
 
   const dynamicColumns: Column<any>[] = categories.map((c) => ({
     key: normalizeKey(c.name),
@@ -81,15 +131,21 @@ export default function ScoresTable() {
     render: (item) => {
       const value = item[normalizeKey(c.name)] || 0;
       const isNegative = c.weight < 0;
+
       return (
         <div className="flex items-center gap-2">
           <span
-            className={`font-medium ${isNegative ? "text-red-600" : "text-slate-800"}`}
+            className={`font-medium ${
+              isNegative ? "text-red-600" : "text-slate-800"
+            }`}
           >
             {value}
           </span>
+
           <span
-            className={`text-xs ${isNegative ? "text-red-500" : "text-slate-500"}`}
+            className={`text-xs ${
+              isNegative ? "text-red-500" : "text-slate-500"
+            }`}
           >
             (×{c.weight} = {(value * c.weight).toFixed(1)})
           </span>
@@ -100,37 +156,52 @@ export default function ScoresTable() {
 
   const columns: Column<any>[] = [
     {
-      key: "member",
+      key: "name",
       label: "Tên đoàn sinh",
       width: 220,
       render: (item) => (
         <span className="font-semibold text-slate-800">
-          {item.mMember?.name || `Đoàn sinh #${item.id}`}
+          {item.name}
         </span>
       ),
     },
 
     ...dynamicColumns,
+
+    {
+      key: "activityBonus",
+      label: "Điểm hoạt động",
+      width: 160,
+      render: (item) => (
+        <span className="font-semibold text-green-600">
+          +{item.activityBonus?.toFixed(1) || "0.0"}
+          {item.activityCount ? ` (${item.activityCount} buổi)` : ""}
+        </span>
+      ),
+    },
+
     {
       key: "totalScore",
       label: "Tổng điểm",
       width: 120,
       render: (item) => (
         <span className="text-lg font-bold text-blue-600">
-          {item.totalScore.toFixed(1)}
+          {item.totalScore?.toFixed(1) || "0.0"}
         </span>
       ),
     },
+
     {
-      key: "yearActive",
-      label: "Năm hoạt động",
-      width: 220,
+      key: "term",
+      label: "Kỳ đánh giá",
+      width: 160,
       render: (item) => (
-        <span className="font-semibold text-center text-slate-800">
-          {item.yearActive || `Năm hoạt động #${item.yearActive}`}
+        <span className="font-semibold text-slate-700">
+          {`Q${item.quarter} - ${item.year}`}
         </span>
       ),
     },
+
     {
       key: "rank",
       label: "Xếp loại",
@@ -150,35 +221,20 @@ export default function ScoresTable() {
       icon: <Pencil className="h-4 w-4" />,
       label: "Chỉnh sửa",
       onClick: (score) => {
-  const memberGrades = grades.filter(
-    (g) =>
-      g.memberId === score.memberId &&
-      g.yearActive === score.yearActive
-  );
+        setEditingScore({
+          id: score.id,
+          name: score.mMember?.name || "",
+          knowledge: score.kien_thuc || 0,
+          skill: score.ky_nang || 0,
+          attendance: score.chuyen_can || 0,
+          bonus: score.thuong || 0,
+          penalty: score.phat || 0,
+          year: score.year,
+          quarter: score.quarter,
+        });
 
-  const findScoreByCategoryName = (name: string) => {
-    const category = categories.find(
-      (c) => normalizeKey(c.name) === normalizeKey(name)
-    );
-    const g = category
-      ? memberGrades.find((mg) => mg.categoryId === category.id)
-      : null;
-    return g ? g.score : 0;
-  };
-
-  setEditingScore({
-    id: score.id,
-    name: score.mMember?.name || "",
-    knowledge: findScoreByCategoryName("Kiến thức"),
-    skill: findScoreByCategoryName("Kỹ năng"),
-    attendance: findScoreByCategoryName("Chuyên cần"),
-    bonus: findScoreByCategoryName("Thưởng"),
-    penalty: findScoreByCategoryName("Phạt"),
-  });
-
-  setIsDialogOpen(true);
-},
-
+        setIsDialogOpen(true);
+      },
     },
     {
       icon: <Trash2 className="h-4 w-4" />,
@@ -188,7 +244,9 @@ export default function ScoresTable() {
     },
   ];
 
-  if (loading) return <p className="p-6 text-slate-500">Đang tải dữ liệu...</p>;
+  if (loading) {
+    return <p className="p-6 text-slate-500">Đang tải dữ liệu...</p>;
+  }
 
   const handleSubmit = async (data: ScoreFormData) => {
     try {
@@ -196,10 +254,7 @@ export default function ScoresTable() {
         (m) => m.name.toLowerCase() === data.name.toLowerCase(),
       );
 
-      if (!member) {
-        console.error("Không tìm thấy member:", data.name);
-        return;
-      }
+      if (!member) return;
 
       const categoryMap = {
         knowledge: "Kiến thức",
@@ -214,10 +269,12 @@ export default function ScoresTable() {
           const cat = categories.find(
             (c) => c.name.toLowerCase() === categoryName.toLowerCase(),
           );
+
           if (!cat) return null;
+
           return {
             categoryId: cat.id,
-            score: Number(data[key as keyof ScoreFormData]) || 0,
+            score: Number(data[key]) || 0,
           };
         })
         .filter(Boolean);
@@ -225,11 +282,14 @@ export default function ScoresTable() {
       await dispatch(
         upsertScoreThunk({
           memberId: member.id,
+          year: data.year,
+          quarter: data.quarter,
           scores: scoresPayload,
         }),
       ).unwrap();
 
       await dispatch(getAllThunk());
+
       setIsDialogOpen(false);
       setEditingScore(null);
     } catch (err) {
@@ -240,26 +300,31 @@ export default function ScoresTable() {
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold text-slate-800">Điểm thi đua</h1>
+
       <DataTable
         title="Bảng điểm thi đua"
         description="Điểm được tính theo công thức: Σ(Điểm × Hệ số)"
         columns={columns}
         data={processedScores}
         actions={actions}
+          key={columns.map(c => c.key).join("-")}
+
+        filterOptions={filterOptions}
         keyExtractor={(item) => item.id}
         onAdd={() => setIsDialogOpen(true)}
         addButtonText="Thêm điểm"
         searchPlaceholder="Tìm kiếm theo tên..."
       />
+
       <ScoreFormDialog
         open={isDialogOpen}
         members={members}
+        categories={categories}
+        editingScore={editingScore}
         onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) setEditingScore(null);
         }}
-        editingScore={editingScore}
-        categories={categories}
         onSubmit={handleSubmit}
       />
     </div>

@@ -78,6 +78,8 @@ export default function AttendanceCalendarPage() {
     dispatch(getAllAttendanceThunk());
   }, [dispatch]);
 
+  
+
   const recordsByDate = useMemo(() => {
     const map: Record<
       string,

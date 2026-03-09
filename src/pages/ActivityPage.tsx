@@ -3,8 +3,9 @@ import  StudentsTable  from "../components/tables/students-table"
 import { MemberStatCards } from "@/features/members/MemberStatCards"
 import { ScrollToTopButton } from "@/components/common/ScrollToTopButton"
 import { ReportCard } from "@/components/reports/report-card"
+import ActivitiesTable from "@/components/tables/activitiesTable"
 
-export default function ReportPage() {
+export default function ActivityPage() {
   return (
     <AdminLayout>
       <div className="space-y-5 animate-fadeIn">
@@ -12,8 +13,7 @@ export default function ReportPage() {
         
         </div>
 
-        <MemberStatCards/>
-        <ReportCard />
+        <ActivitiesTable/>
       </div>
       <ScrollToTopButton/>
     </AdminLayout>
