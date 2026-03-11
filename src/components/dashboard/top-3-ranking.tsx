@@ -49,7 +49,6 @@ export function Top3Ranking() {
   const dispatch = useDispatch();
   const { top3Ranking, loading } = useSelector((state: any) => state.dashboard);
 
-  console.log("Top 3 Ranking Data:", top3Ranking);
 
   useEffect(() => {
     dispatch(fetchTop3Ranking() as any);

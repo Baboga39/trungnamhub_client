@@ -1,37 +1,45 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { AdminLayout } from "@/components/layouts/admin-layout"
-import { getMembersActive } from "@/features/members/memberThunks"
-import { fetchActivitiesThunk } from "@/features/activity/activityThunks"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { 
-  ArrowRight, 
-  Calendar, 
-  Users, 
-  CheckCircle2, 
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AdminLayout } from "@/components/layouts/admin-layout";
+import { getMembersActive } from "@/features/members/memberThunks";
+import { fetchActivitiesThunk } from "@/features/activity/activityThunks";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { markAttendanceActivityThunk } from "@/features/activityAttendance/activityAttendanceThunks";
+import {
+  ArrowRight,
+  Calendar,
+  Users,
+  CheckCircle2,
   XCircle,
   ChevronLeft,
-  Search
-} from "lucide-react"
+  Search,
+} from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function AttendanceActivityPage() {
-  const dispatch = useDispatch()
-  const { activities = [] } = useSelector((state: any) => state.activities)
-  const { membersActive = [] } = useSelector((state: any) => state.members)
-  const [selectedActivity, setSelectedActivity] = useState<any>(null)
-  const [attendance, setAttendance] = useState<any>({})
-  const [searchTerm, setSearchTerm] = useState("")
+  const dispatch = useDispatch();
+  const { activities = [] } = useSelector((state: any) => state.activities);
+  const { membersActive = [] } = useSelector((state: any) => state.members);
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [attendance, setAttendance] = useState<any>({});
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    dispatch(fetchActivitiesThunk())
-    dispatch(getMembersActive())
-  }, [])
+    dispatch(fetchActivitiesThunk());
+    dispatch(getMembersActive());
+  }, []);
 
   const handleToggle = (memberId: number, checked: boolean) => {
     setAttendance((prev: any) => ({
@@ -39,51 +47,52 @@ export default function AttendanceActivityPage() {
       [memberId]: {
         attended: checked,
       },
-    }))
-  }
+    }));
+  };
 
   const markAll = () => {
-    const obj: any = {}
+    const obj: any = {};
     membersActive.forEach((m: any) => {
-      obj[m.id] = { attended: true }
-    })
-    setAttendance(obj)
-  }
+      obj[m.id] = { attended: true };
+    });
+    setAttendance(obj);
+  };
 
   const clearAll = () => {
-    const obj: any = {}
+    const obj: any = {};
     membersActive.forEach((m: any) => {
-      obj[m.id] = { attended: false }
-    })
-    setAttendance(obj)
-  }
+      obj[m.id] = { attended: false };
+    });
+    setAttendance(obj);
+  };
 
   const handleSave = () => {
-    const payload = Object.keys(attendance).map((memberId) => ({
-      memberId: Number(memberId),
-      attended: attendance[memberId].attended,
-    }))
+    const memberIds = Object.keys(attendance)
+      .filter((memberId) => attendance[memberId]?.attended)
+      .map((memberId) => Number(memberId));
 
-    dispatch({
-      type: "attendance/saveAttendance",
-      payload: {
+    dispatch(
+      markAttendanceActivityThunk({
         activityId: selectedActivity.id,
-        records: payload,
-      },
-    })
-  }
+        memberIds: memberIds,
+      }),
+    );
+
+    setAttendance({});
+    toast.success("Điểm danh đã được lưu thành công!");
+  };
 
   const filteredMembers = membersActive.filter((m: any) =>
-    m.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+    m.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const attendanceCount = Object.values(attendance).filter(
-    (a: any) => a.attended
-  ).length
+    (a: any) => a.attended,
+  ).length;
   const attendancePercentage =
     membersActive.length > 0
       ? Math.round((attendanceCount / membersActive.length) * 100)
-      : 0
+      : 0;
 
   return (
     <AdminLayout>
@@ -91,7 +100,9 @@ export default function AttendanceActivityPage() {
         {/* Header */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">Điểm danh hoạt động</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Điểm danh hoạt động
+            </h1>
           </div>
           <p className="text-sm text-muted-foreground">
             Quản lý điểm danh đoàn sinh cho các hoạt động tổ chức
@@ -145,8 +156,8 @@ export default function AttendanceActivityPage() {
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => {
-                        setSelectedActivity(null)
-                        setSearchTerm("")
+                        setSelectedActivity(null);
+                        setSearchTerm("");
                       }}
                       className="p-2 hover:bg-white/50 rounded-lg transition-colors"
                     >
@@ -175,7 +186,9 @@ export default function AttendanceActivityPage() {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <Users className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-1">Tổng số</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Tổng số
+                    </p>
                     <p className="text-2xl font-bold">{membersActive.length}</p>
                   </div>
                 </CardContent>
@@ -195,7 +208,9 @@ export default function AttendanceActivityPage() {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <XCircle className="w-8 h-8 mx-auto mb-2 text-red-600" />
-                    <p className="text-sm text-muted-foreground mb-1">Vắng mặt</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Vắng mặt
+                    </p>
                     <p className="text-2xl font-bold text-red-600">
                       {membersActive.length - attendanceCount}
                     </p>
@@ -206,19 +221,11 @@ export default function AttendanceActivityPage() {
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                onClick={markAll}
-                variant="outline"
-                className="flex-1"
-              >
+              <Button onClick={markAll} variant="outline" className="flex-1">
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Đánh dấu tất cả
               </Button>
-              <Button
-                onClick={clearAll}
-                variant="outline"
-                className="flex-1"
-              >
+              <Button onClick={clearAll} variant="outline" className="flex-1">
                 <XCircle className="w-4 h-4 mr-2" />
                 Bỏ tất cả
               </Button>
@@ -246,7 +253,7 @@ export default function AttendanceActivityPage() {
                 <div className="space-y-2">
                   {filteredMembers.length > 0 ? (
                     filteredMembers.map((member: any) => {
-                      const checked = attendance[member.id]?.attended || false
+                      const checked = attendance[member.id]?.attended || false;
                       return (
                         <div
                           key={member.id}
@@ -260,7 +267,9 @@ export default function AttendanceActivityPage() {
                             className="w-5 h-5"
                           />
                           <div className="flex-1 min-w-0">
-                            <p className={`font-medium truncate ${checked ? "text-green-600" : ""}`}>
+                            <p
+                              className={`font-medium truncate ${checked ? "text-green-600" : ""}`}
+                            >
                               {member.name}
                             </p>
                           </div>
@@ -268,7 +277,7 @@ export default function AttendanceActivityPage() {
                             <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
                           )}
                         </div>
-                      )
+                      );
                     })
                   ) : (
                     <p className="text-center text-muted-foreground py-6">
@@ -280,11 +289,7 @@ export default function AttendanceActivityPage() {
             </Card>
 
             {/* Save Button */}
-            <Button
-              onClick={handleSave}
-              size="lg"
-              className="w-full h-12"
-            >
+            <Button onClick={handleSave} size="lg" className="w-full h-12">
               <CheckCircle2 className="w-5 h-5 mr-2" />
               Lưu điểm danh
             </Button>
@@ -292,5 +297,5 @@ export default function AttendanceActivityPage() {
         )}
       </div>
     </AdminLayout>
-  )
+  );
 }

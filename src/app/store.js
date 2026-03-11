@@ -7,6 +7,7 @@ import userReducer from "../features/user/userSlice";
 import scoreReducer from "../features/score/scoreSlice";
 import dashboardReducer from "../features/dashboard/dashboardSlice";
 import activitiesReducer from "../features/activity/activitySlice";
+import attendanceActivityReducer from "../features/activityAttendance/activityAttendacneSlice";
 
 const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
     grades: scoreReducer,
     dashboard: dashboardReducer,
     activities: activitiesReducer,
+    attendanceActivity: attendanceActivityReducer,
   },
 });
 
