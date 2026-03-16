@@ -14,18 +14,26 @@ export function AttendanceStats({
   members: any[]
   attendance: Record<string, { status: string | null }>
 }) {
-  const stats = useMemo(() => {
-    const values = Object.values(attendance).map((a) => a.status)
+const stats = useMemo(() => {
+  const values = Object.values(attendance).map((a) => a.status)
 
-    return {
-      total: members.length,
-      present: values.filter((v) => v === "present").length,
-      absent: values.filter((v) => v === "absent").length,
-      late: values.filter((v) => v === "late").length,
-      excused: values.filter((v) => v === "excused").length,
-      unexcused: values.filter((v) => v === "unexcused").length,
-    }
-  }, [attendance, members])
+  const absent = values.filter((v) => v === "absent").length
+  const late = values.filter((v) => v === "late").length
+  const excused = values.filter((v) => v === "excused").length
+  const unexcused = values.filter((v) => v === "unexcused").length
+
+  const marked = absent + late + excused + unexcused
+  const present = members.length - marked
+
+  return {
+    total: members.length,
+    present,
+    absent,
+    late,
+    excused,
+    unexcused,
+  }
+}, [attendance, members])
 
   return (
     <div className="grid gap-3 grid-cols-2 lg:grid-cols-6">

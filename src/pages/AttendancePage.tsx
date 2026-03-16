@@ -152,6 +152,8 @@ export default function AttendancePage() {
     ).length;
       const present = total - marked;
 
+      console.log(present)
+
 
     return { total, present, absent, late, excused, unexcused, marked };
   }, [attendance, attendanceAll, membersActive, showAllDays]);
@@ -287,6 +289,7 @@ const handleResetAll = () => {
           members={membersActive}
           attendance={attendance}
           selectedDate={selectedDate}
+          stats={stats}
         />
 
         <AttendanceProgress
