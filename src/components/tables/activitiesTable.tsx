@@ -7,13 +7,19 @@ import {
   type DataTableAction,
 } from "../common/data-table";
 import { CommonForm, type FormField } from "../common/common-form";
-import { Edit, Calendar, Users } from "lucide-react";
+import { Edit, Calendar, Users, Trash2, Eye } from "lucide-react";
 import { Badge } from "../ui/badge";
+import { AttendanceModal } from "../activity/AttendanceModal";
 
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../store";
 
-import { fetchActivitiesThunk, upsertActivityThunk } from "@/features/activity/activityThunks";
+import {
+  fetchActivitiesThunk,
+  upsertActivityThunk,
+  deleteActivityThunk,
+} from "@/features/activity/activityThunks";
+import { getAttendanceByActivityIdThunk } from "@/features/activityAttendance/activityAttendanceThunks";
 import { toast } from "react-toastify";
 
 interface Activity {
@@ -28,7 +34,27 @@ interface Activity {
   };
 }
 
-export default function ActivitiesTable() {
+interface AttendanceRecord {
+  id: number;
+  status: string | null;
+  note: string | null;
+  activityId: number;
+  memberId: number;
+  markedById: number;
+  createdAt: string;
+  updatedAt: string;
+  member: {
+    id: number;
+    name: string;
+    church: string;
+  };
+  markedBy: {
+    id: number;
+    name: string;
+  };
+}
+
+export default function ActivitiesTableWithAttendance() {
   const dispatch = useDispatch<AppDispatch>();
 
   const { activities, loading } = useSelector(
@@ -41,10 +67,17 @@ export default function ActivitiesTable() {
   );
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
 
+  // Attendance Modal States
+  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+  const [selectedActivityForAttendance, setSelectedActivityForAttendance] =
+    useState<Activity | null>(null);
+const { attendance, loading: attendanceLoading } = useSelector(
+  (state: RootState) => state.attendanceActivity
+);  
+
   useEffect(() => {
     dispatch(fetchActivitiesThunk());
   }, [dispatch]);
-
 
   // =========================
   // FORM FIELDS
@@ -146,22 +179,40 @@ export default function ActivitiesTable() {
   ];
 
   // =========================
+  // ATTENDANCE HANDLER
+  // =========================
+
+const handleViewAttendance = async (activity: Activity) => {
+  setSelectedActivityForAttendance(activity);
+
+  const result = await dispatch(
+    getAttendanceByActivityIdThunk(activity.id)
+  );
+
+  if (getAttendanceByActivityIdThunk.fulfilled.match(result)) {
+    setIsAttendanceModalOpen(true);
+  } else {
+    toast.error("Lỗi khi tải dữ liệu tham gia");
+  }
+};
+
+  // =========================
   // ACTIONS
   // =========================
 
-const handleEdit = (activity: Activity) => {
-  const [d, m, y] = activity.date.split("/");
+  const handleEdit = (activity: Activity) => {
+    const [d, m, y] = activity.date.split("/");
 
-  setSelectedActivity({
-    ...activity,
-    quarter: activity.quarter?.toString(),
-    year: activity.year?.toString(),
-    date: `${y}-${m}-${d}`,
-  });
+    setSelectedActivity({
+      ...activity,
+      quarter: activity.quarter?.toString(),
+      year: activity.year?.toString(),
+      date: `${y}-${m}-${d}`,
+    });
 
-  setFormMode("edit");
-  setIsFormOpen(true);
-};
+    setFormMode("edit");
+    setIsFormOpen(true);
+  };
 
   const handleAdd = () => {
     setSelectedActivity(null);
@@ -169,11 +220,35 @@ const handleEdit = (activity: Activity) => {
     setIsFormOpen(true);
   };
 
+  const handleDelete = async (activity: Activity) => {
+    if (!activity.id) return;
+
+    if (!confirm("Bạn có chắc muốn xóa hoạt động này?")) return;
+
+    const resultAction = await dispatch(deleteActivityThunk(activity.id));
+
+    if (deleteActivityThunk.fulfilled.match(resultAction)) {
+      toast.success("Xóa hoạt động thành công!");
+    } else {
+      toast.error("Xóa hoạt động thất bại");
+    }
+  };
+
   const actions: DataTableAction<Activity>[] = [
+    {
+      icon: <Eye className="h-4 w-4" />,
+      label: "Xem tham gia",
+      onClick: handleViewAttendance,
+    },
     {
       icon: <Edit className="h-4 w-4" />,
       label: "Chỉnh sửa",
       onClick: handleEdit,
+    },
+    {
+      icon: <Trash2 className="h-4 w-4" />,
+      label: "Xóa",
+      onClick: handleDelete,
     },
   ];
 
@@ -207,42 +282,44 @@ const handleEdit = (activity: Activity) => {
   // =========================
   // SUBMIT FORM
   // =========================
-function convertToISO(dateStr: string) {
-  const [d, m, y] = dateStr.split("/");
-  return `${y}-${m}-${d}`;
-}
-const handleFormSubmit = async (data: Activity) => {
-  try {
-    const { year, quarter, ...cleanData } = data;
 
-    let payload: Partial<Activity> = { ...cleanData };
-
-    if (payload.date) {
-      payload.date = convertToISO(payload.date);
-    }
-
-    if (formMode === "edit" && selectedActivity) {
-      payload.id = selectedActivity.id;
-    }
-
-    const resultAction = await dispatch(
-      upsertActivityThunk(payload as Activity)
-    );
-
-    if (upsertActivityThunk.fulfilled.match(resultAction)) {
-      toast.success("Lưu hoạt động thành công!");
-
-      dispatch(fetchActivitiesThunk());
-
-      // ⭐ FIX
-      setIsFormOpen(false);
-      setSelectedActivity(null);
-    }
-  } catch (error) {
-    console.error(error);
-    throw error;
+  function convertToISO(dateStr: string) {
+    const [d, m, y] = dateStr.split("/");
+    return `${y}-${m}-${d}`;
   }
-};
+
+  const handleFormSubmit = async (data: Activity) => {
+    try {
+      const { year, quarter, ...cleanData } = data;
+
+      let payload: Partial<Activity> = { ...cleanData };
+
+      if (payload.date) {
+        payload.date = convertToISO(payload.date);
+      }
+
+      if (formMode === "edit" && selectedActivity) {
+        payload.id = selectedActivity.id;
+      }
+
+      const resultAction = await dispatch(
+        upsertActivityThunk(payload as Activity)
+      );
+
+      if (upsertActivityThunk.fulfilled.match(resultAction)) {
+        toast.success("Lưu hoạt động thành công!");
+
+        dispatch(fetchActivitiesThunk());
+
+        setIsFormOpen(false);
+        setSelectedActivity(null);
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
   if (loading && !isFormOpen)
     return (
       <div className="flex flex-col items-center justify-center h-64 bg-white rounded-3xl shadow-lg border">
@@ -278,6 +355,14 @@ const handleFormSubmit = async (data: Activity) => {
         mode={formMode}
         submitButtonText={formMode === "edit" ? "Cập nhật" : "Thêm mới"}
       />
+
+    <AttendanceModal
+  open={isAttendanceModalOpen}
+  onOpenChange={setIsAttendanceModalOpen}
+  activity={selectedActivityForAttendance}
+  attendanceData={attendance}
+  loading={attendanceLoading}
+/>
     </>
   );
 }

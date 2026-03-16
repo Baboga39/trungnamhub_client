@@ -26,3 +26,15 @@ export const upsertActivityThunk = createAsyncThunk(
     }
   }
 );
+
+// xóa activity
+export const deleteActivityThunk = createAsyncThunk(
+  "activities/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      await activityApi.delete(id);
+      return id; // trả về id đã xóa để reducer có thể cập nhật state
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Delete activity failed");
+    }   
+  })

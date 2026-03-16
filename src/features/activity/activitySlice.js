@@ -1,6 +1,6 @@
 // src/features/activity/activitySlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchActivitiesThunk, upsertActivityThunk } from "./activityThunks";
+import { deleteActivityThunk, fetchActivitiesThunk, upsertActivityThunk } from "./activityThunks";
 
 const initialState = {
   activities: [],
@@ -45,6 +45,23 @@ const activitySlice = createSlice({
       .addCase(upsertActivityThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Upsert activity failed";
+      })
+
+
+      .addCase(deleteActivityThunk.pending, (state) => {
+        state.loading = true;
+      })
+
+      .addCase(deleteActivityThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.activities = state.activities.filter(
+          (activity) => activity.id !== action.payload
+        );
+      })
+
+      .addCase(deleteActivityThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Delete activity failed";
       });
   },
 });

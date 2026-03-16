@@ -1,7 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { markAttendanceActivityThunk } from "./activityAttendanceThunks";
+import { 
+  markAttendanceActivityThunk,
+  getAttendanceByActivityIdThunk
+} from "./activityAttendanceThunks";
 
 const initialState = {
+  attendance: [],
   loading: false,
   error: null,
   success: false,
@@ -11,7 +15,7 @@ const attendanceActivitySlice = createSlice({
   name: "attendanceActivity",
   initialState,
   reducers: {
-    resetAttendanceState: (state) => {
+    resetAttendanceActivityState: (state) => {
       state.success = false;
       state.error = null;
     },
@@ -19,7 +23,30 @@ const attendanceActivitySlice = createSlice({
   extraReducers: (builder) => {
     builder
 
+      // =============================
+      // GET ATTENDANCE BY ACTIVITY
+      // =============================
+
+      .addCase(getAttendanceByActivityIdThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getAttendanceByActivityIdThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.attendance = action.payload || [];
+      })
+
+      .addCase(getAttendanceByActivityIdThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Get attendance activity failed";
+      })
+
+
+      // =============================
       // MARK ATTENDANCE
+      // =============================
+
       .addCase(markAttendanceActivityThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
