@@ -158,18 +158,33 @@ export default function AttendancePage() {
   const progressPercentage =
     stats.total > 0 ? (stats.marked / stats.total) * 100 : 0;
 
-  const handleStatusChange = (memberId: string, status: AttendanceStatus) => {
-    setAttendanceAll((prev) => ({
+const handleStatusChange = (memberId: string, status: AttendanceStatus) => {
+  setAttendanceAll((prev) => {
+    const prevStatus = prev[dateKey]?.[memberId]?.status;
+
+    // nếu click lại cùng status -> remove record
+    if (prevStatus === status) {
+      const newDay = { ...(prev[dateKey] || {}) };
+      delete newDay[memberId];
+
+      return {
+        ...prev,
+        [dateKey]: newDay,
+      };
+    }
+
+    return {
       ...prev,
       [dateKey]: {
         ...(prev[dateKey] || {}),
         [memberId]: {
-          status: prev[dateKey]?.[memberId]?.status === status ? null : status,
+          status,
           note: prev[dateKey]?.[memberId]?.note || "",
         },
       },
-    }));
-  };
+    };
+  });
+};
 
   const handleNoteChange = (memberId: string, note: string) => {
     setAttendanceAll((prev) => ({
@@ -184,13 +199,16 @@ export default function AttendancePage() {
     }));
   };
 
-  const handleResetAll = () => {
-    setAttendanceAll((prev) => ({
-      ...prev,
-      [dateKey]: {},
-    }));
-    toast.success("Đã reset dữ liệu cho ngày hiện tại");
-  };
+const handleResetAll = () => {
+  setAttendanceAll((prev) => {
+    const newAttendance = { ...prev };
+    delete newAttendance[dateKey]; // xóa luôn ngày đó
+
+    return newAttendance;
+  });
+
+  toast.success("Đã reset toàn bộ điểm danh của ngày này");
+};
 
   const toggleNotes = (memberId: string) => {
     setExpandedNotes((prev) => ({
@@ -242,8 +260,8 @@ export default function AttendancePage() {
       <div className="space-y-4 animate-fadeIn pb-24 md:pb-6">
         <AttendanceHeader
           compactMode={compactMode}
-          onToggleCompactMode={() => setCompactMode(!compactMode)}
-          onResetAll={handleResetAll}
+          onToggleCompact={() => setCompactMode(!compactMode)}
+          onReset={handleResetAll}
         />
 
         <AttendanceDatePicker
