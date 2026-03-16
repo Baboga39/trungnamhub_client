@@ -123,9 +123,7 @@ export default function AttendancePage() {
     if (searchQuery) {
       list = list.filter(
         (m: Member) =>
-          m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          m.email.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
+          m.name.toLowerCase().includes(searchQuery.toLowerCase())       );
     }
     if (filter === "marked") {
       list = list.filter((m: Member) => attendance[m.id]);
