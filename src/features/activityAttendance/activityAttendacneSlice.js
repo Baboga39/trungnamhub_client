@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { 
+import {
   markAttendanceActivityThunk,
-  getAttendanceByActivityIdThunk
+  getAttendanceByActivityIdThunk,
+  deleteAttendanceActivityThunk,
 } from "./activityAttendanceThunks";
 
 const initialState = {
@@ -24,7 +25,7 @@ const attendanceActivitySlice = createSlice({
     builder
 
       // =============================
-      // GET ATTENDANCE BY ACTIVITY
+      // GET ATTENDANCE
       // =============================
 
       .addCase(getAttendanceByActivityIdThunk.pending, (state) => {
@@ -41,7 +42,6 @@ const attendanceActivitySlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Get attendance activity failed";
       })
-
 
       // =============================
       // MARK ATTENDANCE
@@ -61,6 +61,30 @@ const attendanceActivitySlice = createSlice({
       .addCase(markAttendanceActivityThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Mark attendance failed";
+      })
+
+      // =============================
+      // DELETE ATTENDANCE
+      // =============================
+
+      .addCase(deleteAttendanceActivityThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(deleteAttendanceActivityThunk.fulfilled, (state, action) => {
+        state.loading = false;
+
+        const deletedIds = action.payload.ids;
+
+        state.attendance = state.attendance.filter(
+          (item) => !deletedIds.includes(item.id)
+        );
+      })
+
+      .addCase(deleteAttendanceActivityThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Delete attendance failed";
       });
   },
 });

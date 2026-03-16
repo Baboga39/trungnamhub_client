@@ -28,3 +28,17 @@ export const getAttendanceByActivityIdThunk = createAsyncThunk(
     }
   }
 );
+
+export const deleteAttendanceActivityThunk = createAsyncThunk(
+  "attendanceActivity/deleteAttendance",
+  async (ids, { rejectWithValue }) => {
+    try {
+      const res = await activityAttendanceApi.delete(ids);
+      return { ids, ...res.data };
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data || "Delete attendance activity failed"
+      );
+    }
+  }
+);

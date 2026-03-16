@@ -9,6 +9,7 @@ import {
 import { CommonForm, type FormField } from "../common/common-form";
 import { Edit, Calendar, Users, Trash2, Eye } from "lucide-react";
 import { Badge } from "../ui/badge";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { AttendanceModal } from "../activity/AttendanceModal";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -58,22 +59,27 @@ export default function ActivitiesTableWithAttendance() {
   const dispatch = useDispatch<AppDispatch>();
 
   const { activities, loading } = useSelector(
-    (state: RootState) => state.activities
+    (state: RootState) => state.activities,
   );
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
-    null
+    null,
   );
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [activityToDelete, setActivityToDelete] = useState<Activity | null>(
+    null,
+  );
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Attendance Modal States
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [selectedActivityForAttendance, setSelectedActivityForAttendance] =
     useState<Activity | null>(null);
-const { attendance, loading: attendanceLoading } = useSelector(
-  (state: RootState) => state.attendanceActivity
-);  
+  const { attendance, loading: attendanceLoading } = useSelector(
+    (state: RootState) => state.attendanceActivity,
+  );
 
   useEffect(() => {
     dispatch(fetchActivitiesThunk());
@@ -182,19 +188,17 @@ const { attendance, loading: attendanceLoading } = useSelector(
   // ATTENDANCE HANDLER
   // =========================
 
-const handleViewAttendance = async (activity: Activity) => {
-  setSelectedActivityForAttendance(activity);
+  const handleViewAttendance = async (activity: Activity) => {
+    setSelectedActivityForAttendance(activity);
 
-  const result = await dispatch(
-    getAttendanceByActivityIdThunk(activity.id)
-  );
+    const result = await dispatch(getAttendanceByActivityIdThunk(activity.id));
 
-  if (getAttendanceByActivityIdThunk.fulfilled.match(result)) {
-    setIsAttendanceModalOpen(true);
-  } else {
-    toast.error("Lỗi khi tải dữ liệu tham gia");
-  }
-};
+    if (getAttendanceByActivityIdThunk.fulfilled.match(result)) {
+      setIsAttendanceModalOpen(true);
+    } else {
+      toast.error("Lỗi khi tải dữ liệu tham gia");
+    }
+  };
 
   // =========================
   // ACTIONS
@@ -220,18 +224,28 @@ const handleViewAttendance = async (activity: Activity) => {
     setIsFormOpen(true);
   };
 
-  const handleDelete = async (activity: Activity) => {
-    if (!activity.id) return;
+  const handleDelete = (activity: Activity) => {
+    setActivityToDelete(activity);
+    setDeleteDialogOpen(true);
+  };
+  const handleConfirmDelete = async () => {
+    if (!activityToDelete?.id) return;
 
-    if (!confirm("Bạn có chắc muốn xóa hoạt động này?")) return;
+    setDeleteLoading(true);
 
-    const resultAction = await dispatch(deleteActivityThunk(activity.id));
+    const resultAction = await dispatch(
+      deleteActivityThunk(activityToDelete.id),
+    );
+
+    setDeleteLoading(false);
 
     if (deleteActivityThunk.fulfilled.match(resultAction)) {
       toast.success("Xóa hoạt động thành công!");
     } else {
       toast.error("Xóa hoạt động thất bại");
     }
+
+    setActivityToDelete(null);
   };
 
   const actions: DataTableAction<Activity>[] = [
@@ -270,9 +284,7 @@ const handleViewAttendance = async (activity: Activity) => {
     {
       key: "year",
       label: "Năm",
-      options: Array.from(
-        new Set(activities?.map((a) => a.year))
-      ).map((y) => ({
+      options: Array.from(new Set(activities?.map((a) => a.year))).map((y) => ({
         value: y.toString(),
         label: y.toString(),
       })),
@@ -303,7 +315,7 @@ const handleViewAttendance = async (activity: Activity) => {
       }
 
       const resultAction = await dispatch(
-        upsertActivityThunk(payload as Activity)
+        upsertActivityThunk(payload as Activity),
       );
 
       if (upsertActivityThunk.fulfilled.match(resultAction)) {
@@ -356,13 +368,27 @@ const handleViewAttendance = async (activity: Activity) => {
         submitButtonText={formMode === "edit" ? "Cập nhật" : "Thêm mới"}
       />
 
-    <AttendanceModal
-  open={isAttendanceModalOpen}
-  onOpenChange={setIsAttendanceModalOpen}
-  activity={selectedActivityForAttendance}
-  attendanceData={attendance}
-  loading={attendanceLoading}
-/>
+      <AttendanceModal
+        open={isAttendanceModalOpen}
+        onOpenChange={setIsAttendanceModalOpen}
+        activity={selectedActivityForAttendance}
+        attendanceData={attendance}
+        loading={attendanceLoading}
+      />
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Xóa hoạt động"
+        description="Hành động này không thể hoàn tác."
+        message={`Hoạt động "${activityToDelete?.name}" sẽ bị xóa vĩnh viễn.`}
+        icon="trash"
+        iconColor="red"
+        confirmText="Xóa"
+        cancelText="Hủy"
+        isDangerous
+        isLoading={deleteLoading}
+        onConfirm={handleConfirmDelete}
+      />
     </>
   );
 }
