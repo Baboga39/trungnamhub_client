@@ -200,14 +200,11 @@ const handleStatusChange = (memberId: string, status: AttendanceStatus) => {
   };
 
 const handleResetAll = () => {
-  setAttendanceAll((prev) => {
-    const newAttendance = { ...prev };
-    delete newAttendance[dateKey]; // xóa luôn ngày đó
+  setAttendanceAll({}); // xóa toàn bộ dữ liệu điểm danh
 
-    return newAttendance;
-  });
+  localStorage.removeItem(STORAGE_KEY_ATTENDANCE);
 
-  toast.success("Đã reset toàn bộ điểm danh của ngày này");
+  toast.success("Đã reset toàn bộ điểm danh tất cả ngày");
 };
 
   const toggleNotes = (memberId: string) => {
