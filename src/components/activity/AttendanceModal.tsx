@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useDispatch } from "react-redux";
 import { deleteAttendanceActivityThunk } from "@/features/activityAttendance/activityAttendanceThunks";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
 interface Member {
   id: number;
   name: string;
@@ -80,6 +81,7 @@ export function AttendanceModal({
   const [filteredData, setFilteredData] = useState<AttendanceRecord[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const dispatch = useDispatch();
 
 
@@ -113,18 +115,18 @@ export function AttendanceModal({
   };
 
 
-const handleDelete = async () => {
+const handleDelete = () => {
   if (!selectedIds.length) return;
-
-  const confirm = window.confirm(
-    `Bạn có chắc muốn xóa ${selectedIds.length} người?`
-  );
-
-  if (!confirm) return;
-
-  await dispatch(deleteAttendanceActivityThunk(selectedIds));
-
-  setSelectedIds([]);
+  setConfirmOpen(true);
+};
+const handleConfirmDelete = async () => {
+  try {
+    setDeleting(true);
+    await dispatch(deleteAttendanceActivityThunk(selectedIds));
+    setSelectedIds([]);
+  } finally {
+    setDeleting(false);
+  }
 };
 
   const getChurchColor = (church: string) => {
@@ -318,6 +320,19 @@ const handleDelete = async () => {
 
 
       </DialogContent>
+      <ConfirmDialog
+  open={confirmOpen}
+  onOpenChange={setConfirmOpen}
+  title="Xóa danh sách tham gia"
+  description={`Bạn có chắc muốn xóa ${selectedIds.length} người khỏi danh sách điểm danh?`}
+  icon="trash"
+  iconColor="red"
+  confirmText="Xóa"
+  cancelText="Hủy"
+  isDangerous
+  isLoading={deleting}
+  onConfirm={handleConfirmDelete}
+/>
     </Dialog>
   );
 }
