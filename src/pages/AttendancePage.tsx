@@ -143,7 +143,6 @@ export default function AttendancePage() {
       ? Object.values(attendanceAll).flatMap((day) => Object.values(day))
       : Object.values(attendance);
 
-    const present = allStatuses.filter((s) => s === "present").length;
     const absent = allStatuses.filter((s) => s === "absent").length;
     const late = allStatuses.filter((s) => s === "late").length;
     const excused = allStatuses.filter((s) => s === "excused").length;
@@ -151,6 +150,8 @@ export default function AttendancePage() {
     const marked = allStatuses.filter(
       (s) => s !== null && s !== undefined,
     ).length;
+      const present = total - marked;
+
 
     return { total, present, absent, late, excused, unexcused, marked };
   }, [attendance, attendanceAll, membersActive, showAllDays]);
@@ -200,13 +201,14 @@ const handleStatusChange = (memberId: string, status: AttendanceStatus) => {
   };
 
 const handleResetAll = () => {
-  setAttendanceAll({}); // xóa toàn bộ dữ liệu điểm danh
+  setAttendanceAll({});
+  setNotesAll({});
 
   localStorage.removeItem(STORAGE_KEY_ATTENDANCE);
+  localStorage.removeItem(STORAGE_KEY_NOTES);
 
   toast.success("Đã reset toàn bộ điểm danh tất cả ngày");
 };
-
   const toggleNotes = (memberId: string) => {
     setExpandedNotes((prev) => ({
       ...prev,
