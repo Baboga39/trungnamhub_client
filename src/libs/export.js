@@ -12,6 +12,20 @@ export const exportExcel = (columns, data, title, description = "") => {
     const row = {};
     columns.forEach((col) => {
       let cellValue = item[col.key];
+
+      if (col.key === "createdBy") {
+        cellValue = item.createdBy?.name || "-";
+      }
+
+      if (col.key === "term") {
+        cellValue = `Q${item.quarter} - ${item.year}`;
+      }
+
+      if (col.key === "date") {
+        cellValue = item.date;
+      }
+
+      
       if (col.render) {
         try {
           const rendered = col.render(item);
@@ -93,7 +107,7 @@ export const exportPDF = (columns, data, title, description = "") => {
 
   const headers = columns.map((col) => col.label);
   const dataRows = data.map((item) =>
-    columns.map((col) => String(item[col.key] ?? ""))
+    columns.map((col) => String(item[col.key] ?? "")),
   );
 
   autoTable(doc, {
@@ -117,7 +131,11 @@ export const exportPDF = (columns, data, title, description = "") => {
   // Footer
   const today = new Date().toLocaleDateString("vi-VN");
   doc.setFontSize(9);
-  doc.text(`Xuất bởi hệ thống Trung Nam - Ngày ${today}`, 40, doc.internal.pageSize.height - 30);
+  doc.text(
+    `Xuất bởi hệ thống Trung Nam - Ngày ${today}`,
+    40,
+    doc.internal.pageSize.height - 30,
+  );
 
   doc.save(`${title.replace(/\s+/g, "_")}.pdf`);
 };

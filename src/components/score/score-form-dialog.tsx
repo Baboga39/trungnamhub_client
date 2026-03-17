@@ -223,6 +223,7 @@ export function ScoreFormDialog({
                 type="number"
                 min="0"
                 max="10"
+                disabled
                 step="0.5"
                 value={formData.attendance === "" ? "" : formData.attendance}
                 onChange={(e) =>
@@ -232,7 +233,7 @@ export function ScoreFormDialog({
                       e.target.value === "" ? "" : Number(e.target.value),
                   })
                 }
-                className="h-11"
+                className="h-11 bg-gray-100 cursor-not-allowed"
               />
             </div>
 

@@ -84,7 +84,6 @@ export function AttendanceModal({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const dispatch = useDispatch();
 
-
   useEffect(() => {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -92,8 +91,8 @@ export function AttendanceModal({
         attendanceData.filter(
           (record) =>
             record.member.name.toLowerCase().includes(query) ||
-            record.member.church.toLowerCase().includes(query)
-        )
+            record.member.church.toLowerCase().includes(query),
+        ),
       );
     } else {
       setFilteredData(attendanceData);
@@ -102,7 +101,7 @@ export function AttendanceModal({
 
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
@@ -114,20 +113,19 @@ export function AttendanceModal({
     }
   };
 
-
-const handleDelete = () => {
-  if (!selectedIds.length) return;
-  setConfirmOpen(true);
-};
-const handleConfirmDelete = async () => {
-  try {
-    setDeleting(true);
-    await dispatch(deleteAttendanceActivityThunk(selectedIds));
-    setSelectedIds([]);
-  } finally {
-    setDeleting(false);
-  }
-};
+  const handleDelete = () => {
+    if (!selectedIds.length) return;
+    setConfirmOpen(true);
+  };
+  const handleConfirmDelete = async () => {
+    try {
+      setDeleting(true);
+      await dispatch(deleteAttendanceActivityThunk(selectedIds));
+      setSelectedIds([]);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const getChurchColor = (church: string) => {
     if (church === "-") return "bg-slate-100 text-slate-700";
@@ -158,7 +156,9 @@ const handleConfirmDelete = async () => {
                 <Calendar className="w-4 h-4" />
                 Ngày hoạt động
               </div>
-              <div className="font-semibold text-slate-900">{activity.date}</div>
+              <div className="font-semibold text-slate-900">
+                {activity.date}
+              </div>
             </div>
 
             <div>
@@ -254,7 +254,7 @@ const handleConfirmDelete = async () => {
                       "flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer group",
                       selected
                         ? "border-red-400 bg-red-50"
-                        : "border-slate-200 hover:border-blue-400 hover:bg-blue-50/30"
+                        : "border-slate-200 hover:border-blue-400 hover:bg-blue-50/30",
                     )}
                   >
                     <div className="flex items-center gap-4 flex-1">
@@ -279,7 +279,7 @@ const handleConfirmDelete = async () => {
                           <Badge
                             variant="secondary"
                             className={`text-xs font-medium ${getChurchColor(
-                              record.member.church
+                              record.member.church,
                             )}`}
                           >
                             {record.member.church}
@@ -317,23 +317,20 @@ const handleConfirmDelete = async () => {
             </div>
           )}
         </div>
-
-
       </DialogContent>
       <ConfirmDialog
-  open={confirmOpen}
-  onOpenChange={setConfirmOpen}
-  title="Xóa danh sách tham gia"
-  description={`Bạn có chắc muốn xóa ${selectedIds.length} người khỏi danh sách điểm danh?`}
-  icon="trash"
-  iconColor="red"
-  confirmText="Xóa"
-  cancelText="Hủy"
-  isDangerous
-  isLoading={deleting}
-  onConfirm={handleConfirmDelete}
-/>
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Xóa danh sách tham gia"
+        description={`Bạn có chắc muốn xóa ${selectedIds.length} người khỏi danh sách điểm danh?`}
+        icon="trash"
+        iconColor="red"
+        confirmText="Xóa"
+        cancelText="Hủy"
+        isDangerous
+        isLoading={deleting}
+        onConfirm={handleConfirmDelete}
+      />
     </Dialog>
   );
 }
-

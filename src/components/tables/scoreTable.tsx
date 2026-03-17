@@ -30,8 +30,7 @@ export default function ScoresTable() {
     dispatch(fetchMembersThunk());
   }, [dispatch]);
 
-  const normalizeKey = (str: string) =>
-    str.toLowerCase().replace(/\s+/g, "_");
+  const normalizeKey = (str: string) => str.toLowerCase().replace(/\s+/g, "_");
 
   /*
     API trả dạng:
@@ -52,7 +51,7 @@ export default function ScoresTable() {
         id: `${g.memberId}_${g.year}_${g.quarter}`,
         memberId: g.memberId,
         year: g.year,
-         name: g.mMember?.name || "",  
+        name: g.mMember?.name || "",
         quarter: g.quarter,
         mMember: g.mMember,
         activityBonus: g.activityScore || 0,
@@ -160,9 +159,7 @@ export default function ScoresTable() {
       label: "Tên đoàn sinh",
       width: 220,
       render: (item) => (
-        <span className="font-semibold text-slate-800">
-          {item.name}
-        </span>
+        <span className="font-semibold text-slate-800">{item.name}</span>
       ),
     },
 
@@ -224,11 +221,11 @@ export default function ScoresTable() {
         setEditingScore({
           id: score.id,
           name: score.mMember?.name || "",
-          knowledge: score.kien_thuc || 0,
-          skill: score.ky_nang || 0,
-          attendance: score.chuyen_can || 0,
-          bonus: score.thuong || 0,
-          penalty: score.phat || 0,
+          knowledge: score[normalizeKey("Kiến thức")] || 0,
+          skill: score[normalizeKey("Kỹ năng")] || 0,
+          attendance: score[normalizeKey("Chuyên cần")] || 0,
+          bonus: score[normalizeKey("Thưởng")] || 0,
+          penalty: score[normalizeKey("Phạt")] || 0,
           year: score.year,
           quarter: score.quarter,
         });
@@ -307,8 +304,7 @@ export default function ScoresTable() {
         columns={columns}
         data={processedScores}
         actions={actions}
-          key={columns.map(c => c.key).join("-")}
-
+        key={columns.map((c) => c.key).join("-")}
         filterOptions={filterOptions}
         keyExtractor={(item) => item.id}
         onAdd={() => setIsDialogOpen(true)}

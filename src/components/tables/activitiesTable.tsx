@@ -167,9 +167,7 @@ export default function ActivitiesTableWithAttendance() {
       label: "Kỳ",
       width: 140,
       render: (item) => (
-        <Badge variant="secondary">
-          Q{item.quarter} - {item.year}
-        </Badge>
+        <Badge variant="secondary">{`Q${item.quarter} - ${item.year}`}</Badge>
       ),
     },
     {
@@ -344,7 +342,7 @@ export default function ActivitiesTableWithAttendance() {
     <>
       <DataTable
         title="Danh sách hoạt động"
-        description="Quản lý các hoạt động sinh hoạt thiếu nhi"
+        description="Quản lý các hoạt động sinh hoạt"
         columns={columns}
         data={activities ?? []}
         actions={actions}

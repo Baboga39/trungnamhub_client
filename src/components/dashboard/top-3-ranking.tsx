@@ -34,9 +34,9 @@ const medalIcons = [
 ];
 
 const rankPositions = [
-  "h-32 md:h-40 order-2 md:order-1",
-  "h-40 md:h-52 order-1 md:order-2",
-  "h-32 md:h-40 order-3 md:order-3",
+  "h-24 sm:h-28 md:h-40 order-2 md:order-1",
+  "h-28 sm:h-32 md:h-52 order-1 md:order-2",
+  "h-24 sm:h-28 md:h-40 order-3 md:order-3",
 ];
 
 const gradients = [
@@ -56,39 +56,39 @@ export function Top3Ranking() {
 
   if (loading) {
     return (
-      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-8 shadow-lg overflow-hidden">
-        <div className="flex items-center justify-between mb-8">
+      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 sm:p-6 md:p-8 shadow-lg overflow-hidden">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 md:mb-8">
           <div>
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Top 3 Xuất Sắc
             </h3>
-            <p className="text-sm text-slate-600 mt-1">
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
               Các đoàn sinh có điểm cao nhất
             </p>
           </div>
-          <Star className="w-6 h-6 text-amber-400" />
+          <Star className="w-5 sm:w-6 h-5 sm:h-6 text-amber-400" />
         </div>
-        <div className="h-80 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl animate-pulse" />
+        <div className="h-56 sm:h-64 md:h-80 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl animate-pulse" />
       </div>
     );
   }
 
   if (!top3Ranking || top3Ranking.length < 3) {
     return (
-      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-8 shadow-lg overflow-hidden">
-        <div className="flex items-center justify-between mb-8">
+      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 sm:p-6 md:p-8 shadow-lg overflow-hidden">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 md:mb-8">
           <div>
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Top 3 Xuất Sắc
             </h3>
-            <p className="text-sm text-slate-600 mt-1">
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
               Các đoàn sinh có điểm cao nhất
             </p>
           </div>
-          <Star className="w-6 h-6 text-amber-400" />
+          <Star className="w-5 sm:w-6 h-5 sm:h-6 text-amber-400" />
         </div>
 
-        <div className="flex flex-col items-center justify-center h-80 gap-4">
+        <div className="flex flex-col items-center justify-center h-56 sm:h-64 md:h-80 gap-3 sm:gap-4">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-200 to-purple-200 rounded-full blur-xl opacity-50" />
             <div className="relative bg-white rounded-full p-6 shadow-xl">
@@ -123,7 +123,7 @@ export function Top3Ranking() {
   ];
 
   return (
-    <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-8 shadow-lg overflow-hidden relative">
+    <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 sm:p-6 md:p-8 shadow-lg overflow-hidden relative">
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -137,7 +137,7 @@ export function Top3Ranking() {
           <Star className="w-6 h-6 text-amber-400" />
         </div>
 
-        <div className="flex items-flex-end justify-center gap-3 md:gap-6 h-80 px-2">
+        <div className="flex items-flex-end justify-center gap-2 sm:gap-3 md:gap-6 h-56 sm:h-64 md:h-80 px-2 sm:px-3">
           {performers.map((item, index) => {
             const IconComponent = medalIcons[index].icon;
             const isTop = index === 1;
@@ -148,36 +148,36 @@ export function Top3Ranking() {
                 className={`flex flex-col items-center flex-1 ${rankPositions[index]} transition-transform hover:scale-105`}
               >
                 <div
-                  className={`${medalIcons[index].bgColor} rounded-full p-6 mb-4 shadow-xl ${isTop ? "ring-4 ring-amber-200" : ""}`}
+                  className={`${medalIcons[index].bgColor} rounded-full p-3 sm:p-4 md:p-6 mb-2 sm:mb-3 md:mb-4 shadow-xl ${isTop ? "ring-4 ring-amber-200" : ""}`}
                 >
                   <IconComponent
-                    className={`${medalIcons[index].color} w-8 h-8`}
+                    className={`${medalIcons[index].color} w-5 sm:w-6 md:w-8 h-5 sm:h-6 md:h-8`}
                   />
                 </div>
 
                 <div
                   className={`${gradients[index]} w-full rounded-3xl p-6 flex flex-col items-center justify-between flex-1 shadow-2xl relative`}
                 >
-                  <div className="absolute -top-3 -right-3 bg-white text-slate-800 text-sm font-black rounded-full w-12 h-12 flex items-center justify-center shadow-xl">
+                  <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 bg-white text-slate-800 text-xs sm:text-sm font-black rounded-full w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center shadow-xl">
                     #{item.rank}
                   </div>
 
-                  <div className="text-center flex-1 flex flex-col justify-center mt-3">
-                    <p className="text-white font-bold text-lg truncate">
+                  <div className="text-center flex-1 flex flex-col justify-center mt-1 sm:mt-2 md:mt-3">
+                    <p className="text-white font-bold text-xs sm:text-sm md:text-lg truncate">
                       {item.member.name}
                     </p>
                     {item.member.parish && (
-                      <p className="text-white/90 text-xs">
+                      <p className="text-white/90 text-[10px] sm:text-xs">
                         {item.member.parish}
                       </p>
                     )}
                   </div>
 
                   <div className="text-center mt-auto">
-                    <p className="text-white text-5xl font-black">
+                    <p className="text-white text-2xl sm:text-3xl md:text-5xl font-black">
                       {item.totalScore}
                     </p>
-                    <p className="text-white/90 text-xs font-bold mt-1">ĐIỂM</p>
+                    <p className="text-white/90 text-[10px] sm:text-xs font-bold mt-0.5 sm:mt-1">ĐIỂM</p>
                   </div>
                 </div>
               </div>
