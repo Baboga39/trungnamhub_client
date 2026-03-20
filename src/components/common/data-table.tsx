@@ -382,7 +382,7 @@ export function DataTable<T>({
                   </TableHead>
                 ))}
                 {actions.length > 0 && (
-                  <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider h-16 pr-7 text-right w-[150px]">
+                  <TableHead className="font-bold text-slate-700 text-xs uppercase text-center tracking-wider h-16 pr-7  w-[150px]">
                     Thao tác
                   </TableHead>
                 )}

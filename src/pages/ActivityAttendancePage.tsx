@@ -1,301 +1,322 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AdminLayout } from "@/components/layouts/admin-layout";
 import { getMembersActive } from "@/features/members/memberThunks";
-import { fetchActivitiesThunk } from "@/features/activity/activityThunks";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { markAttendanceActivityThunk } from "@/features/activityAttendance/activityAttendanceThunks";
+  fetchActivitiesThunk,
+  upsertActivityThunk,
+} from "@/features/activity/activityThunks";
 import {
-  ArrowRight,
-  Calendar,
-  Users,
-  CheckCircle2,
-  XCircle,
-  ChevronLeft,
-  Search,
-} from "lucide-react";
+  markAttendanceActivityThunk,
+  getAttendanceByActivityIdThunk,
+} from "@/features/activityAttendance/activityAttendanceThunks";
+
+import { CommonForm, FormField } from "@/components/common/common-form";
 import { toast } from "react-toastify";
+import { activityFormFields } from "@/components/formFields/activityFormFields";
+import { AttendanceActivitySubmitButton } from "@/components/activityAttendance/AttendanceActivitySubmitButton";
 
 export default function AttendanceActivityPage() {
   const dispatch = useDispatch();
+
   const { activities = [] } = useSelector((state: any) => state.activities);
   const { membersActive = [] } = useSelector((state: any) => state.members);
-  const [selectedActivity, setSelectedActivity] = useState<any>(null);
-  const [attendance, setAttendance] = useState<any>({});
-  const [searchTerm, setSearchTerm] = useState("");
+  const { attendance: attendanceList = [], loading } = useSelector(
+    (state: any) => state.attendanceActivity,
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [attendanceMap, setAttendanceMap] = useState<any>({});
+  const [search, setSearch] = useState("");
+
+  // form add activity
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  // =========================
+  // INIT
+  // =========================
   useEffect(() => {
     dispatch(fetchActivitiesThunk());
     dispatch(getMembersActive());
-  }, []);
+  }, [dispatch]);
 
-  const handleToggle = (memberId: number, checked: boolean) => {
-    setAttendance((prev: any) => ({
+  // =========================
+  // LOAD ATTENDANCE
+  // =========================
+  useEffect(() => {
+    if (!selectedActivity) return;
+    dispatch(getAttendanceByActivityIdThunk(selectedActivity.id));
+  }, [selectedActivity, dispatch]);
+
+  // =========================
+  // MAP API → UI
+  // =========================
+  useEffect(() => {
+    if (!selectedActivity) return;
+
+    const mapped: any = {};
+    attendanceList.forEach((item: any) => {
+      mapped[item.memberId] = { attended: true };
+    });
+
+    setAttendanceMap(mapped);
+  }, [attendanceList, selectedActivity]);
+
+  // =========================
+  // HANDLERS
+  // =========================
+  const handleToggle = (id: number) => {
+    setAttendanceMap((prev: any) => ({
       ...prev,
-      [memberId]: {
-        attended: checked,
-      },
+      [id]: { attended: !prev[id]?.attended },
     }));
   };
 
-  const markAll = () => {
-    const obj: any = {};
-    membersActive.forEach((m: any) => {
-      obj[m.id] = { attended: true };
-    });
-    setAttendance(obj);
-  };
+ const handleSave = async () => {
+  if (!selectedActivity) return;
 
-  const clearAll = () => {
-    const obj: any = {};
-    membersActive.forEach((m: any) => {
-      obj[m.id] = { attended: false };
-    });
-    setAttendance(obj);
-  };
+  const memberIds = Object.keys(attendanceMap)
+    .filter((id) => attendanceMap[id]?.attended)
+    .map(Number);
 
-  const handleSave = () => {
-    const memberIds = Object.keys(attendance)
-      .filter((memberId) => attendance[memberId]?.attended)
-      .map((memberId) => Number(memberId));
+  try {
+    setIsSubmitting(true);
 
-    dispatch(
+    await dispatch(
       markAttendanceActivityThunk({
         activityId: selectedActivity.id,
-        memberIds: memberIds,
+        memberIds,
       }),
-    );
+    ).unwrap();
 
-    setAttendance({});
-    toast.success("Điểm danh đã được lưu thành công!");
+    toast.success(`Đã lưu ${memberIds.length} đoàn sinh`);
+  } catch {
+    toast.error("Lưu thất bại");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+  // =========================
+  // FILTER
+  // =========================
+  const filteredMembers = useMemo(() => {
+    return membersActive.filter((m: any) =>
+      m.name.toLowerCase().includes(search.toLowerCase()),
+    );
+  }, [membersActive, search]);
+
+  // =========================
+  // SELECT ALL
+  // =========================
+  const isAllSelected =
+    filteredMembers.length > 0 &&
+    filteredMembers.every((m: any) => attendanceMap[m.id]?.attended);
+
+  const handleSelectAll = () => {
+    setAttendanceMap((prev: any) => {
+      const newData = { ...prev };
+      filteredMembers.forEach((m: any) => {
+        newData[m.id] = { attended: true };
+      });
+      return newData;
+    });
   };
 
-  const filteredMembers = membersActive.filter((m: any) =>
-    m.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const handleClearAll = () => {
+    setAttendanceMap((prev: any) => {
+      const newData = { ...prev };
+      filteredMembers.forEach((m: any) => {
+        delete newData[m.id];
+      });
+      return newData;
+    });
+  };
 
-  const attendanceCount = Object.values(attendance).filter(
+  // =========================
+  // STATS
+  // =========================
+  const attendanceCount = Object.values(attendanceMap).filter(
     (a: any) => a.attended,
   ).length;
-  const attendancePercentage =
+
+  const percent =
     membersActive.length > 0
       ? Math.round((attendanceCount / membersActive.length) * 100)
       : 0;
 
+  const handleCreateActivity = async (data: any) => {
+    const { year, quarter, ...cleanData } = data;
+    try {
+      await dispatch(upsertActivityThunk(cleanData)).unwrap();
+      toast.success("Tạo hoạt động thành công");
+      dispatch(fetchActivitiesThunk());
+      setIsFormOpen(false);
+    } catch {
+      toast.error("Tạo thất bại");
+    }
+  };
+
+  // =========================
+  // UI
+  // =========================
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">
-              Điểm danh hoạt động
-            </h1>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Quản lý điểm danh đoàn sinh cho các hoạt động tổ chức
-          </p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 px-4 py-6 pb-28">
+        <div className="max-w-[1400px] mx-auto space-y-6">
+          {/* HEADER */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold">📋 Điểm danh hoạt động</h1>
+              <p className="text-sm text-gray-500">
+                Quản lý sự tham gia đoàn sinh
+              </p>
+            </div>
 
-        {/* Activity Selection View */}
-        {!selectedActivity && (
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Chọn hoạt động</h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {activities.map((activity: any) => (
-                <Card
-                  key={activity.id}
-                  className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/50 group"
-                  onClick={() => setSelectedActivity(activity)}
+            {!selectedActivity && (
+              <button
+                onClick={() => setIsFormOpen(true)}
+                className="px-4 h-10 rounded-xl bg-blue-600 text-white shadow hover:opacity-90"
+              >
+                + Thêm hoạt động
+              </button>
+            )}
+          </div>
+
+          {/* LIST */}
+          {!selectedActivity && (
+            <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              {activities.map((a: any) => (
+                <div
+                  key={a.id}
+                  onClick={() => {
+                    setAttendanceMap({});
+                    setSelectedActivity(a);
+                  }}
+                  className="bg-white/70 backdrop-blur border rounded-2xl p-6 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition"
                 >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                          {activity.name}
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-1 mt-1">
-                          <Calendar className="w-4 h-4" />
-                          {activity.date}
-                        </CardDescription>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="w-4 h-4" />
-                      {membersActive.length} đoàn sinh
-                    </div>
-                  </CardContent>
-                </Card>
+                  <h3 className="font-semibold text-lg">{a.name}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{a.date}</p>
+                </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Attendance View */}
-        {selectedActivity && (
-          <div className="space-y-6">
-            {/* Activity Header */}
-            <Card className="border-0 bg-gradient-to-r from-primary/5 to-primary/10">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={() => {
-                        setSelectedActivity(null);
-                        setSearchTerm("");
-                      }}
-                      className="p-2 hover:bg-white/50 rounded-lg transition-colors"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <div>
-                      <CardTitle className="text-2xl">
-                        {selectedActivity.name}
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-1 mt-1">
-                        <Calendar className="w-4 h-4" />
-                        {selectedActivity.date}
-                      </CardDescription>
-                    </div>
-                  </div>
-                  <Badge variant="secondary" className="text-base">
-                    {attendancePercentage}% có mặt
-                  </Badge>
+          {/* DETAIL */}
+          {selectedActivity && (
+            <div className="space-y-6">
+              <div className="flex justify-between">
+                <div>
+                  <h2 className="font-semibold text-lg">
+                    {selectedActivity.name}
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    {selectedActivity.date}
+                  </p>
                 </div>
-              </CardHeader>
-            </Card>
 
-            {/* Stats */}
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center">
-                    <Users className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Tổng số
-                    </p>
-                    <p className="text-2xl font-bold">{membersActive.length}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center">
-                    <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-green-600" />
-                    <p className="text-sm text-muted-foreground mb-1">Có mặt</p>
-                    <p className="text-2xl font-bold text-green-600">
-                      {attendanceCount}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center">
-                    <XCircle className="w-8 h-8 mx-auto mb-2 text-red-600" />
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Vắng mặt
-                    </p>
-                    <p className="text-2xl font-bold text-red-600">
-                      {membersActive.length - attendanceCount}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                <button
+                  onClick={() => {
+                    setSelectedActivity(null);
+                    setAttendanceMap({});
+                  }}
+                  className="text-sm text-gray-500"
+                >
+                  ← Quay lại
+                </button>
+              </div>
 
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button onClick={markAll} variant="outline" className="flex-1">
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                Đánh dấu tất cả
-              </Button>
-              <Button onClick={clearAll} variant="outline" className="flex-1">
-                <XCircle className="w-4 h-4 mr-2" />
-                Bỏ tất cả
-              </Button>
-            </div>
+              {/* PROGRESS */}
+              <div className="bg-white p-4 rounded-xl border">
+                <div className="flex justify-between text-sm mb-2">
+                  <span>Tiến độ</span>
+                  <span className="font-semibold text-blue-600">
+                    {percent}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 h-2 rounded-full">
+                  <div
+                    className="bg-blue-500 h-2 rounded-full"
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+              </div>
+              {/* SEARCH + ACTION */}
+              <div className="space-y-2">
+                <input
+                  placeholder="🔍 Tìm đoàn sinh..."
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-blue-400"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
 
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Tìm kiếm đoàn sinh..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">
+                    {filteredMembers.length} người
+                  </span>
 
-            {/* Members List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Danh sách đoàn sinh ({filteredMembers.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {filteredMembers.length > 0 ? (
-                    filteredMembers.map((member: any) => {
-                      const checked = attendance[member.id]?.attended || false;
-                      return (
-                        <div
-                          key={member.id}
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
-                        >
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={(checked) =>
-                              handleToggle(member.id, checked as boolean)
-                            }
-                            className="w-5 h-5"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p
-                              className={`font-medium truncate ${checked ? "text-green-600" : ""}`}
-                            >
-                              {member.name}
-                            </p>
-                          </div>
-                          {checked && (
-                            <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                          )}
-                        </div>
-                      );
-                    })
+                  {isAllSelected ? (
+                    <button
+                      onClick={handleClearAll}
+                      className="text-red-500 text-sm font-medium hover:underline"
+                    >
+                      Bỏ chọn tất cả
+                    </button>
                   ) : (
-                    <p className="text-center text-muted-foreground py-6">
-                      Không tìm thấy đoàn sinh
-                    </p>
+                    <button
+                      onClick={handleSelectAll}
+                      className="text-blue-600 text-sm font-medium hover:underline"
+                    >
+                      Chọn tất cả
+                    </button>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Save Button */}
-            <Button onClick={handleSave} size="lg" className="w-full h-12">
-              <CheckCircle2 className="w-5 h-5 mr-2" />
-              Lưu điểm danh
-            </Button>
-          </div>
-        )}
+              {/* LIST MEMBER */}
+              <div className="space-y-3">
+                {filteredMembers.map((m: any) => {
+                  const checked = attendanceMap[m.id]?.attended;
+
+                  return (
+                    <div
+                      key={m.id}
+                      onClick={() => handleToggle(m.id)}
+                      className={`p-4 rounded-xl border cursor-pointer ${
+                        checked ? "bg-blue-50 border-blue-500" : ""
+                      }`}
+                    >
+                      <p>{m.name}</p>
+                      <p className="text-sm">
+                        {checked ? "✓ Có mặt" : "Chưa chọn"}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+
+<AttendanceActivitySubmitButton
+  onSubmit={handleSave}
+  isSubmitting={isSubmitting}
+  count={attendanceCount}
+/>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* FORM */}
+      <CommonForm
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        title="Thêm hoạt động"
+        description="Nhập thông tin hoạt động"
+        fields={activityFormFields}
+        onSubmit={handleCreateActivity}
+      />
     </AdminLayout>
   );
 }

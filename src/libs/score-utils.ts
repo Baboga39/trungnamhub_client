@@ -1,6 +1,6 @@
 export function calculateTotalScoreDynamic(
   formData: any,
-  categories: { id: number; name: string; weight: number }[]
+  categories: { id: number; name: string; weight: number }[],
 ): number {
   let weightedSum = 0;
   let totalWeight = 0;
@@ -15,8 +15,7 @@ export function calculateTotalScoreDynamic(
     const key = nameMap[cat.name] ?? cat.name;
 
     const rawValue = formData[key];
-    const value =
-      parseFloat(String(rawValue ?? "").replace(/^0+/, "")) || 0;
+    const value = parseFloat(String(rawValue ?? "").replace(/^0+/, "")) || 0;
 
     weightedSum += value * cat.weight;
     totalWeight += cat.weight;
@@ -26,12 +25,10 @@ export function calculateTotalScoreDynamic(
   const penalty = Number(formData.penalty) || 0;
   const activityScore = Number(formData.activityScore) || 0;
 
-  // 1️⃣ tính trung bình trước
-  const avgScore =
-    totalWeight > 0 ? (weightedSum + bonus - penalty) / totalWeight : 0;
+  const avgScore = totalWeight > 0 ? weightedSum / totalWeight : 0;
 
-  // 2️⃣ cộng điểm hoạt động sau
-  const finalScore = avgScore + activityScore;
+  
+  const finalScore = avgScore + bonus - penalty + activityScore;
 
   return parseFloat(finalScore.toFixed(1));
 }

@@ -22,6 +22,10 @@ import {
 } from "@/features/activity/activityThunks";
 import { getAttendanceByActivityIdThunk } from "@/features/activityAttendance/activityAttendanceThunks";
 import { toast } from "react-toastify";
+import { activityFormFields } from "../formFields/activityFormFields";
+import { getActivityFilterOptions } from "../filterOptions/activityFilterOptions";
+import { getActivityActions } from "../actionsTable/activityActions";
+import { activityColumns } from "../columns/activityColumns";
 
 interface Activity {
   id?: number;
@@ -85,106 +89,6 @@ export default function ActivitiesTableWithAttendance() {
     dispatch(fetchActivitiesThunk());
   }, [dispatch]);
 
-  // =========================
-  // FORM FIELDS
-  // =========================
-
-  const activityFormFields: FormField[] = [
-    {
-      name: "name",
-      label: "Tên hoạt động",
-      type: "text",
-      placeholder: "Nhập tên hoạt động",
-      required: true,
-      gridColumn: "span 2",
-    },
-    {
-      name: "description",
-      label: "Mô tả",
-      type: "textarea",
-      placeholder: "Nhập mô tả hoạt động",
-      gridColumn: "span 2",
-    },
-    {
-      name: "date",
-      label: "Ngày hoạt động",
-      type: "date",
-      required: true,
-    },
-    {
-      name: "year",
-      label: "Năm",
-      type: "number",
-      disabled: true,
-    },
-    {
-      name: "quarter",
-      label: "Quý",
-      type: "select",
-      disabled: true,
-      options: [
-        { value: "1", label: "Quý 1" },
-        { value: "2", label: "Quý 2" },
-        { value: "3", label: "Quý 3" },
-        { value: "4", label: "Quý 4" },
-      ],
-    },
-  ];
-
-  // =========================
-  // TABLE COLUMNS
-  // =========================
-
-  const columns: Column<Activity>[] = [
-    {
-      key: "name",
-      label: "Tên hoạt động",
-      width: 220,
-    },
-    {
-      key: "description",
-      label: "Mô tả",
-      width: 260,
-      render: (item) => (
-        <span className="text-slate-600">
-          {item.description || "Không có mô tả"}
-        </span>
-      ),
-    },
-    {
-      key: "date",
-      label: "Ngày",
-      width: 120,
-      render: (item) => (
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-slate-500" />
-          {item.date}
-        </div>
-      ),
-    },
-    {
-      key: "term",
-      label: "Kỳ",
-      width: 140,
-      render: (item) => (
-        <Badge variant="secondary">{`Q${item.quarter} - ${item.year}`}</Badge>
-      ),
-    },
-    {
-      key: "createdBy",
-      label: "Người tạo",
-      width: 180,
-      render: (item) => (
-        <span className="font-medium text-slate-700">
-          {item.createdBy?.name || "-"}
-        </span>
-      ),
-    },
-  ];
-
-  // =========================
-  // ATTENDANCE HANDLER
-  // =========================
 
   const handleViewAttendance = async (activity: Activity) => {
     setSelectedActivityForAttendance(activity);
@@ -246,48 +150,17 @@ export default function ActivitiesTableWithAttendance() {
     setActivityToDelete(null);
   };
 
-  const actions: DataTableAction<Activity>[] = [
-    {
-      icon: <Eye className="h-4 w-4" />,
-      label: "Xem tham gia",
-      onClick: handleViewAttendance,
-    },
-    {
-      icon: <Edit className="h-4 w-4" />,
-      label: "Chỉnh sửa",
-      onClick: handleEdit,
-    },
-    {
-      icon: <Trash2 className="h-4 w-4" />,
-      label: "Xóa",
-      onClick: handleDelete,
-    },
-  ];
+ const actions = getActivityActions({
+  onEdit: handleEdit,
+  onDelete: handleDelete,
+  onViewAttendance: handleViewAttendance,
+});
 
   // =========================
   // FILTER OPTIONS
   // =========================
 
-  const filterOptions = [
-    {
-      key: "quarter",
-      label: "Quý",
-      options: [
-        { value: "1", label: "Quý 1" },
-        { value: "2", label: "Quý 2" },
-        { value: "3", label: "Quý 3" },
-        { value: "4", label: "Quý 4" },
-      ],
-    },
-    {
-      key: "year",
-      label: "Năm",
-      options: Array.from(new Set(activities?.map((a) => a.year))).map((y) => ({
-        value: y.toString(),
-        label: y.toString(),
-      })),
-    },
-  ];
+const filterOptions = getActivityFilterOptions(activities || []);
 
   // =========================
   // SUBMIT FORM
@@ -343,7 +216,7 @@ export default function ActivitiesTableWithAttendance() {
       <DataTable
         title="Danh sách hoạt động"
         description="Quản lý các hoạt động sinh hoạt"
-        columns={columns}
+        columns={activityColumns}
         data={activities ?? []}
         actions={actions}
         keyExtractor={(a) => a.id?.toString() || ""}

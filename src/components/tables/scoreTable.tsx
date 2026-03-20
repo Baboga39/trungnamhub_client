@@ -15,6 +15,9 @@ import {
   getAllThunk,
   upsertScoreThunk,
 } from "@/features/score/scoreThunks";
+import { getScoreColumns } from "../columns/scoreColumns";
+import { getScoreActions } from "../actionsTable/scoreActions";
+import { getScoreFilterOptions } from "../filterOptions/scoreFilterOptions";
 
 export default function ScoresTable() {
   const dispatch = useDispatch();
@@ -32,18 +35,7 @@ export default function ScoresTable() {
 
   const normalizeKey = (str: string) => str.toLowerCase().replace(/\s+/g, "_");
 
-  /*
-    API trả dạng:
-    {
-      memberId,
-      year,
-      quarter,
-      mMember,
-      scores: {},
-      activityScore,
-      activityCount
-    }
-  */
+ 
 
   const scores = useMemo(() => {
     return grades.map((g: any) => {
@@ -73,6 +65,8 @@ export default function ScoresTable() {
     let sumWeight = 0;
 
     categories.forEach((c) => {
+      if (c.name === "Thưởng" || c.name === "Phạt") return;
+
       const key = normalizeKey(c.name);
       const value = Number(score[key]) || 0;
 
@@ -85,7 +79,12 @@ export default function ScoresTable() {
 
   const processedScores = scores.map((s: any) => {
     const baseScore = calculateDynamicTotal(s, categories);
-    const totalScore = baseScore + (s.activityBonus || 0);
+
+    const bonus = Number(s[normalizeKey("Thưởng")] || 0);
+    const penalty = Number(s[normalizeKey("Phạt")] || 0);
+    const activity = Number(s.activityBonus || 0);
+
+    const totalScore = baseScore + bonus - penalty + activity;
 
     const rank = getRank(totalScore);
 
@@ -97,149 +96,19 @@ export default function ScoresTable() {
     };
   });
 
-  const filterOptions = [
-    {
-      key: "rank",
-      label: "Xếp loại",
-      options: Array.from(new Set(processedScores.map((s) => s.rank))).map(
-        (r) => ({
-          value: r,
-          label: r,
-        }),
-      ),
-    },
-    {
-      key: "term",
-      label: "Kỳ đánh giá",
-      options: Array.from(
-        new Set(processedScores.map((s) => `${s.quarter}_${s.year}`)),
-      ).map((t) => {
-        const [quarter, year] = t.split("_");
-        return {
-          value: t,
-          label: `Q${quarter} - ${year}`,
-        };
-      }),
-    },
-  ];
+  const filterOptions = getScoreFilterOptions(processedScores);
 
-  const dynamicColumns: Column<any>[] = categories.map((c) => ({
-    key: normalizeKey(c.name),
-    label: `${c.name} (Hệ số ${c.weight})`,
-    width: 150,
-    render: (item) => {
-      const value = item[normalizeKey(c.name)] || 0;
-      const isNegative = c.weight < 0;
 
-      return (
-        <div className="flex items-center gap-2">
-          <span
-            className={`font-medium ${
-              isNegative ? "text-red-600" : "text-slate-800"
-            }`}
-          >
-            {value}
-          </span>
 
-          <span
-            className={`text-xs ${
-              isNegative ? "text-red-500" : "text-slate-500"
-            }`}
-          >
-            (×{c.weight} = {(value * c.weight).toFixed(1)})
-          </span>
-        </div>
-      );
-    },
-  }));
+  const columns = useMemo(() => getScoreColumns(categories), [categories]);
 
-  const columns: Column<any>[] = [
-    {
-      key: "name",
-      label: "Tên đoàn sinh",
-      width: 220,
-      render: (item) => (
-        <span className="font-semibold text-slate-800">{item.name}</span>
-      ),
-    },
-
-    ...dynamicColumns,
-
-    {
-      key: "activityBonus",
-      label: "Điểm hoạt động",
-      width: 160,
-      render: (item) => (
-        <span className="font-semibold text-green-600">
-          +{item.activityBonus?.toFixed(1) || "0.0"}
-          {item.activityCount ? ` (${item.activityCount} buổi)` : ""}
-        </span>
-      ),
-    },
-
-    {
-      key: "totalScore",
-      label: "Tổng điểm",
-      width: 120,
-      render: (item) => (
-        <span className="text-lg font-bold text-blue-600">
-          {item.totalScore?.toFixed(1) || "0.0"}
-        </span>
-      ),
-    },
-
-    {
-      key: "term",
-      label: "Kỳ đánh giá",
-      width: 160,
-      render: (item) => (
-        <span className="font-semibold text-slate-700">
-          {`Q${item.quarter} - ${item.year}`}
-        </span>
-      ),
-    },
-
-    {
-      key: "rank",
-      label: "Xếp loại",
-      width: 150,
-      render: (item) => (
-        <Badge
-          className={`${getRankColor(item.rank || "")} font-semibold border`}
-        >
-          {item.rank}
-        </Badge>
-      ),
-    },
-  ];
-
-  const actions: DataTableAction<any>[] = [
-    {
-      icon: <Pencil className="h-4 w-4" />,
-      label: "Chỉnh sửa",
-      onClick: (score) => {
-        setEditingScore({
-          id: score.id,
-          name: score.mMember?.name || "",
-          knowledge: score[normalizeKey("Kiến thức")] || 0,
-          skill: score[normalizeKey("Kỹ năng")] || 0,
-          attendance: score[normalizeKey("Chuyên cần")] || 0,
-          bonus: score[normalizeKey("Thưởng")] || 0,
-          penalty: score[normalizeKey("Phạt")] || 0,
-          year: score.year,
-          quarter: score.quarter,
-        });
-
-        setIsDialogOpen(true);
-      },
-    },
-    {
-      icon: <Trash2 className="h-4 w-4" />,
-      label: "Xóa",
-      variant: "destructive",
-      onClick: (score) => console.log("delete", score),
-    },
-  ];
+  const actions = getScoreActions({
+  onEdit: (data) => {
+    setEditingScore(data);
+    setIsDialogOpen(true);
+  },
+  onDelete: (score) => console.log("delete", score),
+});
 
   if (loading) {
     return <p className="p-6 text-slate-500">Đang tải dữ liệu...</p>;

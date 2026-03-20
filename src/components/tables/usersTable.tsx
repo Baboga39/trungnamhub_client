@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { DataTable, type DataTableAction } from "../common/data-table";
 import { CommonForm, type FormField } from "../common/common-form";
 import { Edit, Shield, Trash2, Users } from "lucide-react";
-import { userColumns } from "../colums/userColumns";
+import { userColumns } from "../columns/userColumns";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../store";
 import { toast } from "react-toastify";

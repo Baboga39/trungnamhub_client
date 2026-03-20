@@ -39,3 +39,39 @@ export const getMembersActive = createAsyncThunk(
     }
   }
 );
+
+export const changeMemberStatus = createAsyncThunk(
+  "members/changeStatus",
+  async ({ memberId, status, note }, { rejectWithValue }) => {
+    try {
+      const res = await memberApi.changeStatus(memberId, status, note);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const getMemberHistory = createAsyncThunk(
+  "members/getHistory",
+  async (memberId, { rejectWithValue }) => {
+    try {
+      const res = await memberApi.getHistory(memberId);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const deleteMemberHistory = createAsyncThunk(
+  "members/deleteHistory",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await memberApi.deleteHistory(id);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);

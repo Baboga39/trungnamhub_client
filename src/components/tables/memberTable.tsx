@@ -19,15 +19,26 @@ import {
   Users,
   Home,
 } from "lucide-react";
-import { memberColumns } from "../colums/memberColumns";
-import { Badge } from "../ui/badge";
-import { fetchMembersThunk, upSertMemberThunk } from "../../features/members/memberThunks";
+import { memberColumns } from "../columns/memberColumns";
+import { ConfirmDialog } from "../common/confirm-dialog";
+import {
+  fetchMembersThunk,
+  upSertMemberThunk,
+  deleteMemberHistory,
+} from "../../features/members/memberThunks";
+import { Power, Clock } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import type { RootState, AppDispatch } from "../../store";
 import { toast } from "react-toastify";
 import { th } from "date-fns/locale";
+import DateStatusModal from "../member/DateStatusModal";
+import { getMemberHistory } from "../../features/members/memberThunks";
+import MemberStatusHistoryModal from "../member/MemberStatusHistoryModal";
+import { memberFormFields } from "../formFields/memberFormFields";
+import { getMemberFilterOptions } from "../filterOptions/memberFilterOptions";
+import { getMemberActions } from "../actionsTable/memberActions";
 
 interface Member {
   id: number;
@@ -45,142 +56,65 @@ interface Member {
 }
 
 export default function MembersTable() {
-const { members, loading, error } = useSelector((state: RootState) => state.members);
-
+  const { members, loading, error } = useSelector(
+    (state: RootState) => state.members,
+  );
 
   const dispatch = useDispatch<AppDispatch>();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
+  const [openStatusModal, setOpenStatusModal] = useState(false);
+  const [statusMember, setStatusMember] = useState<Member | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<boolean | null>(null);
+  const [openHistoryModal, setOpenHistoryModal] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [selectedHistoryIds, setSelectedHistoryIds] = useState<number[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // <CHANGE> Fetch members from API
   useEffect(() => {
     dispatch(fetchMembersThunk());
   }, [dispatch]);
 
-  
   const membersWithParents = (members ?? []).map((m) => ({
-  ...m,
-  parents: `${m.fatherName || ""} ${m.motherName || ""}`.trim(),
-}));
-  const memberFormFields: FormField[] = [
-    {
-      name: "name",
-      label: "Họ và tên",
-      type: "text",
-      placeholder: "Nhập họ và tên đầy đủ",
-      required: true,
-      gridColumn: "span 2",
-    },
-    {
-      name: "birthDate",
-      label: "Ngày sinh",
-      type: "date",
-      placeholder: "Chọn ngày sinh",
-      required: false,
-    },
-    {
-      name: "gender",
-      label: "Giới tính",
-      type: "select",
-      required: true,
-      options: [
-        { value: "Nam", label: "Nam" },
-        { value: "Nữ", label: "Nữ" },
-      ],
-    },
-    {
-      name: "parish",
-      label: "Xã Đạo",
-      type: "text",
-      placeholder: "Nhập tên xã đạo",
-      required: false,
-    },
-    {
-      name: "church",
-      label: "Thánh Thất",
-      type: "text",
-      placeholder: "Nhập tên thánh thất",
-      required: true,
-    },
-    {
-      name: "startYear",
-      label: "Năm bắt đầu",
-      type: "number",
-      placeholder: "Nhập năm bắt đầu",
-      required: false,
-    },
-    {
-      name: "fatherName",
-      label: "Tên cha",
-      type: "text",
-      placeholder: "Nhập tên cha",
-      required: false,
-    },
-    {
-      name: "motherName",
-      label: "Tên mẹ",
-      type: "text",
-      placeholder: "Nhập tên mẹ",
-      required: false,
-    },
-    {
-      name: "address",
-      label: "Địa chỉ",
-      type: "textarea",
-      placeholder: "Nhập địa chỉ đầy đủ",
-      required: false,
-      gridColumn: "span 2",
-    },
-    {
-      name: "contact",
-      label: "Số điện thoại",
-      type: "textarea",
-      placeholder: "Nhập số điện thoại",
-      required: false,
-      gridColumn: "span 2",
-    },
-    {
-      name: "active",
-      label: "Trạng thái hoạt động",
-      type: "switch",
-      defaultValue: true,
-      gridColumn: "span 2",
-    },
-  ];
+    ...m,
+    parents: `${m.fatherName || ""} ${m.motherName || ""}`.trim(),
+  }));
 
-const handleFormSubmit = async (data: Member) => {
-  try {
-    let payload: Partial<Member>;
 
-    if (formMode === "edit" && selectedMember) {
-      
-      payload = { ...data, id: selectedMember.id };
-    } else {
-      
-      const { id, ...rest } = data;
-      payload = rest;
+  const handleFormSubmit = async (data: Member) => {
+    try {
+      let payload: Partial<Member>;
+
+      if (formMode === "edit" && selectedMember) {
+        payload = { ...data, id: selectedMember.id };
+      } else {
+        const { id, ...rest } = data;
+        payload = rest;
+      }
+
+      const resultAction = await dispatch(upSertMemberThunk(payload as Member));
+      if (upSertMemberThunk.fulfilled.match(resultAction)) {
+        toast.success(resultAction.message || "Cập nhật thành công!");
+        console.log(resultAction);
+        setSelectedMember(resultAction.payload);
+      }
+    } catch (error) {
+      console.error("Error when upsert:", error);
+      throw error;
     }
+  };
+  const handleViewHistory = async (member: Member) => {
+    setSelectedMember(member);
 
-     const resultAction = await dispatch(upSertMemberThunk(payload as Member));
-     if(upSertMemberThunk.fulfilled.match(resultAction)) {
-      toast.success( resultAction.message || "Cập nhật thành công!");
-      console.log(resultAction);
-      setSelectedMember(resultAction.payload);
+    const response = await dispatch(getMemberHistory(member.id));
 
-     }
-
-
-
-
-   
-  } catch (error) {
-    console.error("Error when upsert:", error);
-    throw error; 
-  }
-};
-
+    setHistoryData(response.payload || []);
+    setOpenHistoryModal(true);
+  };
 
   const handleEdit = (member: Member) => {
     setSelectedMember(member);
@@ -193,64 +127,19 @@ const handleFormSubmit = async (data: Member) => {
     setFormMode("create");
     setIsFormOpen(true);
   };
+  const handleChangeStatus = (member: Member) => {
+    setStatusMember(member);
+    setPendingStatus(!member.active);
+    setOpenStatusModal(true);
+  };
 
-  const actions: DataTableAction<Member>[] = [
-    // {
-    //   icon: <Eye className="h-4 w-4" />,
-    //   label: "Xem chi tiết",
-    //   onClick: (member) => console.log("Xem:", member),
-    // },
-    {
-      icon: <Edit className="h-4 w-4" />,
-      label: "Chỉnh sửa",
-      onClick: handleEdit,
-    },
-    // {
-    //   icon: <Trash2 className="h-4 w-4" />,
-    //   label: "Xóa",
-    //   onClick: (member) => console.log("Xóa:", member),
-    //   variant: "destructive",
-    // },
-  ];
+ const actions = getMemberActions({
+  onEdit: handleEdit,
+  onChangeStatus: handleChangeStatus,
+  onViewHistory: handleViewHistory,
+});
 
-  const filterOptions = [
-    {
-      key: "gender",
-      label: "Giới tính",
-      options: [
-        { value: "Nam", label: "Nam" },
-        { value: "Nữ", label: "Nữ" },
-      ],
-    },
-    {
-      key: "active",
-      label: "Trạng thái",
-      options: [
-        { value: "true", label: "Đang sinh hoạt" },
-        { value: "false", label: "Ngưng hoạt động" },
-      ],
-    },
-    {
-      key: "parish",
-      label: "Xã Đạo",
-      options: Array.from(
-        new Set(members?.map((m) => m.parish).filter(Boolean))
-      ).map((p) => ({
-        value: p!,
-        label: p!,
-      })),
-    },
-    {
-      key: "church",
-      label: "Thánh Thất",
-      options: Array.from(
-        new Set(members?.map((m) => m.church).filter(Boolean))
-      ).map((c) => ({
-        value: c,
-        label: c,
-      })),
-    },
-  ];
+ const filterOptions = getMemberFilterOptions(members || []);
 
   if (loading && !isFormOpen)
     return (
@@ -265,7 +154,6 @@ const handleFormSubmit = async (data: Member) => {
       </div>
     );
 
-  
   return (
     <>
       <DataTable
@@ -295,6 +183,55 @@ const handleFormSubmit = async (data: Member) => {
         onSubmit={handleFormSubmit}
         mode={formMode}
         submitButtonText={formMode === "edit" ? "Cập nhật" : "Thêm mới"}
+      />
+      <DateStatusModal
+        open={openStatusModal}
+        onOpenChange={setOpenStatusModal}
+        memberId={statusMember?.id || null}
+        status={pendingStatus}
+        onSuccess={() => {
+          dispatch(fetchMembersThunk());
+        }}
+      />
+      <MemberStatusHistoryModal
+        open={openHistoryModal}
+        onOpenChange={setOpenHistoryModal}
+        data={historyData}
+        onDelete={async (ids) => {
+          setSelectedHistoryIds(ids);
+          setOpenConfirm(true);
+        }}
+      />
+      <ConfirmDialog
+        open={openConfirm}
+        onOpenChange={setOpenConfirm}
+        title="Xóa lịch sử hoạt động"
+        description="Bạn có chắc chắn muốn xóa các lịch sử đã chọn không?"
+        message="Hành động này không thể hoàn tác. Dữ liệu sẽ bị xóa vĩnh viễn."
+        icon="trash"
+        iconColor="red"
+        confirmText="Xóa"
+        cancelText="Hủy"
+        isDangerous
+        isLoading={isDeleting}
+        onConfirm={async () => {
+          try {
+            setIsDeleting(true);
+
+            await dispatch(deleteMemberHistory(selectedHistoryIds)).unwrap();
+
+            toast.success("Xóa lịch sử thành công!");
+
+            await handleViewHistory(selectedMember!);
+
+            setSelectedHistoryIds([]);
+          } catch (err) {
+            console.error(err);
+            toast.error("Có lỗi khi xóa lịch sử!");
+          } finally {
+            setIsDeleting(false);
+          }
+        }}
       />
     </>
   );

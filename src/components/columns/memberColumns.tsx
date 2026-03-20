@@ -212,22 +212,20 @@ export const memberColumns: Column<Member>[] = [
     width: 180,
     render: (member) => formatContact(member.contact),
   },
-  {
-    key: "active",
-    label: "Trạng thái",
-    width: 140,
-    render: (member) => (
-      <Badge
-        variant={member.active ? "default" : "secondary"}
-        className={`${
-          member.active
-            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200"
-            : "bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"
-        } border font-medium shadow-sm`}
-      >
-        <span className="mr-1.5">{member.active ? "●" : "○"}</span>
-        {member.active ? "Đang sinh hoạt" : "Ngưng hoạt động"}
-      </Badge>
-    ),
-  },
+{
+  key: "active",
+  label: "Trạng thái",
+  width: 140,
+  render: (member) => (
+    <Badge
+      className={`${
+        member.active
+          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+          : "bg-slate-100 text-slate-600 border-slate-200"
+      } border font-medium`}
+    >
+      {member.active ? "🟢 Đang sinh hoạt" : "🔴 Ngưng"}
+    </Badge>
+  ),
+}
 ];
