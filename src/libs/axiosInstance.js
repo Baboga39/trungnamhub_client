@@ -25,6 +25,10 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+axiosInstance.interceptors.request.use((config) => {
+  console.log("👉 API CALL:", config.url);
+  return config;
+});
 
 // Add response interceptor
 axiosInstance.interceptors.response.use(
@@ -39,7 +43,7 @@ axiosInstance.interceptors.response.use(
     if (status === 401) {
       toast.error("Unauthorized - Please login again!");
        localStorage.removeItem("accessToken");
-          if (window.location.pathname !== "/login") {
+           if (window.location.pathname !== "/login") {
         setTimeout(() => {
           window.location.href = "/login";
         }, 1000);

@@ -75,30 +75,30 @@ export default function AttendanceActivityPage() {
     }));
   };
 
- const handleSave = async () => {
-  if (!selectedActivity) return;
+  const handleSave = async () => {
+    if (!selectedActivity) return;
 
-  const memberIds = Object.keys(attendanceMap)
-    .filter((id) => attendanceMap[id]?.attended)
-    .map(Number);
+    const memberIds = Object.keys(attendanceMap)
+      .filter((id) => attendanceMap[id]?.attended)
+      .map(Number);
 
-  try {
-    setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
 
-    await dispatch(
-      markAttendanceActivityThunk({
-        activityId: selectedActivity.id,
-        memberIds,
-      }),
-    ).unwrap();
+      await dispatch(
+        markAttendanceActivityThunk({
+          activityId: selectedActivity.id,
+          memberIds,
+        }),
+      ).unwrap();
 
-    toast.success(`Đã lưu ${memberIds.length} đoàn sinh`);
-  } catch {
-    toast.error("Lưu thất bại");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+      toast.success(`Đã lưu ${memberIds.length} đoàn sinh`);
+    } catch {
+      toast.error("Lưu thất bại");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // =========================
   // FILTER
@@ -298,11 +298,11 @@ export default function AttendanceActivityPage() {
                 })}
               </div>
 
-<AttendanceActivitySubmitButton
-  onSubmit={handleSave}
-  isSubmitting={isSubmitting}
-  count={attendanceCount}
-/>
+              <AttendanceActivitySubmitButton
+                onSubmit={handleSave}
+                isSubmitting={isSubmitting}
+                count={attendanceCount}
+              />
             </div>
           )}
         </div>

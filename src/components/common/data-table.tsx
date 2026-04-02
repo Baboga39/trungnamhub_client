@@ -382,7 +382,7 @@ export function DataTable<T>({
                   </TableHead>
                 ))}
                 {actions.length > 0 && (
-                  <TableHead className="font-bold text-slate-700 text-xs uppercase text-center tracking-wider h-16 pr-7  w-[150px]">
+                  <TableHead className="font-bold text-slate-700 text-xs uppercase text-center tracking-wider h-16 w-[150px]">
                     Thao tác
                   </TableHead>
                 )}
@@ -425,8 +425,8 @@ export function DataTable<T>({
                       </TableCell>
                     ))}
                     {actions.length > 0 && (
-                      <TableCell className="py-5 pr-7 w-[150px]">
-                        <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity duration-200">
+                      <TableCell className="py-5 w-[150px]">
+                        <div className="flex items-center justify-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity duration-200">
                           {actions.map((action, actionIndex) => (
                             <Button
                               key={actionIndex}
