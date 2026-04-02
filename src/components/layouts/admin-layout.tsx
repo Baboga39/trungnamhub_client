@@ -1,6 +1,7 @@
 "use client"
 
 import { type ReactNode, useState, useEffect } from "react"
+import { useSelector } from "react-redux"
 import { Navbar } from "./navbar"
 import { Sidebar } from "./sidebar-nav"
 import { Footer } from "./footer"
@@ -12,6 +13,8 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
+  const isAuthenticated = useSelector((state: any) => state.auth.isAuthenticated)
+
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -33,60 +36,63 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     }
   }
 
+  // 🔥 KEY: nếu chưa auth → bỏ hết layout
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {children}
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-<Navbar onMenuClick={() => setMobileSidebarOpen(true)} />
+      {/* ✅ Navbar chỉ hiện khi login */}
+      <Navbar onMenuClick={() => setMobileSidebarOpen(true)} />
+
       <div className="flex flex-1 relative">
-        {/* Mobile sidebar overlay */}
+        {/* Mobile overlay */}
         {mobileSidebarOpen && (
           <div
-            className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 lg:hidden animate-in fade-in duration-200"
+            className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setMobileSidebarOpen(false)}
           />
         )}
 
-        {/* Sidebar */}
+        {/* ✅ Sidebar chỉ hiện khi login */}
         <aside
           className={cn(
             "fixed lg:sticky top-16 left-0 h-[calc(100vh-4rem)] z-50 flex flex-col",
             "bg-white border-r border-gray-200 shadow-sm transition-all duration-300 ease-in-out",
-            // Mobile behavior
             mobileSidebarOpen ? "translate-x-0" : "-translate-x-full",
-            // Desktop behavior
             "lg:translate-x-0",
             sidebarOpen ? "lg:w-64" : "lg:w-20",
-            // Width on mobile
             "w-64",
           )}
         >
-          {/* Sidebar content */}
           <div className="flex-1 overflow-y-auto px-2 py-4">
-            <Sidebar isCollapsed={!sidebarOpen && !isMobile} onNavigate={() => setMobileSidebarOpen(false)} />
+            <Sidebar
+              isCollapsed={!sidebarOpen && !isMobile}
+              onNavigate={() => setMobileSidebarOpen(false)}
+            />
           </div>
 
-          {/* Toggle button ra mép ngoài sidebar */}
           <div className="absolute top-1/2 right-[-14px] transform -translate-y-1/2 z-50">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 rounded-full backdrop-blur-sm bg-white/80 
-                         hover:bg-white/90 shadow-md border border-gray-200 
-                         transition-all duration-300"
-              onClick={handleToggle}
-            >
-              {sidebarOpen ? (
-                <ChevronLeft className="h-6 w-6 text-slate-700" />
-              ) : (
-                <ChevronRight className="h-6 w-6 text-slate-700" />
-              )}
-            </Button>
+           <Button
+  variant="ghost"
+  size="icon"
+  className="h-8 w-8 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-100"
+  onClick={handleToggle}
+>
+  {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
+</Button>
           </div>
         </aside>
 
-        {/* Main content */}
+        {/* Main */}
         <main className="flex-1 flex flex-col min-w-0 bg-gray-50">
           <div className="flex-1 px-3 sm:px-4 md:px-6 lg:px-8 py-6 space-y-6">
-            <div className="space-y-6">{children}</div>
+            {children}
           </div>
           <Footer />
         </main>

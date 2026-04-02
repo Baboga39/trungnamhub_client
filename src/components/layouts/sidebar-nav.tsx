@@ -24,7 +24,7 @@ export function Sidebar({ isCollapsed = false, onNavigate }) {
   }, [dispatch, isAuthenticated])
 
   const visibleMenus = menuItems.filter((item) =>
-    item.href === "/pending-approvals" || permissions.includes(item.href)
+    permissions.includes(item.href)
   )
 
   const groupedMenus = visibleMenus.reduce((acc, item) => {

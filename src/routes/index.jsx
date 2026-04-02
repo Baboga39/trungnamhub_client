@@ -14,6 +14,7 @@ import PendingApprovalsPage from "@/pages/PendingApprovalsPage";
 export const publicRoutes = [
   { path: "/login", element: <LoginPage /> },
   { path: "/approve", element: <ApproveDocumentPage /> },
+  { path: "/documents", element: <DocumentPage /> },
 ];
 
 export const privateRoutes = [
@@ -26,6 +27,5 @@ export const privateRoutes = [
   { path: "/activity", element: <ActivityPage /> },
   { path: "/scores", element: <ScorePage /> },
   { path: "/attendance-activity", element: <AttendanceActivityPage /> },
-  { path: "/documents", element: <DocumentPage /> },
   { path: "/pending-approvals", element: <PendingApprovalsPage /> },
 ];
