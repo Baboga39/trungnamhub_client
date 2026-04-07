@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import documentApi from "@/api/documentApi";
 import { toast } from "react-toastify";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { DataTable } from "@/components/common/data-table";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Eye } from "lucide-react";
+import { pendingApprovalColumns } from "../columns/pendingApprovalColumns";
+import { getPendingApprovalActions } from "../actionsTable/pendingApprovalActions";
+import { CheckCircle, XCircle } from "lucide-react";
 
 export default function PendingApprovalsTable() {
   const [data, setData] = useState([]);
@@ -51,69 +51,25 @@ export default function PendingApprovalsTable() {
     }
   };
 
-  const columns = useMemo(() => [
-    {
-      key: "title",
-      label: "Tên tài liệu",
-      render: (row: any) => <span className="font-semibold text-slate-800">{row.document?.title}</span>,
-    },
-    {
-      key: "version",
-      label: "Version",
-      render: (row: any) => `v${row.document?.version || 1}`,
-    },
-    {
-      key: "createdBy",
-      label: "Người yêu cầu",
-      render: (row: any) => row.document?.createdBy?.name || "Hệ thống",
-    },
-    {
-      key: "createdAt",
-      label: "Ngày gửi",
-      render: (row: any) => new Date(row.createdAt).toLocaleDateString("vi-VN"),
-    },
-    {
-      key: "status",
-      label: "Trạng thái",
-      render: () => (
-        <Badge variant="outline" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-transparent">
-          Cần Bạn Duyệt
-        </Badge>
-      ),
-    },
-  ], []);
+  const columns = pendingApprovalColumns;
 
-  const actions = [
-    {
-      label: "Xem tài liệu",
-      icon: <Eye size={16} />,
-      onClick: (row: any) => {
-        if (row.document?.fileUrl) window.open(row.document.fileUrl, "_blank");
-      },
+  const actions = getPendingApprovalActions({
+    onView: (row: any) => {
+      if (row.document?.fileUrl) window.open(row.document.fileUrl, "_blank");
     },
-    {
-      label: "Đồng Ý",
-      icon: <CheckCircle size={16} />,
-      onClick: (row: any) => {
-        setSelectedToken(row);
-        setActionType("APPROVE");
-        setComment("");
-        setOpenConfirm(true);
-      },
-      className: "text-blue-600 border-blue-200 hover:bg-blue-50",
+    onApprove: (row: any) => {
+      setSelectedToken(row);
+      setActionType("APPROVE");
+      setComment("");
+      setOpenConfirm(true);
     },
-    {
-      label: "Từ Chối",
-      icon: <XCircle size={16} />,
-      onClick: (row: any) => {
-        setSelectedToken(row);
-        setActionType("REJECT");
-        setComment("");
-        setOpenConfirm(true);
-      },
-      variant: "destructive" as const,
+    onReject: (row: any) => {
+      setSelectedToken(row);
+      setActionType("REJECT");
+      setComment("");
+      setOpenConfirm(true);
     },
-  ];
+  });
 
 
   return (

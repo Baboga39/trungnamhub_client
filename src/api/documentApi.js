@@ -10,6 +10,7 @@ const documentApi = {
   getApprovalDetail: (token) => axiosInstance.get(`/documents/approve-detail/${token}`),
   handleApproval: (data) => axiosInstance.post("/documents/handle-approval-by-mail", data),
   reSubmit: (data) => axiosInstance.post("/documents/resubmit", data),
+  getLogs: (id) => axiosInstance.get(`/documents/${id}/logs`),
 };
 
 export default documentApi;

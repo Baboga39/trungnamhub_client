@@ -10,6 +10,8 @@ import {
   UserCog,
   Settings,
   ClipboardList,
+  FileBarChart,
+  CalendarClock,
 } from "lucide-react"
 
 const baseModules = [
@@ -55,6 +57,18 @@ export const menuItems = [
     icon: Home,
     label: "Tổng quan",
     href: "/",
+    category: "Tổng quan",
+  },
+  {
+    icon: FileBarChart,
+    label: "Trung Tâm Báo Cáo",
+    href: "/report-center",
+    category: "Tổng quan",
+  },
+  {
+    icon: CalendarClock,
+    label: "Báo cáo tự động",
+    href: "/report-schedules",
     category: "Tổng quan",
   },
 

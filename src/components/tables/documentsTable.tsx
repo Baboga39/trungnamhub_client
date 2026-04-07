@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Download, Trash2, Send } from "lucide-react";
 import { DataTable } from "@/components/common/data-table";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
-import { Badge } from "@/components/ui/badge";
 import {
   fetchDocumentsThunk,
   createDocumentThunk,
@@ -15,11 +13,14 @@ import {
   reSubmitDocumentThunk,
 } from "@/features/document/documentThunks";
 import { DocumentFormDialog } from "@/components/document/DocumentFormDialog";
+import { DocumentLogModal } from "@/components/document/DocumentLogModal";
 import { toast } from "react-toastify";
+import { documentColumns } from "../columns/documentColumns";
+import { getDocumentActions } from "../actionsTable/documentActions";
 
 export default function DocumentsTable() {
   const dispatch = useDispatch();
-  const { documents, loading } = useSelector((state) => state.documents);
+  const { documents, loading } = useSelector((state: any) => state.documents);
 
   const [open, setOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState("submit"); // "submit" hoặc "resubmit"
@@ -29,90 +30,44 @@ export default function DocumentsTable() {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
 
+  const [logModalOpen, setLogModalOpen] = useState(false);
+  const [logDocumentId, setLogDocumentId] = useState<number | null>(null);
+
   useEffect(() => {
-    dispatch(fetchDocumentsThunk());
+    dispatch(fetchDocumentsThunk() as any);
   }, [dispatch]);
 
-  const columns = useMemo(
-    () => [
-      {
-        key: "title",
-        label: "Tên tài liệu",
-        render: (row) => row.title,
-      },
-      {
-        key: "version",
-        label: "Version",
-      },
-      {
-        key: "createdBy",
-        label: "Người tạo",
-        render: (row) => (
-          <span className="font-medium text-slate-700">
-            {row.createdBy?.name || "Không rõ"}
-          </span>
-        ),
-      },
-      {
-        key: "status",
-        label: "Trạng thái",
-        render: (row) => {
-          const badgeClasses =
-            row.status === "APPROVED"
-              ? "border-transparent bg-green-100 text-green-700 hover:bg-green-200"
-              : row.status === "NEED_REVISION"
-                ? "border-transparent bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
-                : "border-transparent bg-slate-100 text-slate-700 hover:bg-slate-200";
-
-          return <Badge className={badgeClasses}>{row.status}</Badge>;
-        },
-      },
-      {
-        key: "createdAt",
-        label: "Ngày tạo",
-      },
-    ],
-    [],
-  );
+  const columns = documentColumns;
 
   // 🎯 actions
-  const actions = [
-    {
-      label: "Tái gửi",
-      icon: <Send size={16} />,
-      onClick: (row) => {
-        console.log("Resubmit document:", row);
-        // Chuẩn bị dữ liệu resubmit
-        setResubmitData({
-          id: row.id,
-          title: row.title,
-          file: row.fileUrl, // URL file cũ
-          approvers: row.approvers || [], // Danh sách approver cũ
-        });
-        setDialogMode("resubmit");
-        setOpen(true);
-      },
+  const actions = getDocumentActions({
+    onResubmit: (row: any) => {
+      console.log("Resubmit document:", row);
+      // Chuẩn bị dữ liệu resubmit
+      setResubmitData({
+        id: row.id,
+        title: row.title,
+        file: row.fileUrl, // URL file cũ
+        approvers: row.approvers || [], // Danh sách approver cũ
+      } as any);
+      setDialogMode("resubmit");
+      setOpen(true);
     },
-    {
-      label: "Tải",
-      icon: <Download size={16} />,
-      onClick: (row) => {
-        const link = document.createElement("a");
-        link.href = row.fileUrl;
-        link.download = row.title;
-        link.click();
-      },
+    onDownload: (row: any) => {
+      const link = document.createElement("a");
+      link.href = row.fileUrl;
+      link.download = row.title;
+      link.click();
     },
-    {
-      label: "Xóa",
-      icon: <Trash2 size={16} />,
-      variant: "destructive",
-      onClick: (row) => {
-        setSelectedDoc(row);
-        setOpenConfirm(true);
-      },
+    onDelete: (row: any) => {
+      setSelectedDoc(row);
+      setOpenConfirm(true);
     },
-  ];
+    onHistory: (row: any) => {
+      setLogDocumentId(row.id);
+      setLogModalOpen(true);
+    },
+  });
 
   return (
     <div className="p-6 space-y-6">
@@ -206,6 +161,14 @@ export default function DocumentsTable() {
           setSelectedDoc(null);
         }}
       />
+
+      {logDocumentId && (
+        <DocumentLogModal
+          open={logModalOpen}
+          onOpenChange={setLogModalOpen}
+          documentId={logDocumentId}
+        />
+      )}
     </div>
   );
 }

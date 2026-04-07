@@ -1,48 +1,46 @@
-"use client"
+"use client";
 
-import { type ReactNode, useState, useEffect } from "react"
-import { useSelector } from "react-redux"
-import { Navbar } from "./navbar"
-import { Sidebar } from "./sidebar-nav"
-import { Footer } from "./footer"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Button } from "../ui/button"
+import { type ReactNode, useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { Navbar } from "./navbar";
+import { Sidebar } from "./sidebar-nav";
+import { Footer } from "./footer";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface AdminLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
-  const isAuthenticated = useSelector((state: any) => state.auth.isAuthenticated)
+  const isAuthenticated = useSelector(
+    (state: any) => state.auth.isAuthenticated,
+  );
 
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024)
-    }
-    checkMobile()
-    window.addEventListener("resize", checkMobile)
-    return () => window.removeEventListener("resize", checkMobile)
-  }, [])
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const handleToggle = () => {
     if (isMobile) {
-      setMobileSidebarOpen(!mobileSidebarOpen)
+      setMobileSidebarOpen(!mobileSidebarOpen);
     } else {
-      setSidebarOpen(!sidebarOpen)
+      setSidebarOpen(!sidebarOpen);
     }
-  }
+  };
 
   // 🔥 KEY: nếu chưa auth → bỏ hết layout
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        {children}
-      </div>
-    )
+    return <div className="min-h-screen bg-gray-50">{children}</div>;
   }
 
   return (
@@ -78,14 +76,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           <div className="absolute top-1/2 right-[-14px] transform -translate-y-1/2 z-50">
-           <Button
-  variant="ghost"
-  size="icon"
-  className="h-8 w-8 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-100"
-  onClick={handleToggle}
->
-  {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
-</Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-100"
+              onClick={handleToggle}
+            >
+              {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
+            </Button>
           </div>
         </aside>
 
@@ -98,9 +96,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </main>
       </div>
     </div>
-  )
+  );
 }
 
 function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ")
+  return classes.filter(Boolean).join(" ");
 }

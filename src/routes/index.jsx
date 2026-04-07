@@ -1,5 +1,6 @@
 import LoginPage from "../pages/LoginPage";
 import DashboardPage from "../pages/DashboardPage";
+import ReportCenterPage from "../pages/ReportCenterPage";
 import StudentPage from "../pages/studentPage";
 import ProfilePage from "@/pages/ProfilePage";
 import AttendancePage from "@/pages/AttendancePage";
@@ -11,6 +12,7 @@ import AttendanceActivityPage from "@/pages/ActivityAttendancePage";
 import DocumentPage from "@/pages/DocumentPage";
 import ApproveDocumentPage from "@/pages/ApproveDocumentPage";
 import PendingApprovalsPage from "@/pages/PendingApprovalsPage";
+import ReportSchedulePage from "@/pages/ReportSchedulePage";
 export const publicRoutes = [
   { path: "/login", element: <LoginPage /> },
   { path: "/approve", element: <ApproveDocumentPage /> },
@@ -28,4 +30,6 @@ export const privateRoutes = [
   { path: "/scores", element: <ScorePage /> },
   { path: "/attendance-activity", element: <AttendanceActivityPage /> },
   { path: "/pending-approvals", element: <PendingApprovalsPage /> },
+  { path: "/report-center", element: <ReportCenterPage /> },
+  { path: "/report-schedules", element: <ReportSchedulePage /> },
 ];

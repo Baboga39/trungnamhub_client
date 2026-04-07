@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { DataTable, type DataTableAction } from "../common/data-table";
 import { CommonForm, type FormField } from "../common/common-form";
-import { Edit, Shield, Trash2, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { userColumns } from "../columns/userColumns";
+import { getUserActions } from "../actionsTable/userActions";
+import { userFilterOptions } from "../filterOptions/userFilterOptions";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../store";
 import { toast } from "react-toastify";
@@ -165,37 +167,13 @@ useEffect(() => {
     }
   };
 
-  const actions: DataTableAction<User>[] = [
-    {
-      icon: <Edit className="h-4 w-4" />,
-      label: "Chỉnh sửa",
-      onClick: handleEdit,
-    },
-    {
-      icon: <Shield className="h-4 w-4" />,
-      label: "Phân quyền",
-      onClick: handleManagePermissions,
-    },
-    {
-      icon: <Trash2 className="h-4 w-4 text-destructive" />,
-      label: "Xóa",
-      onClick: handleDelete,
-    },
-  ];
+  const actions = getUserActions({
+    onEdit: handleEdit,
+    onManagePermissions: handleManagePermissions,
+    onDelete: handleDelete,
+  });
 
-  const filterOptions = [
-    {
-      key: "role",
-      label: "Vai trò",
-      options: [
-        { value: "Admin", label: "Admin" },
-        { value: "Manager", label: "Manager" },
-        { value: "Moderator", label: "Moderator" },
-        { value: "Thiếu Phó", label: "Thiếu Phó" },
-        { value: "User", label: "User" },
-      ],
-    },
-  ];
+  const filterOptions = userFilterOptions;
 
   if (loading && !isFormOpen)
     return (
