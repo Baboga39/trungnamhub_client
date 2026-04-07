@@ -25,6 +25,7 @@ interface User {
   startYear: string;
   sumEvent: number;
   role: string;
+  branch: string; // thêm
   createdAt: string;
   Member: any[];
 }
@@ -41,12 +42,11 @@ export default function UsersTable() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
 
-useEffect(() => {
-  if (!users || users.length === 0) {
-    dispatch(getUsersThunk());
-  }
-}, [dispatch, users]);
-
+  useEffect(() => {
+    if (!users || users.length === 0) {
+      dispatch(getUsersThunk());
+    }
+  }, [dispatch, users]);
 
   const userFormFields: FormField[] = [
     {
@@ -85,6 +85,17 @@ useEffect(() => {
         { value: "Trưởng Thiếu", label: "Trưởng Thiếu" },
         { value: "Admin", label: "Admin - Toàn quyền" },
         { value: "User", label: "User - Người dùng" },
+      ],
+    },
+    {
+      name: "branch",       // thêm field branch
+      label: "Ngành",
+      type: "select",
+      required: true,
+      options: [
+        { value: "Thanh", label: "Ngành Thanh" },
+        { value: "Thiếu", label: "Ngành Thiếu" },
+        { value: "Đồng", label: "Ngành Đồng" },
       ],
     },
     {
@@ -133,8 +144,7 @@ useEffect(() => {
   };
 
   const handleEdit = (user: User) => {
-    const userWithoutPassword = { ...user, password: "" };
-    setSelectedUser(userWithoutPassword as User);
+    setSelectedUser({ ...user, password: "" });
     setFormMode("edit");
     setIsFormOpen(true);
   };
@@ -151,9 +161,7 @@ useEffect(() => {
   };
 
   const handleDelete = async (user: User) => {
-    if (
-      window.confirm(`Bạn có chắc muốn xóa người dùng "${user.name}" không?`)
-    ) {
+    if (window.confirm(`Bạn có chắc muốn xóa người dùng "${user.name}" không?`)) {
       try {
         const result = await dispatch(deleteUserThunk(user.id));
         if (deleteUserThunk.fulfilled.match(result)) {
@@ -172,8 +180,6 @@ useEffect(() => {
     onManagePermissions: handleManagePermissions,
     onDelete: handleDelete,
   });
-
-  const filterOptions = userFilterOptions;
 
   if (loading && !isFormOpen)
     return (
@@ -197,7 +203,7 @@ useEffect(() => {
         actions={actions}
         keyExtractor={(u) => u.id.toString()}
         searchPlaceholder="Tìm kiếm người dùng..."
-        filterOptions={filterOptions}
+        filterOptions={userFilterOptions}
         onAdd={handleAdd}
       />
       <PermissionsDialog
@@ -205,15 +211,12 @@ useEffect(() => {
         onOpenChange={setIsPermissionsOpen}
         userName={permissionsUser?.name || ""}
         userId={permissionsUser?.id || 0}
-        initialPermissions={permissionsUser?.permissions || []} // nếu có dữ liệu quyền ban đầu
+        initialPermissions={permissionsUser?.permissions || []}
       />
-
       <CommonForm
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
-        title={
-          formMode === "edit" ? "Chỉnh sửa người dùng" : "Thêm người dùng mới"
-        }
+        title={formMode === "edit" ? "Chỉnh sửa người dùng" : "Thêm người dùng mới"}
         description={
           formMode === "edit"
             ? "Cập nhật thông tin người dùng"

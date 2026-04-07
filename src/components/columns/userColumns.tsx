@@ -9,6 +9,7 @@ interface User {
   sumEvent: number
   role: string
   createdAt: string
+  branch: string
 }
 
 const getRoleBadgeVariant = (role: string) => {
@@ -63,4 +64,10 @@ export const userColumns: Column<User>[] = [
     sortable: true,
     render: (user) => <div className="text-slate-500 text-sm">{user.createdAt}</div>,
   },
+  {
+    key: "branch",
+    label: "Ngành",
+    sortable: true,
+    render: (user) => <div className="text-slate-600">{user.branch}</div>,
+  }
 ]
