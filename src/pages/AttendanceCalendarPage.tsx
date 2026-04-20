@@ -51,6 +51,7 @@ import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getAllAttendanceThunk } from "../features/attendance/attendanceThunks";
+import { getMembersActive } from "../features/members/memberThunks";
 import type { AppDispatch, RootState } from "../store/store";
 
 type AttendanceStatus = "present" | "absent" | "late" | "excused" | "unexcused";
@@ -62,7 +63,9 @@ interface DayAttendance {
 }
 
 export default function AttendanceCalendarPage() {
-  const members = useSelector((state: RootState) => state.members.members);
+  const { membersActive = [], loading } = useSelector(
+    (state: any) => state.members,
+  );
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -70,12 +73,13 @@ export default function AttendanceCalendarPage() {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { list: attendanceList, loading } = useSelector(
+  const { list: attendanceList, loading: attendanceLoading } = useSelector(
     (state: RootState) => state.attendance,
   );
 
   useEffect(() => {
     dispatch(getAllAttendanceThunk());
+    dispatch(getMembersActive());
   }, [dispatch]);
 
   
@@ -173,7 +177,7 @@ export default function AttendanceCalendarPage() {
 
     const { attendance, notes, markedBy } = getAttendanceForDate(selectedDate);
 
-    const membersWithStatus = members.map((member) => ({
+    const membersWithStatus = membersActive.map((member) => ({
       ...member,
       status: attendance[member.id] || "present",
       note: notes[member.id] || "",
@@ -190,10 +194,10 @@ export default function AttendanceCalendarPage() {
         excused: membersWithStatus.filter((m) => m.status === "excused").length,
         unexcused: membersWithStatus.filter((m) => m.status === "unexcused")
           .length,
-        total: members.length,
+        total: membersActive.length,
       },
     };
-  }, [selectedDate, members, recordsByDate]);
+  }, [selectedDate, membersActive, recordsByDate]);
 
   const minSwipeDistance = 50;
 
