@@ -136,13 +136,12 @@ export function DynamicReportForm({
             <Controller
               name={input.key}
               control={control}
-              rules={{ required: "Vui lòng chọn ít nhất 1 người nhận", validate: val => val?.length > 0 || "Vui lòng chọn ít nhất 1 người nhận" }}
               render={({ field }) => (
                 <CustomMultiSelect
                   options={userOptions}
                   value={field.value || []}
                   onChange={field.onChange}
-                  placeholder="— Chọn người nhận —"
+                  placeholder="— Chọn người nhận (Không bắt buộc) —"
                   loading={fetchingUsers}
                   loadingText="Đang tải danh sách..."
                 />

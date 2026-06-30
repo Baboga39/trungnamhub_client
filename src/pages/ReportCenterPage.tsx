@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import reportApi from "@/api/reportApi";
 import { FileText, Users, User, Calendar, Star } from "lucide-react";
 import { DynamicReportForm } from "@/components/reports/DynamicReportForm";
+import { saveAs } from "file-saver";
 
 const IconMap: any = {
   Users: Users,
@@ -27,6 +28,22 @@ const ColorMap: any = {
 const TAG_STYLE = {
   pdf:   { background: "#E6F1FB", color: "#185FA5" },
   email: { background: "#E1F5EE", color: "#0F6E56" },
+};
+
+const base64ToBlob = (base64: string, type: string) => {
+  const byteCharacters = atob(base64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], { type });
+};
+
+const getMimeType = (filename: string) => {
+  if (filename.endsWith(".zip")) return "application/zip";
+  if (filename.endsWith(".pdf")) return "application/pdf";
+  return "application/octet-stream";
 };
 
 export default function ReportCenterPage() {
@@ -53,11 +70,27 @@ export default function ReportCenterPage() {
     if (!selectedTemplate) return;
     try {
       setExecuting(true);
-      await reportApi.executeReport(selectedTemplate.id, parameters);
-      toast.success("Đã yêu cầu xuất báo cáo thành công! Vui lòng kiểm tra email.");
+      const res: any = await reportApi.executeReport(selectedTemplate.id, parameters);
+      
+      const files = res.data?.files || [];
+      if (files.length > 0) {
+        files.forEach((file: any) => {
+          const mimeType = getMimeType(file.filename);
+          const blob = base64ToBlob(file.content, mimeType);
+          saveAs(blob, file.filename);
+        });
+      }
+
+      const hasEmail = parameters.email && (typeof parameters.email === "string" ? parameters.email.trim() !== "" : parameters.email.length > 0);
+      if (hasEmail) {
+        toast.success("Đã gửi email và tải báo cáo xuống thành công!");
+      } else {
+        toast.success("Đã tải báo cáo xuống thành công!");
+      }
       setIsModalOpen(false);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Có lỗi xảy ra khi chạy báo cáo");
+      console.error("❌ Error in handleExecute:", err);
+      toast.error(err.response?.data?.message || err.message || "Có lỗi xảy ra khi chạy báo cáo");
     } finally {
       setExecuting(false);
     }
