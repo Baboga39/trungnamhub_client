@@ -4,6 +4,8 @@ const reportApi = {
   getTemplates: () => axiosInstance.get("/reports/templates"),
   executeReport: (templateId, parameters) =>
     axiosInstance.post("/reports/execute", { templateId, parameters }),
+  sendReportEmail: (email, subject, files) =>
+    axiosInstance.post("/reports/send-email", { email, subject, files }),
 
   // Schedule CRUD
   getSchedules: () => axiosInstance.get("/reports/schedules"),

@@ -71,15 +71,7 @@ export default function ReportCenterPage() {
     try {
       setExecuting(true);
       const res: any = await reportApi.executeReport(selectedTemplate.id, parameters);
-      
-      const files = res.data?.files || [];
-      if (files.length > 0) {
-        files.forEach((file: any) => {
-          const mimeType = getMimeType(file.filename);
-          const blob = base64ToBlob(file.content, mimeType);
-          saveAs(blob, file.filename);
-        });
-      }
+  
 
       const hasEmail = parameters.email && (typeof parameters.email === "string" ? parameters.email.trim() !== "" : parameters.email.length > 0);
       if (hasEmail) {
