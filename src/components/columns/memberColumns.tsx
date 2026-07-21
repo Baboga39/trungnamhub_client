@@ -11,14 +11,12 @@ export interface Member {
   gender: string;
   parish: string | null;
   church: string;
-  startYear: number | null;
   fatherName: string | null;
   motherName: string | null;
   address: string | null;
   contact: string | null;
   active: boolean;
-
-
+  startDate: string | null;
   parents?: string;
 }
 
@@ -145,16 +143,14 @@ export const memberColumns: Column<Member>[] = [
     ),
   },
   {
-    key: "startYear",
-    label: "Năm bắt đầu",
-    width: 120,
+    key: "startDate",
+    label: "Ngày bắt đầu",
+    width: 140,
     render: (member) => (
       <div className="flex items-center gap-2">
         <Calendar className="h-4 w-4 text-slate-400" />
         <span className="text-slate-700">
-          {member.startYear || (
-            <span className="text-slate-400 italic">N/A</span>
-          )}
+          {formatDate(member.startDate)}
         </span>
       </div>
     ),

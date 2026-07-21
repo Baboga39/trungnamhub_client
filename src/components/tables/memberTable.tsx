@@ -48,6 +48,7 @@ interface Member {
   parish: string | null;
   church: string;
   startYear: number | null;
+  startDate: string | null;
   fatherName: string | null;
   motherName: string | null;
   address: string | null;
@@ -59,7 +60,6 @@ export default function MembersTable() {
   const { members, loading, error } = useSelector(
     (state: RootState) => state.members,
   );
-
   const dispatch = useDispatch<AppDispatch>();
 
   const [isFormOpen, setIsFormOpen] = useState(false);

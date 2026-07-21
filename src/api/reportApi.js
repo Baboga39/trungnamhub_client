@@ -3,7 +3,13 @@ import axiosInstance from "../libs/axiosInstance";
 const reportApi = {
   getTemplates: () => axiosInstance.get("/reports/templates"),
   executeReport: (templateId, parameters) =>
-    axiosInstance.post("/reports/execute", { templateId, parameters }),
+  axiosInstance.post(
+    "/reports/execute",
+    { templateId, parameters },
+    {
+      responseType: "blob",
+    }
+  ),
   sendReportEmail: (email, subject, files) =>
     axiosInstance.post("/reports/send-email", { email, subject, files }),
 

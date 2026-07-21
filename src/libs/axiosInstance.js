@@ -33,8 +33,12 @@ axiosInstance.interceptors.request.use((config) => {
 // Add response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
-    return response.data;
-  },
+  if (response.config.responseType === "blob") {
+    return response;
+  }
+
+  return response.data;
+},
   (error) => {
     const status = error.response?.status;
     const message = error.response?.data?.message;

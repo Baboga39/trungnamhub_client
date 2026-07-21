@@ -41,6 +41,11 @@ export const memberFormFields: FormField[] = [
     type: "number",
   },
   {
+    name: "startDate",
+    label: "Ngày bắt đầu",
+    type: "date",
+  },
+  {
     name: "fatherName",
     label: "Tên cha",
     type: "text",

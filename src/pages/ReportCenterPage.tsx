@@ -70,16 +70,29 @@ export default function ReportCenterPage() {
     if (!selectedTemplate) return;
     try {
       setExecuting(true);
-      const res: any = await reportApi.executeReport(selectedTemplate.id, parameters);
-  
+ const res: any = await reportApi.executeReport(
+  selectedTemplate.id,
+  parameters
+);
+// Lấy tên file từ header
+const disposition = res.headers["content-disposition"];
 
-      const hasEmail = parameters.email && (typeof parameters.email === "string" ? parameters.email.trim() !== "" : parameters.email.length > 0);
-      if (hasEmail) {
-        toast.success("Đã gửi email và tải báo cáo xuống thành công!");
-      } else {
-        toast.success("Đã tải báo cáo xuống thành công!");
-      }
-      setIsModalOpen(false);
+let filename = "Report.pdf";
+
+if (disposition) {
+  const match = disposition.match(/filename\*=UTF-8''(.+)$/);
+
+  if (match) {
+    filename = decodeURIComponent(match[1]);
+  }
+}
+
+// Tải file
+saveAs(res.data, filename);
+
+toast.success("Đã tải báo cáo thành công!");
+
+setIsModalOpen(false);
     } catch (err: any) {
       console.error("❌ Error in handleExecute:", err);
       toast.error(err.response?.data?.message || err.message || "Có lỗi xảy ra khi chạy báo cáo");
