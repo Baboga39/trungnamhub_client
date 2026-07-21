@@ -60,6 +60,7 @@ export interface FormField {
   label: string;
   type: FieldType;
   placeholder?: string;
+   hidden?: (values: any) => boolean;
   required?: boolean;
   disabled?: boolean;
   options?: { value: string; label: string }[]; // For select fields
@@ -664,7 +665,8 @@ useEffect(() => {
 
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {fields.map((field) => {
+              {
+              fields.map((field) => {
                 // Skip rendering if field has dependencies that aren't met
                 if (field.dependsOn) {
                   const dependentValue = formData[field.dependsOn.field];

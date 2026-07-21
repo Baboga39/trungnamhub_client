@@ -54,6 +54,9 @@ interface Member {
   address: string | null;
   contact: string | null;
   active: boolean;
+  promotionDate?: string | null;
+
+  status?: "ACTIVE" | "INACTIVE" | "PROMOTED";
 }
 
 export default function MembersTable() {
@@ -67,7 +70,6 @@ export default function MembersTable() {
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [openStatusModal, setOpenStatusModal] = useState(false);
   const [statusMember, setStatusMember] = useState<Member | null>(null);
-  const [pendingStatus, setPendingStatus] = useState<boolean | null>(null);
   const [openHistoryModal, setOpenHistoryModal] = useState(false);
   const [historyData, setHistoryData] = useState([]);
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -84,26 +86,42 @@ export default function MembersTable() {
     parents: `${m.fatherName || ""} ${m.motherName || ""}`.trim(),
   }));
 
-
   const handleFormSubmit = async (data: Member) => {
     try {
-      let payload: Partial<Member>;
+      const payload: any = { ...data };
 
-      if (formMode === "edit" && selectedMember) {
-        payload = { ...data, id: selectedMember.id };
-      } else {
-        const { id, ...rest } = data;
-        payload = rest;
+      switch (data.status) {
+        case "ACTIVE":
+          payload.active = true;
+          payload.promotionDate = null;
+          break;
+
+        case "INACTIVE":
+          payload.active = false;
+          payload.promotionDate = null;
+          break;
+
+        case "PROMOTED":
+          payload.active = false;
+          break;
       }
 
-      const resultAction = await dispatch(upSertMemberThunk(payload as Member));
+      delete payload.status;
+
+      if (formMode === "edit" && selectedMember) {
+        payload.id = selectedMember.id;
+      } else {
+        delete payload.id;
+      }
+
+      const resultAction = await dispatch(upSertMemberThunk(payload));
+
       if (upSertMemberThunk.fulfilled.match(resultAction)) {
         toast.success(resultAction.message || "Cập nhật thành công!");
-        console.log(resultAction);
         setSelectedMember(resultAction.payload);
       }
     } catch (error) {
-      console.error("Error when upsert:", error);
+      console.error(error);
       throw error;
     }
   };
@@ -127,19 +145,18 @@ export default function MembersTable() {
     setFormMode("create");
     setIsFormOpen(true);
   };
-  const handleChangeStatus = (member: Member) => {
-    setStatusMember(member);
-    setPendingStatus(!member.active);
-    setOpenStatusModal(true);
-  };
+const handleChangeStatus = (member: Member) => {
+  setStatusMember(member);
+  setOpenStatusModal(true);
+};
 
- const actions = getMemberActions({
-  onEdit: handleEdit,
-  onChangeStatus: handleChangeStatus,
-  onViewHistory: handleViewHistory,
-});
+  const actions = getMemberActions({
+    onEdit: handleEdit,
+    onChangeStatus: handleChangeStatus,
+    onViewHistory: handleViewHistory,
+  });
 
- const filterOptions = getMemberFilterOptions(members || []);
+  const filterOptions = getMemberFilterOptions(members || []);
 
   if (loading && !isFormOpen)
     return (
@@ -179,20 +196,30 @@ export default function MembersTable() {
             : "Điền thông tin để thêm thành viên mới vào hệ thống"
         }
         fields={memberFormFields}
-        initialData={selectedMember}
+        initialData={
+          selectedMember
+            ? {
+                ...selectedMember,
+                status: selectedMember.active
+                  ? "ACTIVE"
+                  : selectedMember.promotionDate
+                    ? "PROMOTED"
+                    : "INACTIVE",
+              }
+            : undefined
+        }
         onSubmit={handleFormSubmit}
         mode={formMode}
         submitButtonText={formMode === "edit" ? "Cập nhật" : "Thêm mới"}
       />
       <DateStatusModal
-        open={openStatusModal}
-        onOpenChange={setOpenStatusModal}
-        memberId={statusMember?.id || null}
-        status={pendingStatus}
-        onSuccess={() => {
-          dispatch(fetchMembersThunk());
-        }}
-      />
+  open={openStatusModal}
+  onOpenChange={setOpenStatusModal}
+  member={statusMember || null}
+  onSuccess={() => {
+    dispatch(fetchMembersThunk());
+  }}
+/>
       <MemberStatusHistoryModal
         open={openHistoryModal}
         onOpenChange={setOpenHistoryModal}

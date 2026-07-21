@@ -36,11 +36,6 @@ export const memberFormFields: FormField[] = [
     required: true,
   },
   {
-    name: "startYear",
-    label: "Năm bắt đầu",
-    type: "number",
-  },
-  {
     name: "startDate",
     label: "Ngày bắt đầu",
     type: "date",
@@ -68,11 +63,35 @@ export const memberFormFields: FormField[] = [
     gridColumn: "span 2",
   },
   {
-    name: "active",
-    label: "Trạng thái hoạt động",
-    type: "switch",
-    defaultValue: true,
+    name: "status",
+    label: "Trạng thái",
+    type: "select",
+    required: true,
+    defaultValue: "ACTIVE",
+    options: [
+      {
+        value: "ACTIVE",
+        label: "Đang sinh hoạt",
+      },
+      {
+        value: "INACTIVE",
+        label: "Ngừng sinh hoạt",
+      },
+      {
+        value: "PROMOTED",
+        label: "Đã lên ngành",
+      },
+    ],
     gridColumn: "span 2",
-    disabled: true,
   },
+{
+  name: "promotionDate",
+  label: "Ngày lên ngành",
+  type: "date",
+  gridColumn: "span 2",
+  dependsOn: {
+    field: "status",
+    value: "PROMOTED",
+  },
+}
 ];

@@ -13,11 +13,11 @@ import { Search, Calendar, Trash2, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Inbox } from "lucide-react";
 
-
 interface StatusHistory {
   id: number;
   memberId: number;
   status: boolean;
+  type: "ACTIVE" | "INACTIVE" | "PROMOTED";
   date: string;
   note: string | null;
   createdAt: string;
@@ -67,6 +67,37 @@ export default function MemberStatusHistoryModal({
     if (!selectedIds.length || !onDelete) return;
     await onDelete(selectedIds);
     setSelectedIds([]);
+  };
+  const getStatusInfo = (type: StatusHistory["type"]) => {
+    switch (type) {
+      case "ACTIVE":
+        return {
+          text: "Đang sinh hoạt",
+          className: "bg-green-100 text-green-700",
+          icon: "✓",
+        };
+
+      case "INACTIVE":
+        return {
+          text: "Nghỉ sinh hoạt",
+          className: "bg-red-100 text-red-700",
+          icon: "✕",
+        };
+
+      case "PROMOTED":
+        return {
+          text: "Lên ngành",
+          className: "bg-blue-100 text-blue-700",
+          icon: "⬆",
+        };
+
+      default:
+        return {
+          text: "Không xác định",
+          className: "bg-gray-100 text-gray-700",
+          icon: "?",
+        };
+    }
   };
 
   return (
@@ -134,22 +165,22 @@ export default function MemberStatusHistoryModal({
                           {item.date}
                         </span>
                       </div>
-                      <Badge
-                        className={
-                          item.status
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }
-                      >
-                        {item.status ? "✓ Hoạt động" : "✕ Nghỉ sinh hoạt"}
-                      </Badge>
+                      {(() => {
+                        const status = getStatusInfo(item.type);
+
+                        return (
+                          <Badge className={status.className}>
+                            {status.icon} {status.text}
+                          </Badge>
+                        );
+                      })()}
                     </div>
 
                     {/* Note */}
                     {item.note && (
-                      <div className="text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded mb-2 inline-block">
-                        <span className="font-medium">Ghi chú:</span>{" "}
-                        {item.note}
+                      <div className="mt-2 rounded-md bg-slate-50 border px-3 py-2 text-sm text-slate-600">
+                        <span className="font-semibold">Ghi chú</span>
+                        <p className="mt-1">{item.note}</p>
                       </div>
                     )}
 

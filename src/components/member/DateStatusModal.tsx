@@ -17,70 +17,108 @@ import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { cn } from "../../libs/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../store";
 import { toast } from "react-toastify";
 import { changeMemberStatus } from "../../features/members/memberThunks";
 
+interface Member {
+  id: number;
+  active: boolean;
+  promotionDate?: string | null;
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  memberId: number | null;
-  status: boolean | null; // true = active, false = inactive
+  member: Member | null;
   onSuccess?: () => void;
 }
 
 export default function DateStatusModal({
   open,
   onOpenChange,
-  memberId,
-  status,
+  member,
   onSuccess,
-}: Props) {
+}: Props){
   const dispatch = useDispatch<AppDispatch>();
 
-  const [date, setDate] = useState<Date | null>(new Date());
-  const [note, setNote] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<
+  "ACTIVE" | "INACTIVE" | "PROMOTED"
+>("ACTIVE");
 
-  const handleSubmit = async () => {
-    if (!memberId || status === null || !date) {
-      toast.error("Thiếu thông tin");
-      return;
-    }
+const [date, setDate] = useState<Date | null>(new Date());
 
-    try {
-      setLoading(true);
+const [note, setNote] = useState("");
 
-      await dispatch(
-        changeMemberStatus({
-          memberId,
-          status,
-          note,
-        })
-      ).unwrap();
+const [loading, setLoading] = useState(false);
+useEffect(() => {
+  if (!member) return;
 
-      toast.success("Cập nhật trạng thái thành công ✨");
+  if (member.active) {
+    setStatus("ACTIVE");
+  } else if (member.promotionDate) {
+    setStatus("PROMOTED");
+  } else {
+    setStatus("INACTIVE");
+  }
 
-      onOpenChange(false);
-      setNote("");
-      setDate(new Date());
+  setDate(new Date());
+  setNote("");
+}, [member]);
 
-      onSuccess?.();
-    } catch (err: any) {
-      toast.error(err?.message || "Có lỗi xảy ra");
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleSubmit = async () => {
 
-  const statusLabel = status
-    ? "Hoạt động lại"
-    : "Ngưng sinh hoạt";
+  if (!member) {
+    toast.error("Thiếu thông tin");
+    return;
+  }
 
-  const statusColor = status
-    ? "text-green-600"
-    : "text-red-500";
+  try {
+    setLoading(true);
+
+    await dispatch(
+      changeMemberStatus({
+        memberId: member.id,
+
+        status: status === "ACTIVE",
+
+        promotionDate:
+          status === "PROMOTED"
+            ? date?.toISOString()
+            : null,
+
+        note,
+      })
+    ).unwrap();
+
+    toast.success("Cập nhật trạng thái thành công");
+
+    onOpenChange(false);
+
+    onSuccess?.();
+  } catch (err: any) {
+    toast.error(err?.message || "Có lỗi xảy ra");
+  } finally {
+    setLoading(false);
+  }
+};
+
+  const statusLabel =
+    status === "ACTIVE"
+      ? "Hoạt động lại"
+      : status === "PROMOTED"
+        ? "Lên ngành"
+        : "Ngưng sinh hoạt";
+
+  const statusColor =
+    status === "ACTIVE"
+      ? "text-green-600"
+      : status === "PROMOTED"
+        ? "text-blue-600"
+        : "text-red-500";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -91,40 +129,73 @@ export default function DateStatusModal({
               {statusLabel}
             </DialogTitle>
             <DialogDescription>
-              Chọn ngày thay đổi trạng thái cho thành viên
+              {status === "PROMOTED"
+                ? "Chọn ngày lên ngành"
+                : "Xác nhận thay đổi trạng thái thành viên"}
             </DialogDescription>
           </DialogHeader>
+          <div className="space-y-2">
+  <Label>Trạng thái</Label>
+
+  <Select
+    value={status}
+    onValueChange={(value) =>
+      setStatus(value as "ACTIVE" | "INACTIVE" | "PROMOTED")
+    }
+  >
+    <SelectTrigger>
+      <SelectValue />
+    </SelectTrigger>
+
+    <SelectContent>
+      <SelectItem value="ACTIVE">
+        Đang sinh hoạt
+      </SelectItem>
+
+      <SelectItem value="INACTIVE">
+        Ngưng sinh hoạt
+      </SelectItem>
+
+      <SelectItem value="PROMOTED">
+        Đã lên ngành
+      </SelectItem>
+    </SelectContent>
+  </Select>
+</div>  
 
           {/* DATE PICKER */}
-          <div className="space-y-2">
-            <Label>Ngày</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal h-11",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date
-                    ? format(date, "dd/MM/yyyy", { locale: vi })
-                    : "Chọn ngày"}
-                </Button>
-              </PopoverTrigger>
+          {status === "PROMOTED" && (
+            <div className="space-y-2">
+              {" "}
+              <Label>Ngày</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal h-11",
+                      !date && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date
+                      ? format(date, "dd/MM/yyyy", { locale: vi })
+                      : "Chọn ngày"}
+                  </Button>
+                </PopoverTrigger>
 
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date || undefined}
-                  onSelect={(d) => setDate(d || null)}
-                  locale={vi}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={date || undefined}
+                    onSelect={(d) => setDate(d || null)}
+                    locale={vi}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
 
           {/* NOTE */}
           <div className="space-y-2">
@@ -152,9 +223,11 @@ export default function DateStatusModal({
               onClick={handleSubmit}
               disabled={loading}
               className={cn(
-                status
+                status === "ACTIVE"
                   ? "bg-green-600 hover:bg-green-700"
-                  : "bg-red-500 hover:bg-red-600"
+                  : status === "PROMOTED"
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "bg-red-500 hover:bg-red-600",
               )}
             >
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}

@@ -42,9 +42,18 @@ export const getMembersActive = createAsyncThunk(
 
 export const changeMemberStatus = createAsyncThunk(
   "members/changeStatus",
-  async ({ memberId, status, note }, { rejectWithValue }) => {
+  async (
+    { memberId, active, promotionDate, note },
+    { rejectWithValue }
+  ) => {
     try {
-      const res = await memberApi.changeStatus(memberId, status, note);
+      const res = await memberApi.changeStatus(
+        memberId,
+        active,
+        promotionDate,
+        note
+      );
+
       return res.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

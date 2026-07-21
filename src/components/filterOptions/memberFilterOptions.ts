@@ -23,11 +23,13 @@ export const getMemberFilterOptions = (members: Member[]) => {
       ],
     },
     {
-      key: "active",
+      key: "status",
       label: "Trạng thái",
       options: [
-        { value: "true", label: "Đang sinh hoạt" },
-        { value: "false", label: "Ngưng hoạt động" },
+        { value: "ACTIVE", label: "Đang sinh hoạt" },
+        { value: "PROMOTED", label: "Lên ngành" },
+        { value: "INACTIVE", label: "Ngưng hoạt động" },
+        
       ],
     },
     {
