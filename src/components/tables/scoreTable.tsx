@@ -114,7 +114,7 @@ export default function ScoresTable() {
     return <p className="p-6 text-slate-500">Đang tải dữ liệu...</p>;
   }
 
-  const handleSubmit = async (data: ScoreFormData) => {
+  const handleSubmit = async (data: any) => {
     try {
       const member = members.find(
         (m) => m.name.toLowerCase() === data.name.toLowerCase(),
@@ -122,25 +122,28 @@ export default function ScoresTable() {
 
       if (!member) return;
 
-      const categoryMap = {
-        knowledge: "Kiến thức",
-        skill: "Kỹ năng",
-        attendance: "Chuyên cần",
-        bonus: "Thưởng",
-        penalty: "Phạt",
+      const legacyKeyMap: Record<string, string> = {
+        "Kiến thức": "knowledge",
+        "Kỹ năng": "skill",
+        "Chuyên cần": "attendance",
+        "Thưởng": "bonus",
+        "Phạt": "penalty",
       };
 
-      const scoresPayload = Object.entries(categoryMap)
-        .map(([key, categoryName]) => {
-          const cat = categories.find(
-            (c) => c.name.toLowerCase() === categoryName.toLowerCase(),
-          );
+      const scoresPayload = categories
+        .map((cat: any) => {
+          const normKey = normalizeKey(cat.name);
+          const legacyKey = legacyKeyMap[cat.name];
 
-          if (!cat) return null;
+          const val =
+            data[cat.id] ??
+            data[normKey] ??
+            (legacyKey ? data[legacyKey] : undefined) ??
+            0;
 
           return {
             categoryId: cat.id,
-            score: Number(data[key]) || 0,
+            score: Number(val) || 0,
           };
         })
         .filter(Boolean);

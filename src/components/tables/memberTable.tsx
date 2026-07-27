@@ -145,10 +145,10 @@ export default function MembersTable() {
     setFormMode("create");
     setIsFormOpen(true);
   };
-const handleChangeStatus = (member: Member) => {
-  setStatusMember(member);
-  setOpenStatusModal(true);
-};
+  const handleChangeStatus = (member: Member) => {
+    setStatusMember(member);
+    setOpenStatusModal(true);
+  };
 
   const actions = getMemberActions({
     onEdit: handleEdit,
@@ -213,13 +213,13 @@ const handleChangeStatus = (member: Member) => {
         submitButtonText={formMode === "edit" ? "Cập nhật" : "Thêm mới"}
       />
       <DateStatusModal
-  open={openStatusModal}
-  onOpenChange={setOpenStatusModal}
-  member={statusMember || null}
-  onSuccess={() => {
-    dispatch(fetchMembersThunk());
-  }}
-/>
+        open={openStatusModal}
+        onOpenChange={setOpenStatusModal}
+        member={statusMember || null}
+        onSuccess={() => {
+          dispatch(fetchMembersThunk());
+        }}
+      />
       <MemberStatusHistoryModal
         open={openHistoryModal}
         onOpenChange={setOpenHistoryModal}

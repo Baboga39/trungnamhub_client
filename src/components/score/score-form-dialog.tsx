@@ -26,6 +26,8 @@ interface ScoreFormDialogProps {
   members: { id: number; name: string }[];
 }
 
+const normalizeKey = (str: string) => str.toLowerCase().replace(/\s+/g, "_");
+
 export function ScoreFormDialog({
   open,
   onOpenChange,
@@ -34,60 +36,81 @@ export function ScoreFormDialog({
   categories,
   members,
 }: ScoreFormDialogProps) {
-  const [formData, setFormData] = useState<ScoreFormData>({
+  const [formData, setFormData] = useState<Record<string, any>>({
     name: "",
-    knowledge: 0,
-    skill: 0,
-    attendance: 0,
-    bonus: 0,
-    penalty: 0,
     year: new Date().getFullYear(),
     quarter: Math.floor(new Date().getMonth() / 3) + 1,
+    activityScore: 0,
   });
 
   useEffect(() => {
     if (editingScore) {
-      setFormData({
-        name: editingScore.name,
-        knowledge: editingScore.knowledge,
-        skill: editingScore.skill,
-        attendance: editingScore.attendance,
-        bonus: editingScore.bonus,
-        penalty: editingScore.penalty,
+      const initialData: Record<string, any> = {
+        name: editingScore.name || editingScore.mMember?.name || "",
         year: editingScore.year,
-            activityScore: editingScore.activityScore ?? 0,
-
         quarter: editingScore.quarter,
+        activityScore: editingScore.activityScore ?? editingScore.activityBonus ?? 0,
+      };
+
+      const legacyKeyMap: Record<string, string> = {
+        "Kiến thức": "knowledge",
+        "Kỹ năng": "skill",
+        "Chuyên cần": "attendance",
+        "Thưởng": "bonus",
+        "Phạt": "penalty",
+      };
+
+      categories.forEach((cat) => {
+        const normKey = normalizeKey(cat.name);
+        const legacyKey = legacyKeyMap[cat.name];
+
+        const scoreVal =
+          (editingScore as any)[normKey] ??
+          (editingScore as any)[cat.name] ??
+          (editingScore as any)[cat.id] ??
+          (legacyKey ? (editingScore as any)[legacyKey] : undefined) ??
+          0;
+
+        initialData[cat.id] = scoreVal;
+        initialData[normKey] = scoreVal;
+        if (legacyKey) {
+          initialData[legacyKey] = scoreVal;
+        }
       });
+
+      setFormData(initialData);
     } else {
-      setFormData({
+      const initialData: Record<string, any> = {
         name: "",
-        knowledge: 0,
-        skill: 0,
-        attendance: 0,
-        bonus: 0,
-        activityScore: 0,
-        penalty: 0,
         year: new Date().getFullYear(),
         quarter: Math.floor(new Date().getMonth() / 3) + 1,
+        activityScore: 0,
+      };
+
+      categories.forEach((cat) => {
+        const normKey = normalizeKey(cat.name);
+        initialData[cat.id] = 0;
+        initialData[normKey] = 0;
       });
+
+      setFormData(initialData);
     }
-  }, [editingScore, open]);
+  }, [editingScore, open, categories]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Convert "" -> 0 trước khi submit
-    const normalized: ScoreFormData = {
-      ...formData,
-      knowledge: formData.knowledge === "" ? 0 : formData.knowledge,
-      skill: formData.skill === "" ? 0 : formData.skill,
-      attendance: formData.attendance === "" ? 0 : formData.attendance,
-      bonus: formData.bonus === "" ? 0 : formData.bonus,
-      penalty: formData.penalty === "" ? 0 : formData.penalty,
-    };
+    const normalized: Record<string, any> = { ...formData };
 
-    onSubmit(normalized);
+    categories.forEach((cat) => {
+      const normKey = normalizeKey(cat.name);
+      const rawVal = normalized[cat.id] ?? normalized[normKey];
+      const val = rawVal === "" ? 0 : Number(rawVal) || 0;
+      normalized[cat.id] = val;
+      normalized[normKey] = val;
+    });
+
+    onSubmit(normalized as any);
     onOpenChange(false);
   };
 
@@ -96,7 +119,7 @@ export function ScoreFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-slate-800">
             {editingScore ? "Chỉnh sửa điểm" : "Thêm điểm mới"}
@@ -134,6 +157,7 @@ export function ScoreFormDialog({
               ))}
             </select>
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-sm font-semibold">Năm</Label>
@@ -169,114 +193,83 @@ export function ScoreFormDialog({
               </select>
             </div>
           </div>
-          {/* --- INPUTS --- */}
+
+          {/* --- DYNAMIC INPUTS --- */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="knowledge" className="text-sm font-semibold">
-                Kiến thức (HS3)
-              </Label>
-              <Input
-                id="knowledge"
-                type="number"
-                min="0"
-                max="10"
-                step="0.5"
-                value={formData.knowledge === "" ? "" : formData.knowledge}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    knowledge:
-                      e.target.value === "" ? "" : Number(e.target.value),
-                  })
-                }
-                className="h-11"
-              />
-            </div>
+            {categories
+              .filter((cat) => cat.name !== "Thưởng" && cat.name !== "Phạt")
+              .map((cat) => {
+                const normKey = normalizeKey(cat.name);
+                const isAttendance = cat.name === "Chuyên cần";
+                const val = formData[cat.id] ?? formData[normKey] ?? 0;
 
-            <div className="space-y-2">
-              <Label htmlFor="skill" className="text-sm font-semibold">
-                Kỹ năng (HS3)
-              </Label>
-              <Input
-                id="skill"
-                type="number"
-                min="0"
-                max="10"
-                step="0.5"
-                value={formData.skill === "" ? "" : formData.skill}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    skill: e.target.value === "" ? "" : Number(e.target.value),
-                  })
-                }
-                className="h-11"
-              />
-            </div>
+                return (
+                  <div key={cat.id} className="space-y-2">
+                    <Label htmlFor={`cat-${cat.id}`} className="text-sm font-semibold">
+                      {cat.name} (HS{cat.weight})
+                    </Label>
+                    <Input
+                      id={`cat-${cat.id}`}
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.5"
+                      disabled={isAttendance}
+                      value={val === "" ? "" : val}
+                      onChange={(e) => {
+                        const newScore =
+                          e.target.value === "" ? "" : Number(e.target.value);
+                        setFormData((prev) => ({
+                          ...prev,
+                          [cat.id]: newScore,
+                          [normKey]: newScore,
+                        }));
+                      }}
+                      className={`h-11 ${
+                        isAttendance ? "bg-slate-100 cursor-not-allowed" : ""
+                      }`}
+                    />
+                  </div>
+                );
+              })}
 
-            <div className="space-y-2">
-              <Label htmlFor="attendance" className="text-sm font-semibold">
-                Chuyên cần (HS2)
-              </Label>
-              <Input
-                id="attendance"
-                type="number"
-                min="0"
-                max="10"
-                disabled
-                step="0.5"
-                value={formData.attendance === "" ? "" : formData.attendance}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    attendance:
-                      e.target.value === "" ? "" : Number(e.target.value),
-                  })
-                }
-                className="h-11 bg-gray-100 cursor-not-allowed"
-              />
-            </div>
+            {categories
+              .filter((cat) => cat.name === "Thưởng" || cat.name === "Phạt")
+              .map((cat) => {
+                const normKey = normalizeKey(cat.name);
+                const legacyKey = cat.name === "Thưởng" ? "bonus" : "penalty";
+                const val =
+                  formData[cat.id] ??
+                  formData[legacyKey] ??
+                  formData[normKey] ??
+                  0;
 
-            <div className="space-y-2">
-              <Label htmlFor="bonus" className="text-sm font-semibold">
-                Điểm thưởng
-              </Label>
-              <Input
-                id="bonus"
-                type="number"
-                min="0"
-                step="0.5"
-                value={formData.bonus === "" ? "" : formData.bonus}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    bonus: e.target.value === "" ? "" : Number(e.target.value),
-                  })
-                }
-                className="h-11"
-              />
-            </div>
-
-            <div className="space-y-2 col-span-2">
-              <Label htmlFor="penalty" className="text-sm font-semibold">
-                Điểm phạt
-              </Label>
-              <Input
-                id="penalty"
-                type="number"
-                min="0"
-                step="0.5"
-                value={formData.penalty === "" ? "" : formData.penalty}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    penalty:
-                      e.target.value === "" ? "" : Number(e.target.value),
-                  })
-                }
-                className="h-11"
-              />
-            </div>
+                return (
+                  <div key={cat.id} className="space-y-2">
+                    <Label htmlFor={`cat-${cat.id}`} className="text-sm font-semibold">
+                      {cat.name === "Thưởng" ? "Điểm thưởng" : "Điểm phạt"}
+                    </Label>
+                    <Input
+                      id={`cat-${cat.id}`}
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      value={val === "" ? "" : val}
+                      onChange={(e) => {
+                        const newScore =
+                          e.target.value === "" ? "" : Number(e.target.value);
+                        setFormData((prev) => ({
+                          ...prev,
+                          [cat.id]: newScore,
+                          [normKey]: newScore,
+                          [legacyKey]: newScore,
+                        }));
+                      }}
+                      className="h-11"
+                    />
+                  </div>
+                );
+              })}
           </div>
           <div className="space-y-2">
   <Label className="text-sm font-semibold">

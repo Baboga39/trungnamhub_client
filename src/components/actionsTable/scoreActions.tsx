@@ -16,15 +16,8 @@ export const getScoreActions = ({
     label: "Chỉnh sửa",
     onClick: (score) => {
       onEdit({
-        id: score.id,
-        name: score.mMember?.name || "",
-        knowledge: score[normalizeKey("Kiến thức")] || 0,
-        skill: score[normalizeKey("Kỹ năng")] || 0,
-        attendance: score[normalizeKey("Chuyên cần")] || 0,
-        bonus: score[normalizeKey("Thưởng")] || 0,
-        penalty: score[normalizeKey("Phạt")] || 0,
-        year: score.year,
-        quarter: score.quarter,
+        ...score,
+        name: score.name || score.mMember?.name || "",
       });
     },
   },
