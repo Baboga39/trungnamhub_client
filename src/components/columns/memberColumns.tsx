@@ -18,6 +18,7 @@ export interface Member {
   active: boolean;
   promotionDate?: string | null;
   startDate: string | null;
+  branch?: string | null;
   parents?: string;
 }
 
@@ -140,6 +141,19 @@ export const memberColumns: Column<Member>[] = [
       <div className="flex items-center gap-2">
         <Church className="h-4 w-4 text-slate-400" />
         <span className="text-slate-700">{member.church}</span>
+      </div>
+    ),
+  },
+  {
+    key: "branch",
+    label: "Ngành",
+    width: 130,
+    searchable: true,
+    render: (member) => (
+      <div className="flex items-center gap-2">
+        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 font-medium">
+          {member.branch || <span className="text-slate-400 italic">Chưa xếp</span>}
+        </Badge>
       </div>
     ),
   },

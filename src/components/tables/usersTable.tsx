@@ -32,7 +32,7 @@ interface User {
 
 export default function UsersTable() {
   const { users, loading, error } = useSelector(
-    (state: RootState) => state.users
+    (state: RootState) => state.users,
   );
   const dispatch = useDispatch<AppDispatch>();
 
@@ -83,12 +83,16 @@ export default function UsersTable() {
         { value: "Thiếu Trưởng", label: "Thiếu Trưởng" },
         { value: "Thiếu Phó", label: "Thiếu Phó" },
         { value: "Trưởng Thiếu", label: "Trưởng Thiếu" },
+        { value: "Thanh Trưởng", label: "Thanh Trưởng" },
+        { value: "Thanh Phó", label: "Thanh Phó" },
+        { value: "Vườn trưởng", label: "Vườn trưởng" },
+        { value: "Vườn phó", label: "Vườn phó" },
         { value: "Admin", label: "Admin - Toàn quyền" },
         { value: "User", label: "User - Người dùng" },
       ],
     },
     {
-      name: "branch",       // thêm field branch
+      name: "branch", // thêm field branch
       label: "Ngành",
       type: "select",
       required: true,
@@ -161,7 +165,9 @@ export default function UsersTable() {
   };
 
   const handleDelete = async (user: User) => {
-    if (window.confirm(`Bạn có chắc muốn xóa người dùng "${user.name}" không?`)) {
+    if (
+      window.confirm(`Bạn có chắc muốn xóa người dùng "${user.name}" không?`)
+    ) {
       try {
         const result = await dispatch(deleteUserThunk(user.id));
         if (deleteUserThunk.fulfilled.match(result)) {
@@ -216,7 +222,9 @@ export default function UsersTable() {
       <CommonForm
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
-        title={formMode === "edit" ? "Chỉnh sửa người dùng" : "Thêm người dùng mới"}
+        title={
+          formMode === "edit" ? "Chỉnh sửa người dùng" : "Thêm người dùng mới"
+        }
         description={
           formMode === "edit"
             ? "Cập nhật thông tin người dùng"

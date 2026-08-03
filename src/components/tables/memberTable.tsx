@@ -34,6 +34,7 @@ import type { RootState, AppDispatch } from "../../store";
 import { toast } from "react-toastify";
 import { th } from "date-fns/locale";
 import DateStatusModal from "../member/DateStatusModal";
+import PromoteBranchModal from "../member/PromoteBranchModal";
 import { getMemberHistory } from "../../features/members/memberThunks";
 import MemberStatusHistoryModal from "../member/MemberStatusHistoryModal";
 import { memberFormFields } from "../formFields/memberFormFields";
@@ -55,7 +56,7 @@ interface Member {
   contact: string | null;
   active: boolean;
   promotionDate?: string | null;
-
+  branch?: string | null;
   status?: "ACTIVE" | "INACTIVE" | "PROMOTED";
 }
 
@@ -75,6 +76,8 @@ export default function MembersTable() {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [selectedHistoryIds, setSelectedHistoryIds] = useState<number[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [openPromoteModal, setOpenPromoteModal] = useState(false);
+  const [promoteMember, setPromoteMember] = useState<Member | null>(null);
 
   // <CHANGE> Fetch members from API
   useEffect(() => {
@@ -150,10 +153,16 @@ export default function MembersTable() {
     setOpenStatusModal(true);
   };
 
+  const handlePromoteBranch = (member: Member) => {
+    setPromoteMember(member);
+    setOpenPromoteModal(true);
+  };
+
   const actions = getMemberActions({
     onEdit: handleEdit,
     onChangeStatus: handleChangeStatus,
     onViewHistory: handleViewHistory,
+    onPromoteBranch: handlePromoteBranch,
   });
 
   const filterOptions = getMemberFilterOptions(members || []);
@@ -216,6 +225,14 @@ export default function MembersTable() {
         open={openStatusModal}
         onOpenChange={setOpenStatusModal}
         member={statusMember || null}
+        onSuccess={() => {
+          dispatch(fetchMembersThunk());
+        }}
+      />
+      <PromoteBranchModal
+        open={openPromoteModal}
+        onOpenChange={setOpenPromoteModal}
+        member={promoteMember}
         onSuccess={() => {
           dispatch(fetchMembersThunk());
         }}

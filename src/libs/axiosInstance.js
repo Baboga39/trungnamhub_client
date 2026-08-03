@@ -26,7 +26,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 axiosInstance.interceptors.request.use((config) => {
-  console.log("👉 API CALL:", config.url);
   return config;
 });
 

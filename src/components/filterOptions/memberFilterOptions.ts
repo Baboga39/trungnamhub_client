@@ -5,6 +5,7 @@ interface Member {
   gender: string;
   parish: string | null;
   church: string;
+  branch?: string | null;
   startYear: number | null;
   fatherName: string | null;
   motherName: string | null;
@@ -21,6 +22,16 @@ export const getMemberFilterOptions = (members: Member[]) => {
         { value: "Nam", label: "Nam" },
         { value: "Nữ", label: "Nữ" },
       ],
+    },
+    {
+      key: "branch",
+      label: "Ngành",
+      options: Array.from(
+        new Set(members?.map((m) => m.branch).filter(Boolean))
+      ).map((b) => ({
+        value: b!,
+        label: b!,
+      })),
     },
     {
       key: "status",

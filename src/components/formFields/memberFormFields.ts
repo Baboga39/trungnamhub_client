@@ -36,6 +36,16 @@ export const memberFormFields: FormField[] = [
     required: true,
   },
   {
+    name: "branch",
+    label: "Ngành",
+    type: "select",
+    options: [
+      { value: "Đồng", label: "Ngành Đồng (Cấp 1)" },
+      { value: "Thiếu", label: "Ngành Thiếu (Cấp 2)" },
+      { value: "Thanh", label: "Ngành Thanh (Cấp 3)" },
+    ],
+  },
+  {
     name: "startDate",
     label: "Ngày bắt đầu",
     type: "date",

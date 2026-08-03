@@ -17,7 +17,7 @@ interface StatusHistory {
   id: number;
   memberId: number;
   status: boolean;
-  type: "ACTIVE" | "INACTIVE" | "PROMOTED";
+  type: "ACTIVE" | "INACTIVE" | "PROMOTED" | "BRANCH_PROMOTED";
   date: string;
   note: string | null;
   createdAt: string;
@@ -89,6 +89,13 @@ export default function MemberStatusHistoryModal({
           text: "Lên ngành",
           className: "bg-blue-100 text-blue-700",
           icon: "⬆",
+        };
+
+      case "BRANCH_PROMOTED":
+        return {
+          text: "Chuyển ngành",
+          className: "bg-purple-100 text-purple-700",
+          icon: "🔄",
         };
 
       default:

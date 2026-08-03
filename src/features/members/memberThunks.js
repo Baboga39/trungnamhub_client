@@ -84,3 +84,15 @@ export const deleteMemberHistory = createAsyncThunk(
     }
   }
 );
+
+export const promoteBranch = createAsyncThunk(
+  "members/promoteBranch",
+  async ({ memberId, note }, { rejectWithValue }) => {
+    try {
+      const res = await memberApi.promoteBranch(memberId, note);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
