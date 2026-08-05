@@ -6,8 +6,7 @@ import { selectGlobalLoading } from "../../lib/loadingSelector"
 const LoadingContext = createContext();
 
 export const LoadingProvider = ({ children }) => {
-  const isLoading = useSelector(selectGlobalLoading); // ✅ Lấy từ Redux
-
+  const isLoading = useSelector(selectGlobalLoading); 
   const showLoading = () => {};
   const hideLoading = () => {};
 

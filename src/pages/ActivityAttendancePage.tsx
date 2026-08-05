@@ -92,7 +92,7 @@ export default function AttendanceActivityPage() {
         }),
       ).unwrap();
 
-      toast.success(`Đã lưu ${memberIds.length} đoàn sinh`);
+      toast.success(`Đã lưu `);
     } catch {
       toast.error("Lưu thất bại");
     } finally {
