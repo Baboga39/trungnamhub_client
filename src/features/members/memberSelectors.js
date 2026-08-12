@@ -16,7 +16,6 @@ export const selectTotalMembersThisYear = (state) => {
 // Số đoàn sinh Đang sinh hoạt
 export const selectActiveMembers = (state) => {
   return state.members.members.filter((member) => member.active === true).length;
-  console.log(state.members.members);
 };
 
 // Số đoàn sinh theo giáo xứ đông nhất
