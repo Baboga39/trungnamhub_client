@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { useNavigate } from "react-router-dom";
+import programApi from "../api/programApi";
 
 import {
   Card,
@@ -46,6 +47,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     programApi.getHealthCheck().catch((err) => {
+    console.warn("Program server wake-up failed:", err.message);
+  });
+
     try {
       const result = await dispatch(loginThunk(formData)).unwrap();
        navigate("/", { replace: true });

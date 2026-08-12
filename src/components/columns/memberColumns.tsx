@@ -228,8 +228,8 @@ export const memberColumns: Column<Member>[] = [
   label: "Trạng thái",
   width: 150,
   render: (member) => {
- switch (member.status) {
-      case "ACTIVE":
+ switch (member.active) {
+      case true:
         return (
           <Badge className="bg-green-100 text-green-700 border-green-200">
             Hoạt động
@@ -243,7 +243,7 @@ export const memberColumns: Column<Member>[] = [
           </Badge>
         );
 
-      case "INACTIVE":
+      case false:
         return (
           <Badge className="bg-red-100 text-red-700 border-red-200">
             Nghỉ

@@ -1,6 +1,8 @@
 import programAxiosInstance from "../libs/programAxiosInstance";
 
 const programApi = {
+
+  getHealthCheck: () => programAxiosInstance.get("/health"),
   // Quarter Programs
   getPrograms: (params) => programAxiosInstance.get("/programs", { params }),
   getProgram: (id) => programAxiosInstance.get(`/programs/${id}`),
@@ -14,6 +16,8 @@ const programApi = {
   createLesson: (programId, data) => programAxiosInstance.post(`/programs/${programId}/lessons`, data),
   updateLesson: (id, data) => programAxiosInstance.patch(`/lessons/${id}`, data),
   deleteLesson: (id) => programAxiosInstance.delete(`/lessons/${id}`),
+
+
 
   // Program Leaders
   getLeaders: (lessonId) => programAxiosInstance.get(`/program-lessons/${lessonId}/leaders`),
