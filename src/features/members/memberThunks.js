@@ -20,7 +20,6 @@ export const upSertMemberThunk = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await memberApi.upSert(data);
-      console.log("Upsert response data:", res);
       return res.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -87,9 +86,9 @@ export const deleteMemberHistory = createAsyncThunk(
 
 export const promoteBranch = createAsyncThunk(
   "members/promoteBranch",
-  async ({ memberId, note }, { rejectWithValue }) => {
+  async ({ memberId, note, effectiveDate }, { rejectWithValue }) => {
     try {
-      const res = await memberApi.promoteBranch(memberId, note);
+      const res = await memberApi.promoteBranch(memberId, note, effectiveDate);
       return res.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

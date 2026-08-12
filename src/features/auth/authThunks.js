@@ -21,6 +21,7 @@ export const loginThunk = createAsyncThunk(
           email: decoded.email,
           name: decoded.name,
           role: decoded.role,
+          branch: decoded.branch,
           startYear: decoded.startYear,
           sumEvent: decoded.sumEvent,
         };

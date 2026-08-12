@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Input } from "../ui/input";
 import {
   Dialog,
   DialogContent,
@@ -53,6 +54,9 @@ export default function PromoteBranchModal({
 }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const [note, setNote] = useState("");
+  const [effectiveDate, setEffectiveDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [loading, setLoading] = useState(false);
 
   const currentBranch = getBranchInfo(member?.branch);
@@ -70,12 +74,13 @@ export default function PromoteBranchModal({
     try {
       setLoading(true);
       await dispatch(
-        promoteBranch({ memberId: member.id, note })
+        promoteBranch({ memberId: member.id, note, effectiveDate })
       ).unwrap();
       toast.success(
         `Lên ngành thành công: ${currentBranch!.name} → ${nextBranch!.name}`
       );
       setNote("");
+      setEffectiveDate(new Date().toISOString().split("T")[0]);
       onOpenChange(false);
       onSuccess?.();
     } catch (err: any) {
@@ -180,6 +185,22 @@ export default function PromoteBranchModal({
                     {nextBranch!.name}
                   </span>
                 </div>
+              </div>
+
+              {/* Ngày lên ngành */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">
+                  Ngày lên ngành <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="date"
+                  value={effectiveDate}
+                  onChange={(e) => setEffectiveDate(e.target.value)}
+                  className="h-11"
+                />
+                <p className="text-xs text-slate-400">
+                  Mặc định là hôm nay. Có thể chọn ngày thực tế nếu khác.
+                </p>
               </div>
 
               {/* Note */}

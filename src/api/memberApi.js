@@ -14,8 +14,8 @@ const memberApi = {
     }),
   getHistory: (memberId) => axiosInstance.get(`/members/${memberId}/history`),
   deleteHistory: (ids) => axiosInstance.delete(`/members/history`, { data: { ids } }),
-  promoteBranch: (memberId, note) =>
-    axiosInstance.patch("/members/promote-branch", { memberId, note }),
+  promoteBranch: (memberId, note, effectiveDate) =>
+    axiosInstance.patch("/members/promote-branch", { memberId, note, effectiveDate }),
   getBranches: () => axiosInstance.get("/members/branches"),
 };
 

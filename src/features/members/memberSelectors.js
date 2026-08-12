@@ -6,9 +6,11 @@ export const selectTotalMembersThisYear = (state) => {
   const currentYear = new Date().getFullYear();
 
   return state.members.members.filter((member) => {
-    if (!member.joinedDate) return false; // nếu ko có ngày thì bỏ qua
-    const joinedYear = new Date(member.joinedDate).getFullYear();
-    return joinedYear === currentYear;
+    if (!member.startDate) return false;
+
+    const [day, month, year] = member.startDate.split("/");
+
+    return Number(year) === currentYear;
   }).length;
 };
 // Số đoàn sinh Đang sinh hoạt

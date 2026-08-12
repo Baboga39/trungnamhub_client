@@ -24,7 +24,7 @@ export function Sidebar({ isCollapsed = false, onNavigate }) {
   }, [dispatch, isAuthenticated])
 
   const visibleMenus = menuItems.filter((item) =>
-    permissions.includes(item.href)
+    !permissions || permissions.length === 0 || permissions.includes(item.href) || item.href === "/programs" || item.href === "/"
   )
 
   const groupedMenus = visibleMenus.reduce((acc, item) => {

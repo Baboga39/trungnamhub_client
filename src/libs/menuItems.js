@@ -12,9 +12,15 @@ import {
   ClipboardList,
   FileBarChart,
   CalendarClock,
+  CalendarDays,
 } from "lucide-react"
 
 const baseModules = [
+  {
+    icon: CalendarDays,
+    label: "Chương trình sinh hoạt",
+    href: "/programs",
+  },
   {
     icon: Users,
     label: "Đoàn sinh",
@@ -57,6 +63,12 @@ export const menuItems = [
     icon: Home,
     label: "Tổng quan",
     href: "/",
+    category: "Tổng quan",
+  },
+  {
+    icon: Trophy,
+    label: "Executive Dashboard",
+    href: "/executive-dashboard",
     category: "Tổng quan",
   },
   {

@@ -14,9 +14,19 @@ import { GradeTrendTimeline } from "@/components/dashboard/grade-trend-timeline"
 import { SmartKpiCards } from "@/components/dashboard/smart-kpi-cards"
 import { Top3Ranking } from "@/components/dashboard/top-3-ranking"
 import { fetchDashboardStats } from "../features/dashboard/dashboardThunks"
-import { url } from "zod"
+import { useNavigate } from "react-router-dom"
+import { Shield, ChevronRight } from "lucide-react"
 
 const quickActions = [
+  {
+    id: "0",
+    title: "Executive Cockpit",
+    description: "Trưởng Đoàn Cockpit",
+    icon: Shield,
+    color: "text-amber-600",
+    bgColor: "bg-amber-100",
+    url: "/executive-dashboard",
+  },
   {
     id: "1",
     title: "Điểm danh",
@@ -51,11 +61,13 @@ const quickActions = [
     icon: ClipboardList,
     color: "text-purple-600",
     bgColor: "bg-purple-100",
+    url: "/report-center"
   },
 ]
 
 export default function DashboardPage() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { stats, loading } = useSelector((state: any) => state.dashboard)
 
   useEffect(() => {
@@ -65,6 +77,26 @@ export default function DashboardPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {/* Executive Banner */}
+        <div
+          onClick={() => navigate("/executive-dashboard")}
+          className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-5 text-white shadow-lg flex items-center justify-between cursor-pointer hover:opacity-95 transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-amber-500/20 text-amber-300 rounded-xl border border-amber-400/30">
+              <Shield className="w-6 h-6 text-amber-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-extrabold text-white">Executive Dashboard — Quý Trưởng Đoàn</h2>
+              <p className="text-xs text-slate-300">Xem ngay báo cáo tổng quan đa chiều, so sánh các Ngành & Cảnh báo nguy cơ</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-xs font-bold bg-white/10 px-3 py-2 rounded-xl hover:bg-white/20 transition-colors">
+            <span>Mở Executive Cockpit</span>
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatsCard
