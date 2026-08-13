@@ -1,5 +1,5 @@
 import React from "react";
-import { Crown, Medal, Star, Trophy, Sparkles } from "lucide-react";
+import { Crown, Medal, Star, Trophy, Sparkles, Award } from "lucide-react";
 import { ExecutiveTopMember } from "@/types/executiveDashboard";
 
 interface Top3PodiumSectionProps {
@@ -10,6 +10,36 @@ interface Top3PodiumSectionProps {
   branch: string;
 }
 
+// 3 Ngành theo màu vàng, xanh, đỏ: Đồng (Vàng) -> Thiếu (Xanh) -> Thanh (Đỏ)
+const getBranchBadgeStyle = (branchName: string) => {
+  if (branchName.includes("Đồng")) {
+    return {
+      bg: "bg-amber-100/90 text-amber-900 border-amber-300",
+      dot: "bg-amber-500",
+      label: "🟡 Ngành Đồng",
+    };
+  }
+  if (branchName.includes("Thiếu")) {
+    return {
+      bg: "bg-blue-100/90 text-blue-900 border-blue-300",
+      dot: "bg-blue-600",
+      label: "🔵 Ngành Thiếu",
+    };
+  }
+  if (branchName.includes("Thanh")) {
+    return {
+      bg: "bg-rose-100/90 text-rose-900 border-rose-300",
+      dot: "bg-rose-600",
+      label: "🔴 Ngành Thanh",
+    };
+  }
+  return {
+    bg: "bg-slate-100 text-slate-800 border-slate-300",
+    dot: "bg-slate-500",
+    label: branchName,
+  };
+};
+
 export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
   topMembers,
   loading,
@@ -19,9 +49,9 @@ export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
 }) => {
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-indigo-900 via-slate-900 to-purple-950 p-6 sm:p-8 rounded-3xl text-white shadow-xl mb-6 border border-indigo-500/20 animate-pulse">
-        <div className="h-7 bg-indigo-700/50 rounded w-1/3 mb-6"></div>
-        <div className="h-64 bg-indigo-950/60 rounded-2xl"></div>
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm mb-6 animate-pulse">
+        <div className="h-7 bg-slate-200 rounded w-1/3 mb-6"></div>
+        <div className="h-64 bg-slate-100 rounded-2xl"></div>
       </div>
     );
   }
@@ -29,8 +59,8 @@ export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
   let podiumMembers: ExecutiveTopMember[] = [];
 
   if (branch === "all") {
-    // Pick the #1 Top Member from EACH branch (Ngành Thanh, Ngành Thiếu, Ngành Đồng)
-    const targetBranches = ["Ngành Thanh", "Ngành Thiếu", "Ngành Đồng"];
+    // Pick #1 representative from EACH branch in order: Ngành Đồng (Vàng), Ngành Thiếu (Xanh), Ngành Thanh (Đỏ)
+    const targetBranches = ["Ngành Đồng", "Ngành Thiếu", "Ngành Thanh"];
     const pickedIds = new Set<number>();
 
     for (const b of targetBranches) {
@@ -54,7 +84,7 @@ export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
       }
     }
 
-    // Sort the 3 branch representatives by overallScore descending to assign podium positions #1, #2, #3
+    // Sort representatives by overallScore descending to assign podium positions Rank 1, 2, 3
     podiumMembers.sort((a, b) => b.overallScore - a.overallScore);
     podiumMembers = podiumMembers.map((m, idx) => ({
       ...m,
@@ -70,15 +100,15 @@ export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
 
   if (podiumMembers.length === 0) {
     return (
-      <div className="bg-gradient-to-br from-indigo-900 via-slate-900 to-purple-950 p-6 sm:p-8 rounded-3xl text-white shadow-xl mb-6 border border-indigo-500/20 text-center py-12">
-        <Trophy className="w-12 h-12 text-indigo-400/40 mx-auto mb-3" />
-        <h3 className="text-lg font-bold text-slate-200">Chưa có dữ liệu Top 3 cho Quý {quarter}/{year}</h3>
+      <div className="bg-white p-8 rounded-3xl border border-slate-200/80 shadow-sm mb-6 text-center py-12">
+        <Trophy className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+        <h3 className="text-lg font-bold text-slate-700">Chưa có dữ liệu Top 3 cho Quý {quarter}/{year}</h3>
         <p className="text-xs text-slate-400 mt-1">Vui lòng kiểm tra lại điểm số và lượt tham gia của đoàn sinh</p>
       </div>
     );
   }
 
-  // Podium order: [Rank 2 (Silver), Rank 1 (Gold), Rank 3 (Bronze)]
+  // Podium order: [Rank 2 (Silver - Left), Rank 1 (Gold - Center), Rank 3 (Bronze - Right)]
   const podiumOrder = [
     podiumMembers[1] || null, // Rank 2
     podiumMembers[0] || null, // Rank 1
@@ -88,59 +118,69 @@ export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
   const config = [
     {
       rank: 2,
-      medalEmoji: "🥈",
-      title: "Hạng 2",
-      badgeColor: "bg-slate-200 text-slate-800 font-extrabold",
-      gradient: "bg-gradient-to-t from-slate-700 via-slate-600 to-slate-500 border-slate-400",
+      medalIcon: Medal,
+      title: "Hạng 2 • Á Quân",
+      badgeColor: "bg-slate-200 text-slate-900 font-extrabold border border-slate-300",
+      gradient: "bg-gradient-to-t from-slate-200 via-slate-100 to-white border-slate-300 shadow-slate-200/50",
       heightClass: "h-48 sm:h-56",
-      ringColor: "ring-slate-300",
-      iconColor: "text-slate-200",
+      avatarRing: "ring-slate-300 ring-4 bg-slate-50 text-slate-600",
+      headerBg: "bg-slate-100 text-slate-800",
+      iconColor: "text-slate-500",
+      scoreColor: "text-slate-800",
     },
     {
       rank: 1,
-      medalEmoji: "👑",
-      title: "Hạng 1 - Quán Quân",
-      badgeColor: "bg-amber-400 text-slate-900 font-black",
-      gradient: "bg-gradient-to-t from-amber-600 via-amber-500 to-yellow-400 border-amber-300 shadow-amber-500/30",
+      medalIcon: Crown,
+      title: "Hạng 1 • Quán Quân",
+      badgeColor: "bg-amber-400 text-amber-950 font-black border border-amber-500 shadow-md",
+      gradient: "bg-gradient-to-t from-amber-200/90 via-amber-100/70 to-amber-50/50 border-amber-300 shadow-amber-200/60",
       heightClass: "h-60 sm:h-72",
-      ringColor: "ring-amber-300 ring-4",
-      iconColor: "text-amber-300",
+      avatarRing: "ring-amber-400 ring-4 bg-amber-50 text-amber-600 shadow-lg shadow-amber-500/20",
+      headerBg: "bg-amber-400 text-amber-950 font-black",
+      iconColor: "text-amber-500",
+      scoreColor: "text-amber-900",
     },
     {
       rank: 3,
-      medalEmoji: "🥉",
+      medalIcon: Star,
       title: "Hạng 3",
-      badgeColor: "bg-amber-800 text-amber-100 font-extrabold",
-      gradient: "bg-gradient-to-t from-amber-900 via-amber-800 to-amber-700 border-amber-600",
+      badgeColor: "bg-amber-800 text-amber-100 font-extrabold border border-amber-900",
+      gradient: "bg-gradient-to-t from-amber-100/80 via-orange-50/60 to-white border-amber-200 shadow-amber-100/50",
       heightClass: "h-40 sm:h-48",
-      ringColor: "ring-amber-700",
-      iconColor: "text-amber-400",
+      avatarRing: "ring-amber-700/60 ring-4 bg-amber-50 text-amber-700",
+      headerBg: "bg-amber-800/90 text-amber-100",
+      iconColor: "text-amber-700",
+      scoreColor: "text-amber-950",
     },
   ];
 
   return (
-    <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 p-6 sm:p-8 rounded-3xl text-white shadow-2xl mb-6 border border-indigo-500/30 relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="bg-gradient-to-b from-amber-50/50 via-slate-50/80 to-white p-6 sm:p-8 rounded-3xl border border-amber-200/70 shadow-md mb-6 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-80 h-80 bg-amber-300/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-300/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="relative z-10">
-        {/* Header */}
+        {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="bg-amber-400/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full border border-amber-400/30 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                Vinh Danh Đại Diện Xuất Sắc Mỗi Ngành • Quý {quarter}/{year}
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full border border-amber-300 flex items-center gap-1.5 shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                Vinh Danh Đại Diện Xuất Sắc các Ngành • Quý {quarter}/{year}
               </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-amber-200 via-white to-purple-200 bg-clip-text text-transparent">
-              🏆 Top 3 Xuất Sắc Đại Diện Các Ngành
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              🏆 Top 3 Xuất Sắc Dẫn Đầu
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1">
-              Ghi nhận gương mặt xuất sắc nhất dẫn đầu từ mỗi Ngành (Thanh, Thiếu, Đồng) trong Quý
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+              Ghi nhận gương mặt tiêu biểu từ các Ngành 🟡 Ngành Đồng • 🔵 Ngành Thiếu • 🔴 Ngành Thanh
             </p>
           </div>
-          <Star className="w-8 h-8 text-amber-400 animate-spin-slow" />
+          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-sm self-start sm:self-auto">
+            <Award className="w-5 h-5 text-amber-500" />
+            <span className="text-xs font-bold text-slate-700">Đại Diện Ngành</span>
+          </div>
         </div>
 
         {/* Podium Stand Display */}
@@ -149,17 +189,20 @@ export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
             const cfg = config[idx];
             if (!member) return null;
 
+            const Icon = cfg.medalIcon;
+            const branchStyle = getBranchBadgeStyle(member.branch);
+
             return (
               <div
                 key={member.id}
-                className={`flex flex-col items-center flex-1 max-w-[200px] transition-all duration-300 hover:-translate-y-1.5`}
+                className="flex flex-col items-center flex-1 max-w-[210px] transition-all duration-300 hover:-translate-y-2 group"
               >
-                {/* Avatar / Medal Header */}
+                {/* Avatar & Rank Badge */}
                 <div className="relative mb-3 flex flex-col items-center">
                   <div
-                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-2 border-white/20 flex items-center justify-center shadow-lg ${cfg.ringColor}`}
+                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-lg transition-transform group-hover:scale-105 ${cfg.avatarRing}`}
                   >
-                    <span className="text-2xl sm:text-3xl">{cfg.medalEmoji}</span>
+                    <Icon className={`w-7 h-7 sm:w-8 sm:h-8 ${cfg.iconColor}`} />
                   </div>
                   <span
                     className={`text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full mt-1.5 shadow-md ${cfg.badgeColor}`}
@@ -168,36 +211,47 @@ export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
                   </span>
                 </div>
 
-                {/* Member Name & Info */}
-                <div className="text-center mb-2 px-1 w-full">
-                  <h3 className="font-extrabold text-xs sm:text-base text-white truncate drop-shadow">
+                {/* Member Name & Branch */}
+                <div className="text-center mb-2.5 px-1 w-full">
+                  <h3 className="font-black text-xs sm:text-base text-slate-900 truncate tracking-tight">
                     {member.name}
                   </h3>
-                  <div className="text-[11px] font-extrabold text-amber-300 truncate">
-                    {member.branch}
+                  <div className="mt-1 flex items-center justify-center">
+                    <span
+                      className={`text-[10px] sm:text-xs font-extrabold px-2 py-0.5 rounded-full border shadow-2xs flex items-center gap-1 ${branchStyle.bg}`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${branchStyle.dot}`}></span>
+                      {branchStyle.label}
+                    </span>
                   </div>
-                  <div className="text-[10px] text-indigo-200/70 truncate">
-                    {member.parish || "Xứ đoàn"}
+                  <div className="text-[10px] text-slate-400 truncate mt-1 font-medium">
+                    {member.parish || "Xứ đoàn Trung Nam"}
                   </div>
                 </div>
 
                 {/* Podium Block */}
                 <div
-                  className={`w-full ${cfg.heightClass} ${cfg.gradient} rounded-t-2xl p-4 border-t border-l border-r flex flex-col items-center justify-between shadow-2xl relative overflow-hidden`}
+                  className={`w-full ${cfg.heightClass} ${cfg.gradient} rounded-t-3xl p-4 border-t border-l border-r flex flex-col items-center justify-between shadow-xl relative overflow-hidden`}
                 >
                   <div className="text-center mt-2">
-                    <span className="text-[10px] uppercase font-bold text-white/80 tracking-wider block">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">
                       Điểm Tích Lũy
                     </span>
-                    <span className="text-2xl sm:text-4xl font-black text-white drop-shadow-md">
+                    <span className={`text-2xl sm:text-4xl font-black ${cfg.scoreColor} drop-shadow-xs`}>
                       {member.overallScore}
                     </span>
                   </div>
 
                   {/* Sub-metrics */}
-                  <div className="w-full text-center text-[10px] sm:text-xs text-white/90 space-y-0.5 pt-2 border-t border-white/20">
-                    <div>Chuyên cần: <b>{member.attendanceRate}%</b></div>
-                    <div>Thi đua: <b>{member.score}</b></div>
+                  <div className="w-full text-center text-[10px] sm:text-xs text-slate-700 space-y-1 pt-2.5 border-t border-slate-300/60">
+                    <div className="flex items-center justify-between font-semibold">
+                      <span className="text-slate-500">Chuyên cần:</span>
+                      <span className="text-emerald-700 font-bold">{member.attendanceRate}%</span>
+                    </div>
+                    <div className="flex items-center justify-between font-semibold">
+                      <span className="text-slate-500">Thi đua:</span>
+                      <span className="text-indigo-700 font-bold">{member.score}</span>
+                    </div>
                   </div>
                 </div>
               </div>
