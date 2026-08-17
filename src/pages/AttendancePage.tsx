@@ -224,8 +224,13 @@ const handleResetAll = () => {
     setShowConfirmDialog(false);
     setIsSubmitting(true);
     try {
+      const payload =
+        Object.keys(attendanceAll).length > 0
+          ? attendanceAll
+          : { [dateKey]: {} };
+
       const resultAction = await dispatch(
-        markAttendanceThunk({ records: attendanceAll }),
+        markAttendanceThunk({ records: payload }),
       );
 
       if (markAttendanceThunk.fulfilled.match(resultAction)) {

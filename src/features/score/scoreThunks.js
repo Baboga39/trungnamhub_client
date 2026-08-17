@@ -38,3 +38,15 @@ export const upsertScoreThunk = createAsyncThunk(
     }
   }
 );
+
+export const deleteScoreThunk = createAsyncThunk(
+  "grades/deleteScore",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await scoreApi.deleteScore(data);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);

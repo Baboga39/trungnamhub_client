@@ -45,6 +45,20 @@ const programApi = {
   deleteLessonFile: (lessonId, fileId) =>
     programAxiosInstance.delete(`/program-lessons/${lessonId}/files/${fileId}`),
 
+  // Program Approval Workflow
+  sendProgramApproval: (id, reviewerIds) =>
+    programAxiosInstance.post(`/programs/${id}/send-approval`, { reviewerIds }),
+  resubmitProgram: (id, reviewerIds) =>
+    programAxiosInstance.post(`/programs/${id}/resubmit`, { reviewerIds }),
+  handleProgramApprovalByUser: (id, data) =>
+    programAxiosInstance.post(`/programs/${id}/handle-approval`, data),
+  handleProgramApproval: (data) =>
+    programAxiosInstance.post("/program-approvals/handle", data),
+  getProgramApprovalDetail: (token) =>
+    programAxiosInstance.get("/program-approvals/detail", { params: { token } }),
+  getProgramApprovalHistory: (id) =>
+    programAxiosInstance.get(`/programs/${id}/approval-history`),
+
   // Attendance Integration
   ensureSession: (lessonId) =>
     programAxiosInstance.post(`/program-lessons/${lessonId}/ensure-session`),

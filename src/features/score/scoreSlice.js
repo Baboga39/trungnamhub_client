@@ -4,6 +4,7 @@ import {
   getAllThunk,
   getCategoriesThunk,
   upsertScoreThunk,
+  deleteScoreThunk,
 } from "./scoreThunks";
 
 const initialState = {
@@ -53,32 +54,42 @@ const gradeSlice = createSlice({
       .addCase(upsertScoreThunk.pending, (state) => {
         state.loading = true;
       })
-    .addCase(upsertScoreThunk.fulfilled, (state, action) => {
-  state.loading = false;
+      .addCase(upsertScoreThunk.fulfilled, (state, action) => {
+        state.loading = false;
 
-  const updated = action.payload;
+        const updated = action.payload;
 
-  if (Array.isArray(updated)) {
-    // 🔹 Nếu server trả về nhiều bản ghi (array)
-    updated.forEach((u) => {
-      const index = state.grades.findIndex((g) => g.id === u.id);
-      if (index !== -1) {
-        state.grades[index] = u;
-      } else {
-        state.grades.push(u);
-      }
-    });
-  } else if (updated) {
-    // 🔹 Nếu chỉ 1 bản ghi
-    const index = state.grades.findIndex((g) => g.id === updated.id);
-    if (index !== -1) {
-      state.grades[index] = updated;
-    } else {
-      state.grades.push(updated);
-    }
-  }
-})
+        if (Array.isArray(updated)) {
+          updated.forEach((u) => {
+            const index = state.grades.findIndex((g) => g.id === u.id);
+            if (index !== -1) {
+              state.grades[index] = u;
+            } else {
+              state.grades.push(u);
+            }
+          });
+        } else if (updated) {
+          const index = state.grades.findIndex((g) => g.id === updated.id);
+          if (index !== -1) {
+            state.grades[index] = updated;
+          } else {
+            state.grades.push(updated);
+          }
+        }
+      })
       .addCase(upsertScoreThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // ✅ Delete Score
+      .addCase(deleteScoreThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteScoreThunk.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(deleteScoreThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

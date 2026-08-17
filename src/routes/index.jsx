@@ -11,15 +11,19 @@ import ScorePage from "@/pages/Score";
 import AttendanceActivityPage from "@/pages/ActivityAttendancePage";
 import DocumentPage from "@/pages/DocumentPage";
 import ApproveDocumentPage from "@/pages/ApproveDocumentPage";
+import ApproveProgramPage from "@/pages/ApproveProgramPage";
 import PendingApprovalsPage from "@/pages/PendingApprovalsPage";
 import ReportSchedulePage from "@/pages/ReportSchedulePage";
 import ExecutiveDashboardPage from "@/pages/ExecutiveDashboardPage";
+import PublicExecutiveDashboardPage from "@/pages/PublicExecutiveDashboardPage";
 import ProgramsPage from "@/pages/ProgramsPage";
 import ProgramDetailPage from "@/pages/ProgramDetailPage";
 
 export const publicRoutes = [
   { path: "/login", element: <LoginPage /> },
   { path: "/approve", element: <ApproveDocumentPage /> },
+  { path: "/approve-program", element: <ApproveProgramPage /> },
+  { path: "/public-dashboard", element: <PublicExecutiveDashboardPage /> },
   { path: "/documents", element: <DocumentPage /> },
 ];
 

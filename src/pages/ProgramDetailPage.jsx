@@ -15,6 +15,8 @@ import {
 import LessonFormModal from "@/components/program/LessonFormModal";
 import DeleteConfirmDialog from "@/components/program/DeleteConfirmDialog";
 import programApi from "@/api/programApi";
+import SendProgramApprovalDialog from "@/components/program/SendProgramApprovalDialog";
+import ProgramApprovalHistoryModal from "@/components/program/ProgramApprovalHistoryModal";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import {
@@ -38,11 +40,17 @@ import {
   AlertTriangle,
   Inbox,
   RotateCcw,
+  SendHorizontal,
+  History,
+  FileCheck2,
 } from "lucide-react";
 
 const STATUS_CONFIG = {
   DRAFT: { label: "Nháp", className: "bg-amber-100 text-amber-700 border-amber-200" },
-  PUBLISHED: { label: "Đã đăng", className: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  PENDING: { label: "Chờ duyệt", className: "bg-blue-100 text-blue-700 border-blue-200" },
+  NEED_REVISION: { label: "Cần sửa", className: "bg-red-100 text-red-700 border-red-200" },
+  APPROVED: { label: "Đã duyệt", className: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  PUBLISHED: { label: "Đã đăng", className: "bg-teal-100 text-teal-700 border-teal-200" },
   ARCHIVED: { label: "Lưu trữ", className: "bg-slate-100 text-slate-600 border-slate-200" },
 };
 
@@ -79,6 +87,11 @@ export default function ProgramDetailPage() {
   const [deleteLesson, setDeleteLesson] = useState(null);
   const [deleteLessonLoading, setDeleteLessonLoading] = useState(false);
   const [syncingLessonId, setSyncingLessonId] = useState(null);
+
+  // Approval Modals
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [approvalMode, setApprovalMode] = useState("send");
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   const fetchProgram = useCallback(
     async (silent = false) => {
@@ -249,7 +262,45 @@ export default function ProgramDetailPage() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowHistoryModal(true)}
+                      className="rounded-xl border-gray-200 hover:bg-slate-50 text-slate-700 font-medium"
+                    >
+                      <History className="h-4 w-4 mr-1.5 text-amber-600" />
+                      Lịch sử duyệt
+                    </Button>
+
+                    {canEdit && program.status === "DRAFT" && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setApprovalMode("send");
+                          setShowApprovalModal(true);
+                        }}
+                        className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md shadow-blue-200"
+                      >
+                        <SendHorizontal className="h-4 w-4 mr-1.5" />
+                        Gửi phê duyệt
+                      </Button>
+                    )}
+
+                    {canEdit && program.status === "NEED_REVISION" && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setApprovalMode("resubmit");
+                          setShowApprovalModal(true);
+                        }}
+                        className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-medium shadow-md shadow-amber-200"
+                      >
+                        <RefreshCw className="h-4 w-4 mr-1.5" />
+                        Trình lại
+                      </Button>
+                    )}
+
                     <Button
                       variant="outline"
                       size="sm"
@@ -259,13 +310,15 @@ export default function ProgramDetailPage() {
                       <RefreshCw className="h-4 w-4 mr-1.5" />
                       Làm mới
                     </Button>
+
                     {canEdit && (
                       <Button
+                        size="sm"
                         onClick={() => {
                           setEditLesson(null);
                           setShowLessonForm(true);
                         }}
-                        className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md shadow-blue-200"
+                        className="rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-medium"
                       >
                         <Plus className="h-4 w-4 mr-1.5" />
                         Thêm bài học
@@ -653,6 +706,26 @@ export default function ProgramDetailPage() {
         onConfirm={handleDeleteLesson}
         loading={deleteLessonLoading}
       />
+
+      {/* ─────────── Approval Dialog ─────────── */}
+      {program && (
+        <SendProgramApprovalDialog
+          open={showApprovalModal}
+          onOpenChange={setShowApprovalModal}
+          program={program}
+          mode={approvalMode}
+          onSuccess={() => fetchProgram(true)}
+        />
+      )}
+
+      {/* ─────────── History Modal ─────────── */}
+      {program && (
+        <ProgramApprovalHistoryModal
+          open={showHistoryModal}
+          onOpenChange={setShowHistoryModal}
+          programId={program.id}
+        />
+      )}
     </AdminLayout>
   );
 }

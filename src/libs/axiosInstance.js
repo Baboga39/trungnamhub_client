@@ -44,9 +44,10 @@ axiosInstance.interceptors.response.use(
 
 
     if (status === 401) {
-      toast.error("Unauthorized - Please login again!");
-       localStorage.removeItem("accessToken");
-           if (window.location.pathname !== "/login") {
+      const isPublicPath = window.location.pathname === "/login" || window.location.pathname.startsWith("/public") || window.location.pathname.startsWith("/approve");
+      if (!isPublicPath) {
+        toast.error("Hết phiên làm việc - Vui lòng đăng nhập lại!");
+        localStorage.removeItem("accessToken");
         setTimeout(() => {
           window.location.href = "/login";
         }, 1000);

@@ -9,21 +9,23 @@ interface RiskCenterSectionProps {
 }
 
 export const RiskCenterSection: React.FC<RiskCenterSectionProps> = ({
-  riskMembers,
+  riskMembers = [],
   loading,
   onMemberClick,
 }) => {
   const [selectedRiskFilter, setSelectedRiskFilter] = useState<"all" | "high" | "medium" | "low">("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const highRisks = riskMembers.filter((m) => m.riskLevel === "high");
-  const mediumRisks = riskMembers.filter((m) => m.riskLevel === "medium");
-  const lowRisks = riskMembers.filter((m) => m.riskLevel === "low");
+  const safeRiskMembers = Array.isArray(riskMembers) ? riskMembers : [];
+
+  const highRisks = safeRiskMembers.filter((m) => m.riskLevel === "high");
+  const mediumRisks = safeRiskMembers.filter((m) => m.riskLevel === "medium");
+  const lowRisks = safeRiskMembers.filter((m) => m.riskLevel === "low");
 
   const filteredMembers =
     selectedRiskFilter === "all"
-      ? riskMembers
-      : riskMembers.filter((m) => m.riskLevel === selectedRiskFilter);
+      ? safeRiskMembers
+      : safeRiskMembers.filter((m) => m.riskLevel === selectedRiskFilter);
 
   if (loading) {
     return (
@@ -57,7 +59,7 @@ export const RiskCenterSection: React.FC<RiskCenterSectionProps> = ({
           onClick={() => setIsModalOpen(true)}
           className="flex items-center gap-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100/80 px-4 py-2 rounded-2xl border border-rose-200 transition-colors shadow-2xs"
         >
-          <span>Xem tất cả ({riskMembers.length} em)</span>
+          <span>Xem tất cả ({safeRiskMembers.length} em)</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
@@ -74,7 +76,6 @@ export const RiskCenterSection: React.FC<RiskCenterSectionProps> = ({
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-extrabold uppercase text-rose-900 tracking-wider flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-pulse"></span>
               🔴 NGUY CƠ CAO (HIGH)
             </span>
             <span className="text-2xl font-black text-rose-900">{highRisks.length}</span>
@@ -92,7 +93,6 @@ export const RiskCenterSection: React.FC<RiskCenterSectionProps> = ({
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-extrabold uppercase text-amber-900 tracking-wider flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
               🟠 NGUY CƠ TRUNG BÌNH
             </span>
             <span className="text-2xl font-black text-amber-900">{mediumRisks.length}</span>
@@ -110,7 +110,6 @@ export const RiskCenterSection: React.FC<RiskCenterSectionProps> = ({
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-extrabold uppercase text-yellow-900 tracking-wider flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
               🟡 NGUY CƠ THẤP (LOW)
             </span>
             <span className="text-2xl font-black text-yellow-900">{lowRisks.length}</span>
@@ -120,16 +119,16 @@ export const RiskCenterSection: React.FC<RiskCenterSectionProps> = ({
       </div>
 
       {/* Top 3 Risk Snippet */}
-      {riskMembers.length > 0 && (
+      {safeRiskMembers.length > 0 && (
         <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-slate-50/50">
           <div className="px-4 py-2.5 text-xs font-bold text-slate-500 bg-slate-100/80 border-b border-slate-200 flex justify-between">
-            <span>Danh sách Nguy cơ Cao nhất ({Math.min(3, riskMembers.length)} em)</span>
+            <span>Danh sách Nguy cơ Cao nhất ({Math.min(3, safeRiskMembers.length)} em)</span>
             <button onClick={() => setIsModalOpen(true)} className="text-blue-600 hover:underline">
               Bấm để xem tất cả
             </button>
           </div>
           <div className="divide-y divide-slate-100">
-            {riskMembers.slice(0, 3).map((m) => (
+            {safeRiskMembers.slice(0, 3).map((m) => (
               <div
                 key={m.id}
                 onClick={() => onMemberClick && onMemberClick(m.id)}
@@ -188,7 +187,7 @@ export const RiskCenterSection: React.FC<RiskCenterSectionProps> = ({
             {/* Modal Filter Tabs */}
             <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2 overflow-x-auto">
               {[
-                { key: "all", label: `Tất cả (${riskMembers.length})` },
+                { key: "all", label: `Tất cả (${safeRiskMembers.length})` },
                 { key: "high", label: `🔴 High (${highRisks.length})` },
                 { key: "medium", label: `🟠 Medium (${mediumRisks.length})` },
                 { key: "low", label: `🟡 Low (${lowRisks.length})` },

@@ -16,6 +16,14 @@ const dashboardApi = {
   getExecutiveAttendanceTrend: (params) => axiosInstance.get("/dashboard/executive/attendance-trend", { params }),
   getExecutiveActivities: (params) => axiosInstance.get("/dashboard/executive/activities", { params }),
   getExecutiveRisks: (params) => axiosInstance.get("/dashboard/executive/risks", { params }),
+
+  // Public Executive Dashboard Endpoints (No Token Required)
+  getPublicExecutiveOverview: (params) => axiosInstance.get("/dashboard/executive/public/overview", { params }),
+  getPublicExecutiveBranches: (params) => axiosInstance.get("/dashboard/executive/public/branches", { params }),
+  getPublicExecutiveTopMembers: (params) => axiosInstance.get("/dashboard/executive/public/top-members", { params }),
+  getPublicExecutiveAttendanceTrend: (params) => axiosInstance.get("/dashboard/executive/public/attendance-trend", { params }),
+  getPublicExecutiveActivities: (params) => axiosInstance.get("/dashboard/executive/public/activities", { params }),
+  getPublicExecutiveRisks: (params) => axiosInstance.get("/dashboard/executive/public/risks", { params }),
 };
 
 export default dashboardApi;

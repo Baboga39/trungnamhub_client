@@ -165,10 +165,7 @@ export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full border border-amber-300 flex items-center gap-1.5 shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                Vinh Danh Đại Diện Xuất Sắc các Ngành • Quý {quarter}/{year}
-              </span>
+             
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
               🏆 Top 3 Xuất Sắc Dẫn Đầu

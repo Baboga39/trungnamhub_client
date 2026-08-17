@@ -17,8 +17,9 @@ interface AttendanceTrendSectionProps {
   loading: boolean;
 }
 
-export const AttendanceTrendSection: React.FC<AttendanceTrendSectionProps> = ({ data, loading }) => {
+export const AttendanceTrendSection: React.FC<AttendanceTrendSectionProps> = ({ data = [], loading }) => {
   const [activeSeries, setActiveSeries] = useState<string>("all");
+  const safeData = Array.isArray(data) ? data : [];
 
   if (loading) {
     return (
@@ -65,14 +66,14 @@ export const AttendanceTrendSection: React.FC<AttendanceTrendSectionProps> = ({ 
         </div>
       </div>
 
-      {data.length === 0 ? (
+      {safeData.length === 0 ? (
         <div className="text-center py-12 text-slate-400 text-sm font-medium">
           Chưa có dữ liệu sinh hoạt trong khoảng thời gian này.
         </div>
       ) : (
         <div className="h-72 w-full pt-2">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 10, right: 30, left: -10, bottom: 0 }}>
+            <LineChart data={safeData} margin={{ top: 10, right: 30, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis dataKey="label" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
               <YAxis domain={[0, 100]} stroke="#94a3b8" fontSize={11} tickFormatter={(v) => `${v}%`} axisLine={false} tickLine={false} />

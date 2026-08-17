@@ -43,7 +43,7 @@ export const ActivityParticipationSection: React.FC<ActivityParticipationSection
       ) : (
         <div className="space-y-3.5">
           {activities.map((act) => {
-            const dateStr = act.date ? new Date(act.date).toLocaleDateString("vi-VN") : "";
+            const dateStr = act.date;
             return (
               <div
                 key={act.id}

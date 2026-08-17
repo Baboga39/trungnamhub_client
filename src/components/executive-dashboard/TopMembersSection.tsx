@@ -14,19 +14,19 @@ const getBranchBadge = (branchName: string) => {
   if (branchName.includes("Đồng")) {
     return {
       className: "bg-amber-100/90 text-amber-900 border-amber-200",
-      label: "🟡 Ngành Đồng",
+      label: "🟡Đồng",
     };
   }
   if (branchName.includes("Thiếu")) {
     return {
       className: "bg-blue-100/90 text-blue-900 border-blue-200",
-      label: "🔵 Ngành Thiếu",
+      label: "🔵Thiếu",
     };
   }
   if (branchName.includes("Thanh")) {
     return {
       className: "bg-rose-100/90 text-rose-900 border-rose-200",
-      label: "🔴 Ngành Thanh",
+      label: "🔴Thanh",
     };
   }
   return {

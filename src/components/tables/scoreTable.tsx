@@ -7,13 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/common/data-table";
 import type { Column, DataTableAction } from "@/components/common/data-table";
 import { ScoreFormDialog } from "@/components/score/score-form-dialog";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import type { Score, ScoreFormData } from "@/types/score";
 import { fetchMembersThunk } from "@/features/members/memberThunks";
 import { getRank, getRankColor } from "@/libs/score-utils";
+import { toast } from "react-toastify";
 import {
   getCategoriesThunk,
   getAllThunk,
   upsertScoreThunk,
+  deleteScoreThunk,
 } from "@/features/score/scoreThunks";
 import { getScoreColumns } from "../columns/scoreColumns";
 import { getScoreActions } from "../actionsTable/scoreActions";
@@ -26,6 +29,10 @@ export default function ScoresTable() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingScore, setEditingScore] = useState<Score | null>(null);
+
+  const [scoreToDelete, setScoreToDelete] = useState<any>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     dispatch(getCategoriesThunk());
@@ -102,13 +109,37 @@ export default function ScoresTable() {
 
   const columns = useMemo(() => getScoreColumns(categories), [categories]);
 
+  const handleConfirmDelete = async () => {
+    if (!scoreToDelete) return;
+    try {
+      setIsDeleting(true);
+      await dispatch(
+        deleteScoreThunk({
+          memberId: scoreToDelete.memberId,
+          year: scoreToDelete.year,
+          quarter: scoreToDelete.quarter,
+        })
+      ).unwrap();
+      toast.success("Đã xóa điểm thi đua thành công!");
+      dispatch(getAllThunk());
+    } catch (err: any) {
+      toast.error("Xóa điểm thất bại: " + (err || "Đã xảy ra lỗi"));
+    } finally {
+      setIsDeleting(false);
+      setScoreToDelete(null);
+    }
+  };
+
   const actions = getScoreActions({
-  onEdit: (data) => {
-    setEditingScore(data);
-    setIsDialogOpen(true);
-  },
-  onDelete: (score) => console.log("delete", score),
-});
+    onEdit: (data) => {
+      setEditingScore(data);
+      setIsDialogOpen(true);
+    },
+    onDelete: (score) => {
+      setScoreToDelete(score);
+      setIsConfirmOpen(true);
+    },
+  });
 
   if (loading) {
     return <p className="p-6 text-slate-500">Đang tải dữ liệu...</p>;
@@ -194,6 +225,21 @@ export default function ScoresTable() {
           if (!open) setEditingScore(null);
         }}
         onSubmit={handleSubmit}
+      />
+
+      <ConfirmDialog
+        open={isConfirmOpen}
+        onOpenChange={setIsConfirmOpen}
+        title="Xóa điểm thi đua"
+        description={`Bạn có chắc chắn muốn xóa tất cả điểm Quý ${scoreToDelete?.quarter}/${scoreToDelete?.year} của em ${scoreToDelete?.name || "này"}?`}
+        message="Hành động này sẽ xóa toàn bộ các cột điểm thi đua của đoàn sinh trong Quý và không thể hoàn tác."
+        icon="trash"
+        iconColor="red"
+        isDangerous={true}
+        confirmText="Xóa điểm"
+        cancelText="Hủy"
+        isLoading={isDeleting}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );
