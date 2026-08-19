@@ -166,11 +166,10 @@ export default function PublicExecutiveDashboardPage() {
 
   const handleShareLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast.success("Đã sao chép liên kết chia sẻ Báo cáo Xứ Đoàn!");
+    toast.success("Đã sao chép liên kết chia sẻ Báo cáo Gia Đình Hưng Đạo!");
   };
 
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
-
+const years = Array.from({ length: 3 }, (_, i) => currentYear - i);
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-16 font-sans">
       {/* ────────────────── Public Header Bar ────────────────── */}
@@ -183,14 +182,14 @@ export default function PublicExecutiveDashboardPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
-                  XỨ ĐOÀN TRUNG NAM
+                  Gia Đình Hưng Đạo Trung Nam
                 </h1>
                 <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] font-bold">
                   <Globe className="w-3 h-3 mr-1 inline" /> Công khai
                 </Badge>
               </div>
               <p className="text-xs text-slate-500 font-medium">
-                Báo cáo Chỉ số & Bảng Vàng Xuất Sắc Xứ Đoàn
+                Báo cáo Chỉ số & Bảng Vàng Xuất Sắc Gia Đình Hưng Đạo
               </p>
             </div>
           </div>
@@ -307,7 +306,7 @@ export default function PublicExecutiveDashboardPage() {
 
       {/* Footer */}
       <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-slate-400">
-        <p>© {currentYear} Trung Nam Hub. Báo cáo Tổng quan Xứ Đoàn được cập nhật tự động.</p>
+        <p>© {currentYear} Trung Nam Hub. Báo cáo Tổng quan Gia Đình Hưng Đạo được cập nhật tự động.</p>
       </footer>
     </div>
   );

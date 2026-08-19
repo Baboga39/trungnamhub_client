@@ -144,7 +144,7 @@ export const TopMembersSection: React.FC<TopMembersSectionProps> = ({
                     </td>
                     <td className="px-4 py-3.5">
                       <div className="font-extrabold text-slate-900">{m.name}</div>
-                      <div className="text-xs text-slate-400">{m.parish || "Xứ đoàn Trung Nam"}</div>
+                      <div className="text-xs text-slate-400">{m.parish || "Gia Đình Hưng Đạo Trung Nam"}</div>
                     </td>
                     <td className="px-4 py-3.5">
                       <span

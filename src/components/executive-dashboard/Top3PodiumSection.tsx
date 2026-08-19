@@ -222,7 +222,7 @@ export const Top3PodiumSection: React.FC<Top3PodiumSectionProps> = ({
                     </span>
                   </div>
                   <div className="text-[10px] text-slate-400 truncate mt-1 font-medium">
-                    {member.parish || "Xứ đoàn Trung Nam"}
+                    {member.parish || "Gia Đình Hưng Đạo Trung Nam"}
                   </div>
                 </div>
 

@@ -94,7 +94,7 @@ export const AttendanceTrendSection: React.FC<AttendanceTrendSectionProps> = ({ 
                 <Line
                   type="monotone"
                   dataKey="all"
-                  name="Toàn Xứ đoàn"
+                  name="Toàn Gia Đình Hưng Đạo"
                   stroke="#2563eb"
                   strokeWidth={3}
                   dot={{ r: 4, fill: "#2563eb" }}

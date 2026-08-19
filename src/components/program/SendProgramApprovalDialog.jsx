@@ -17,7 +17,7 @@ export default function SendProgramApprovalDialog({
   open,
   onOpenChange,
   program,
-  mode = "send", // "send" | "resubmit"
+  mode = "send",
   onSuccess,
 }) {
   const [users, setUsers] = useState([]);
