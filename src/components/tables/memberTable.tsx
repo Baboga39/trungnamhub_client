@@ -53,6 +53,7 @@ interface Member {
   fatherName: string | null;
   motherName: string | null;
   address: string | null;
+  group: string | null;
   contact: string | null;
   active: boolean;
   promotionDate?: string | null;

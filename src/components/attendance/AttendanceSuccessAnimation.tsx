@@ -1,4 +1,5 @@
 import { CheckCircle2 } from "lucide-react"
+import { createPortal } from "react-dom"
 
 interface AttendanceSuccessAnimationProps {
   show: boolean
@@ -7,8 +8,8 @@ interface AttendanceSuccessAnimationProps {
 export function AttendanceSuccessAnimation({ show }: AttendanceSuccessAnimationProps) {
   if (!show) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm animate-in fade-in duration-300">
+  return createPortal(
+    <div className="fixed inset-0 top-0 left-0 w-screen h-screen min-h-[100dvh] z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="bg-white rounded-3xl p-8 shadow-2xl animate-in zoom-in duration-500">
         <div className="flex flex-col items-center gap-4">
           <div className="h-20 w-20 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center animate-in zoom-in duration-500">
@@ -20,6 +21,8 @@ export function AttendanceSuccessAnimation({ show }: AttendanceSuccessAnimationP
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
+

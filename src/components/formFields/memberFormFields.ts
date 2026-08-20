@@ -67,6 +67,13 @@ export const memberFormFields: FormField[] = [
     gridColumn: "span 2",
   },
   {
+    name: "group",
+    label: "Hàng/Đội/Toán",
+    type: "text",
+    placeholder: "Nhập Hàng/Đội/Toán",
+    gridColumn: "span 2",
+  },
+  {
     name: "contact",
     label: "Số điện thoại",
     type: "textarea",

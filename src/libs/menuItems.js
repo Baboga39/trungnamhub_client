@@ -138,7 +138,7 @@ export const menuItems = [
     href: "/report-schedules",
     category: "Tổng quan",
   },
-  ...baseModules.map((item) => ({ ...item, category: "Ngành Thiếu" })),
+  ...baseModules.map((item) => ({ ...item, category: "Ngành" })),
   {
     icon: ClipboardList,
     label: "Tài liệu chờ duyệt",
