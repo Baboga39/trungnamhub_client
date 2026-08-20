@@ -3,11 +3,14 @@ import axiosInstance from "../libs/axiosInstance";
 
 const dashboardApi = {
   stats: () => axiosInstance.get("/dashboard/stats"),
-  top3Ranking: () => axiosInstance.get("/dashboard/top3-members"),
+  top3Ranking: (params) => axiosInstance.get("/dashboard/top3-members", { params }),
+
   ranking: () => axiosInstance.get("/dashboard/ranking"),
   gradeTimeLine: () => axiosInstance.get("/dashboard/grade-trend-timeline"),
   getRiskMembers: () => axiosInstance.get("/dashboard/risk-members"),
   getAttendanceStreak: () => axiosInstance.get("/dashboard/attendance-streak-top"),
+  getQuarterlyBirthdays: (params) => axiosInstance.get("/dashboard/quarterly-birthdays", { params }),
+
 
   // Executive Cockpit Endpoints
   getExecutiveOverview: (params) => axiosInstance.get("/dashboard/executive/overview", { params }),

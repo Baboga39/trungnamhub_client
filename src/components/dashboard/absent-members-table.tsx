@@ -9,7 +9,7 @@ export function AbsentMembersTable() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("/api/dashboard/absent-members")
+    fetch("/api/v1/dashboard/absent-members")
       .then((res) => res.json())
       .then((members) => {
         setData(members)

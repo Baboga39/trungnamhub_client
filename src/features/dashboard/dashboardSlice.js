@@ -1,11 +1,22 @@
 // src/features/auth/authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAttendanceStreak, fetchDashboardStats, fetchGradeTimeLine, fetchRanking, fetchRiskMembers, fetchTop3Ranking } from "./dashboardThunks";
+import { fetchAttendanceStreak, fetchDashboardStats, fetchGradeTimeLine, fetchQuarterlyBirthdays, fetchRanking, fetchRiskMembers, fetchTop3Ranking } from "./dashboardThunks";
 
 
 const dashboardSlice = createSlice({
   name: "dashboard",
-  initialState: { stats: null,top3Ranking: null, loading: false,  error: null, gradeTimeLine: null,  ranking: null , riskMembers: null, attendanceStreak  : []},
+  initialState: {
+    stats: null,
+    top3Ranking: null,
+    loading: false,
+    error: null,
+    gradeTimeLine: null,
+    ranking: null,
+    riskMembers: null,
+    attendanceStreak: [],
+    quarterlyBirthdays: null,
+    quarterlyBirthdaysLoading: false,
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDashboardStats.pending, (state) => {
@@ -74,8 +85,20 @@ const dashboardSlice = createSlice({
         state.loading = false
         state.error = action.payload;
       })
+      .addCase(fetchQuarterlyBirthdays.pending, (state) => {
+        state.quarterlyBirthdaysLoading = true
+      })
+      .addCase(fetchQuarterlyBirthdays.fulfilled, (state, action) => {
+        state.quarterlyBirthdays = action.payload
+        state.quarterlyBirthdaysLoading = false
+      })
+      .addCase(fetchQuarterlyBirthdays.rejected, (state, action) => {
+        state.quarterlyBirthdaysLoading = false
+        state.error = action.payload
+      })
   }
 })
 
 
 export default dashboardSlice.reducer;
+

@@ -4,10 +4,14 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Medal, Crown, Star, TrendingUp } from "lucide-react";
 import { fetchTop3Ranking } from "@/features/dashboard/dashboardThunks";
+import { Badge } from "@/components/ui/badge";
 
 interface ApiItem {
   memberId: number;
   totalScore: number;
+  rank?: string;
+  quarter?: number;
+  year?: number;
   member: {
     id: number;
     name: string;
@@ -15,175 +19,320 @@ interface ApiItem {
   };
 }
 
-const medalIcons = [
-  {
+const podiumConfigs = {
+  1: {
+    rankNum: 1,
+    height: "h-60 sm:h-64 md:h-72",
     icon: Crown,
-    color: "text-amber-400",
-    bgColor: "bg-gradient-to-br from-amber-100 to-yellow-100",
+    iconColor: "text-amber-500",
+    iconBg:
+      "bg-white ring-4 ring-amber-300/80 shadow-xl",
+    gradient:
+      "bg-gradient-to-b from-amber-400 via-amber-500 to-yellow-600",
   },
-  {
-    icon: Crown,
-    color: "text-blue-400",
-    bgColor: "bg-gradient-to-br from-blue-100 to-cyan-100",
-  },
-  {
+  2: {
+    rankNum: 2,
+    height: "h-52 sm:h-56 md:h-64",
     icon: Medal,
-    color: "text-orange-500",
-    bgColor: "bg-gradient-to-br from-orange-100 to-red-100",
+    iconColor: "text-blue-600",
+    iconBg:
+      "bg-white ring-4 ring-blue-200/90 shadow-lg",
+    gradient:
+      "bg-gradient-to-b from-blue-500 via-blue-600 to-indigo-700",
   },
-];
-
-const rankPositions = [
-  "h-24 sm:h-28 md:h-40 order-2 md:order-1",
-  "h-28 sm:h-32 md:h-52 order-1 md:order-2",
-  "h-24 sm:h-28 md:h-40 order-3 md:order-3",
-];
-
-const gradients = [
-  "bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-600",
-  "bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-700",
-  "bg-gradient-to-br from-orange-400 via-orange-500 to-red-600",
-];
+  3: {
+    rankNum: 3,
+    height: "h-44 sm:h-48 md:h-56",
+    icon: Medal,
+    iconColor: "text-orange-500",
+    iconBg:
+      "bg-white ring-4 ring-orange-200/90 shadow-lg",
+    gradient:
+      "bg-gradient-to-b from-orange-400 via-orange-500 to-rose-600",
+  },
+};
 
 export function Top3Ranking() {
   const dispatch = useDispatch();
-  const { top3Ranking, loading } = useSelector((state: any) => state.dashboard);
+  const { top3Ranking, loading } = useSelector(
+    (state: any) => state.dashboard
+  );
 
+  const now = new Date();
+  const currentQuarter = Math.ceil((now.getMonth() + 1) / 3);
+  const currentYear = now.getFullYear();
+
+  const quarter = top3Ranking?.[0]?.quarter || currentQuarter;
+  const year = top3Ranking?.[0]?.year || currentYear;
 
   useEffect(() => {
-    dispatch(fetchTop3Ranking() as any);
+    dispatch(fetchTop3Ranking({}) as any);
   }, [dispatch]);
+
+  const renderHeader = () => (
+    <div className="flex items-center justify-between gap-4 mb-6">
+      <div className="min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h3 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            Top 3 Xuất Sắc
+          </h3>
+
+          <Badge className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+            Quý {quarter}/{year}
+          </Badge>
+        </div>
+
+        <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          Đoàn sinh có điểm thi đua cao nhất trong quý
+        </p>
+      </div>
+
+      <div className="shrink-0 p-2.5 sm:p-3 bg-amber-100/90 rounded-xl sm:rounded-2xl">
+        <Star className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 fill-amber-400" />
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
-      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 sm:p-6 md:p-8 shadow-lg overflow-hidden">
-        <div className="flex items-center justify-between mb-4 sm:mb-6 md:mb-8">
-          <div>
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Top 3 Xuất Sắc
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              Các đoàn sinh có điểm cao nhất
-            </p>
-          </div>
-          <Star className="w-5 sm:w-6 h-5 sm:h-6 text-amber-400" />
-        </div>
-        <div className="h-56 sm:h-64 md:h-80 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl animate-pulse" />
+      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-5 sm:p-6 shadow-lg border border-slate-100">
+        {renderHeader()}
+
+        <div className="h-72 sm:h-80 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl animate-pulse" />
       </div>
     );
   }
 
-  if (!top3Ranking || top3Ranking.length < 3) {
+  if (!top3Ranking || top3Ranking.length === 0) {
     return (
-      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 sm:p-6 md:p-8 shadow-lg overflow-hidden">
-        <div className="flex items-center justify-between mb-4 sm:mb-6 md:mb-8">
-          <div>
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Top 3 Xuất Sắc
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              Các đoàn sinh có điểm cao nhất
-            </p>
-          </div>
-          <Star className="w-5 sm:w-6 h-5 sm:h-6 text-amber-400" />
-        </div>
+      <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-5 sm:p-6 shadow-lg border border-slate-100">
+        {renderHeader()}
 
-        <div className="flex flex-col items-center justify-center h-56 sm:h-64 md:h-80 gap-3 sm:gap-4">
-          <div className="relative">
+        <div className="flex flex-col items-center justify-center py-12 sm:py-14">
+          <div className="relative mb-4">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-200 to-purple-200 rounded-full blur-xl opacity-50" />
-            <div className="relative bg-white rounded-full p-6 shadow-xl">
-              <TrendingUp className="w-12 h-12 text-slate-300" />
+
+            <div className="relative bg-white rounded-full p-5 shadow-lg">
+              <TrendingUp className="w-9 h-9 text-slate-300" />
             </div>
           </div>
-          
-          <div className="text-center">
-            <h4 className="text-lg font-bold text-slate-700 mb-2">
-              Chưa có dữ liệu
-            </h4>
-            <p className="text-sm text-slate-500 max-w-xs">
-              Dữ liệu xếp hạng sẽ xuất hiện khi có đủ 3 thành viên tham gia
-            </p>
-          </div>
 
-          <div className="flex gap-2 mt-4">
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse" />
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse" />
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse" />
+          <div className="text-center px-4">
+            <h4 className="text-base font-bold text-slate-700 mb-1">
+              Chưa có dữ liệu Quý {quarter}
+            </h4>
+
+            <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
+              Điểm thi đua sẽ hiển thị khi đoàn sinh trong ngành được chấm
+              điểm trong Quý {quarter}/{year}
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
-  // API sort: [rank1, rank2, rank3]
-  const performers = [
-    { ...top3Ranking[1], rank: 2 },
-    { ...top3Ranking[0], rank: 1 },
-    { ...top3Ranking[2], rank: 3 },
-  ];
+  /**
+   * Normalize ranking
+   *
+   * API:
+   * [rank 1, rank 2, rank 3]
+   *
+   * UI:
+   * [rank 2, rank 1, rank 3]
+   */
+  const ranking = [...top3Ranking]
+    .sort((a, b) => {
+      const rankA = Number(a.rank) || 999;
+      const rankB = Number(b.rank) || 999;
+
+      return rankA - rankB;
+    })
+    .slice(0, 3);
+
+  const performers = ranking.map((item: ApiItem, index: number) => {
+    const rank = Number(item.rank) || index + 1;
+
+    return {
+      ...item,
+      rank,
+      config:
+        podiumConfigs[rank as keyof typeof podiumConfigs] ||
+        podiumConfigs[3],
+    };
+  });
+
+  const orderedPerformers = [
+    performers.find((item) => item.rank === 2),
+    performers.find((item) => item.rank === 1),
+    performers.find((item) => item.rank === 3),
+  ].filter(Boolean) as typeof performers;
 
   return (
-    <div className="rounded-3xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 sm:p-6 md:p-8 shadow-lg overflow-hidden relative">
-      <div className="relative z-10">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Top 3 Xuất Sắc
-            </h3>
-            <p className="text-sm text-slate-600 mt-1">
-              Các đoàn sinh có điểm cao nhất
-            </p>
-          </div>
-          <Star className="w-6 h-6 text-amber-400" />
-        </div>
+    <div className="rounded-3xl bg-gradient-to-br from-blue-50/90 via-purple-50/60 to-pink-50/80 p-5 sm:p-6 shadow-lg border border-indigo-100/60">
+      {renderHeader()}
 
-        <div className="flex items-flex-end justify-center gap-2 sm:gap-3 md:gap-6 h-56 sm:h-64 md:h-80 px-2 sm:px-3">
-          {performers.map((item, index) => {
-            const IconComponent = medalIcons[index].icon;
-            const isTop = index === 1;
+      {/* Podium */}
+      <div className="flex items-end justify-center gap-2 sm:gap-4 md:gap-6 max-w-2xl mx-auto pt-5 sm:pt-7">
+        {orderedPerformers.map((item) => {
+          const config = item.config;
+          const IconComponent = config.icon;
 
-            return (
+          return (
+            <div
+              key={item.memberId}
+              className="
+                group
+                flex
+                flex-col
+                items-center
+                w-[31%]
+                min-w-0
+                transition-transform
+                duration-200
+                hover:-translate-y-1
+              "
+            >
+              {/* Medal */}
               <div
-                key={item.memberId}
-                className={`flex flex-col items-center flex-1 ${rankPositions[index]} transition-transform hover:scale-105`}
+                className={`
+                  relative
+                  z-20
+                  w-11 h-11
+                  sm:w-14 sm:h-14
+                  rounded-xl sm:rounded-2xl
+                  flex items-center justify-center
+                  ${config.iconBg}
+                  ${item.rank === 1 ? "scale-105 sm:scale-110" : ""}
+                  mb-[-20px] sm:mb-[-24px]
+                `}
               >
-                <div
-                  className={`${medalIcons[index].bgColor} rounded-full p-3 sm:p-4 md:p-6 mb-2 sm:mb-3 md:mb-4 shadow-xl ${isTop ? "ring-4 ring-amber-200" : ""}`}
+                <IconComponent
+                  className={`
+                    w-5 h-5
+                    sm:w-7 sm:h-7
+                    ${config.iconColor}
+                  `}
+                />
+
+                {/* Rank */}
+                <span
+                  className="
+                    absolute
+                    -top-1.5
+                    -right-1.5
+                    w-5 h-5
+                    sm:w-6 sm:h-6
+                    rounded-full
+                    bg-white
+                    border border-slate-200
+                    shadow-md
+                    text-[9px] sm:text-[10px]
+                    font-black
+                    text-slate-700
+                    flex items-center justify-center
+                  "
                 >
-                  <IconComponent
-                    className={`${medalIcons[index].color} w-5 sm:w-6 md:w-8 h-5 sm:h-6 md:h-8`}
-                  />
+                  {item.rank}
+                </span>
+              </div>
+
+              {/* Pillar */}
+              <div
+                className={`
+                  relative
+                  w-full
+                  ${config.height}
+                  ${config.gradient}
+                  rounded-2xl sm:rounded-3xl
+                  px-2.5 sm:px-4
+                  pt-8 sm:pt-10
+                  pb-4 sm:pb-5
+                  flex
+                  flex-col
+                  items-center
+                  justify-between
+                  text-white
+                  shadow-lg
+                  overflow-hidden
+                `}
+              >
+                {/* Shine */}
+                <div
+                  className="
+                    absolute
+                    inset-x-0
+                    top-0
+                    h-20
+                    bg-gradient-to-b
+                    from-white/15
+                    to-transparent
+                    pointer-events-none
+                  "
+                />
+
+                {/* Member */}
+                <div className="relative z-10 w-full text-center">
+                  <p
+                    className="
+                      font-bold
+                      text-xs sm:text-sm md:text-base
+                      leading-tight
+                      truncate
+                    "
+                    title={item.member?.name}
+                  >
+                    {item.member?.name}
+                  </p>
+
+                  {item.member?.parish && (
+                    <p
+                      className="
+                        text-white/75
+                        text-[10px] sm:text-xs
+                        font-medium
+                        mt-1
+                        truncate
+                      "
+                      title={item.member.parish}
+                    >
+                      {item.member.parish}
+                    </p>
+                  )}
                 </div>
 
-                <div
-                  className={`${gradients[index]} w-full rounded-3xl p-6 flex flex-col items-center justify-between flex-1 shadow-2xl relative`}
-                >
-                  <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 bg-white text-slate-800 text-xs sm:text-sm font-black rounded-full w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center shadow-xl">
-                    #{item.rank}
-                  </div>
+                {/* Score */}
+                <div className="relative z-10 text-center">
+                  <p
+                    className="
+                      text-2xl
+                      sm:text-3xl
+                      md:text-4xl
+                      font-black
+                      tracking-tight
+                      leading-none
+                    "
+                  >
+                    {item.totalScore}
+                  </p>
 
-                  <div className="text-center flex-1 flex flex-col justify-center mt-1 sm:mt-2 md:mt-3">
-                    <p className="text-white font-bold text-xs sm:text-sm md:text-lg truncate">
-                      {item.member.name}
-                    </p>
-                    {item.member.parish && (
-                      <p className="text-white/90 text-[10px] sm:text-xs">
-                        {item.member.parish}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="text-center mt-auto">
-                    <p className="text-white text-2xl sm:text-3xl md:text-5xl font-black">
-                      {item.totalScore}
-                    </p>
-                    <p className="text-white/90 text-[10px] sm:text-xs font-bold mt-0.5 sm:mt-1">ĐIỂM</p>
-                  </div>
+                  <p
+                    className="
+                      text-white/70
+                      text-[9px]
+                      sm:text-[10px]
+                      font-bold
+                      tracking-[0.18em]
+                      mt-1
+                    "
+                  >
+                    ĐIỂM
+                  </p>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

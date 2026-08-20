@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from "react-redux"
 import { AdminLayout } from "../components/layouts/admin-layout"
 import { StatsCard } from "@/components/dashboard/stats-card"
 import { EnhancedRankingTable } from "@/components/dashboard/enhanced-ranking-table"
-import { AbsentMembersTable } from "@/components/dashboard/absent-members-table"
+import { QuarterlyBirthdays } from "@/components/dashboard/quarterly-birthdays"
 import { QuickActions } from "@/components/dashboard/quick-actions"
+
 import { Users, GraduationCap, Calendar, UserCheck, ClipboardList, PlusCircle, Award } from "lucide-react"
 import { AttendanceStreak } from "@/components/dashboard/attendance-streak"
 import { RiskMembers } from "@/components/dashboard/risk-members"
@@ -126,14 +127,29 @@ export default function DashboardPage() {
           />
 
           <StatsCard
-            title="Điểm danh tháng này"
-            value={loading ? "..." : `${stats?.attendanceRate?.value?.toFixed(1) || 0}%`}
-            subtitle="So với tháng trước"
+            title="Điểm danh gần nhất"
+            value={
+              loading
+                ? "..."
+                : `${stats?.latestAttendance?.rate?.toFixed(1) ?? stats?.attendanceRate?.value?.toFixed(1) ?? 0}%`
+            }
+            subtitle={
+              loading
+                ? "..."
+                : stats?.latestAttendance?.hasData && stats?.latestAttendance?.date
+                ? `${stats.latestAttendance.presentCount}/${stats.latestAttendance.totalMembers} đoàn sinh (${stats.latestAttendance.date})`
+                : "Chưa có buổi sinh hoạt"
+            }
             icon={UserCheck}
-            trend={{
-              value: Math.abs(stats?.attendanceRate?.trend || 0),
-              isPositive: (stats?.attendanceRate?.trend || 0) >= 0,
-            }}
+            trend={
+              stats?.latestAttendance?.hasData
+                ? {
+                    value: Math.abs(stats?.latestAttendance?.trend ?? stats?.attendanceRate?.trend ?? 0),
+                    isPositive: (stats?.latestAttendance?.trend ?? stats?.attendanceRate?.trend ?? 0) >= 0,
+                    label: "so với buổi trước",
+                  }
+                : undefined
+            }
             iconColor="text-orange-600"
             iconBgColor="bg-orange-100"
           />
@@ -167,8 +183,9 @@ export default function DashboardPage() {
             <QuickActions title="Thao tác nhanh" actions={quickActions} />
             <AttendanceStreak />
             <RiskMembers />
-            <AbsentMembersTable />
+            <QuarterlyBirthdays />
           </div>
+
         </div>
       </div>
     </AdminLayout>

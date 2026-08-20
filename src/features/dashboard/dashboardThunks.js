@@ -12,11 +12,12 @@ export const fetchDashboardStats = createAsyncThunk(
 
 export const fetchTop3Ranking = createAsyncThunk(
   "dashboard/fetchTop3Ranking",
-  async () => { 
-    const res = await dashboardApi.top3Ranking()
+  async (params) => { 
+    const res = await dashboardApi.top3Ranking(params)
     return res.data
   }
 )
+
 
 export const fetchRanking = createAsyncThunk(
   "dashboard/fetchRanking",
@@ -49,3 +50,11 @@ export const fetchAttendanceStreak = createAsyncThunk(
     return res.data
   }
 );
+
+export const fetchQuarterlyBirthdays = createAsyncThunk(
+  "dashboard/fetchQuarterlyBirthdays",
+  async (params) => {
+    const res = await dashboardApi.getQuarterlyBirthdays(params)
+    return res.data
+  }
+);
