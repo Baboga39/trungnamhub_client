@@ -18,11 +18,11 @@ export const getMemberActions = ({
       label: "Lên Ngành",
       onClick: onPromoteBranch,
     },
-    {
-      icon: <Power className="h-4 w-4" />,
-      label: "Đổi trạng thái",
-      onClick: onChangeStatus,
-    },
+    // {
+    //   icon: <Power className="h-4 w-4" />,
+    //   label: "Đổi trạng thái",
+    //   onClick: onChangeStatus,
+    // },
     {
       icon: <Edit className="h-4 w-4" />,
       label: "Chỉnh sửa",
