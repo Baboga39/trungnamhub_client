@@ -13,7 +13,7 @@ import {
   FileBarChart,
   CalendarClock,
   CalendarDays,
-} from "lucide-react"
+} from "lucide-react";
 
 const baseModules = [
   {
@@ -56,56 +56,65 @@ const baseModules = [
     label: "Tài liệu",
     href: "/documents",
   },
-]
+];
 
-export const menuItems = [
-  {
-    icon: Home,
-    label: "Tổng quan",
-    href: "/",
-    category: "Tổng quan",
-  },
-  {
-    icon: Trophy,
-    label: "Executive Dashboard",
-    href: "/executive-dashboard",
-    category: "Tổng quan",
-  },
-  {
-    icon: FileBarChart,
-    label: "Trung Tâm Báo Cáo",
-    href: "/report-center",
-    category: "Tổng quan",
-  },
-  {
-    icon: CalendarClock,
-    label: "Báo cáo tự động",
-    href: "/report-schedules",
-    category: "Tổng quan",
-  },
+export const getMenuItems = (user) => {
+  const branchCategory =
+    user?.role === "admin"
+      ? "Tất cả ngành"
+      : user?.branch
+        ? `Ngành ${user.branch}`
+        : "Ngành Thiếu"
 
-  ...baseModules.map(item => ({
-    ...item,
-    category: "Ngành Thiếu",
-  })),
+  return [
+    {
+      icon: Home,
+      label: "Tổng quan",
+      href: "/",
+      category: "Tổng quan",
+    },
+    {
+      icon: Trophy,
+      label: "Executive Dashboard",
+      href: "/executive-dashboard",
+      category: "Tổng quan",
+    },
+    {
+      icon: FileBarChart,
+      label: "Trung Tâm Báo Cáo",
+      href: "/report-center",
+      category: "Tổng quan",
+    },
+    {
+      icon: CalendarClock,
+      label: "Báo cáo tự động",
+      href: "/report-schedules",
+      category: "Tổng quan",
+    },
 
-  {
-    icon: ClipboardList,
-    label: "Tài liệu chờ duyệt",
-    href: "/pending-approvals",
-    category: "Phê duyệt",
-  },
+    ...baseModules.map((item) => ({
+      ...item,
+      category: branchCategory,
+    })),
 
-  {
-    icon: UserCog,
-    label: "Người dùng",
-    href: "/users",
-    category: "Trưởng",
-  },
-  {
-    icon: Settings,
-    label: "Cài đặt",
-    href: "/settings",
-    category: "Trưởng",
-  },
-]
+    {
+      icon: ClipboardList,
+      label: "Tài liệu chờ duyệt",
+      href: "/pending-approvals",
+      category: "Phê duyệt",
+    },
+
+    {
+      icon: UserCog,
+      label: "Người dùng",
+      href: "/users",
+      category: "Trưởng",
+    },
+    {
+      icon: Settings,
+      label: "Cài đặt",
+      href: "/settings",
+      category: "Trưởng",
+    },
+  ]
+}
