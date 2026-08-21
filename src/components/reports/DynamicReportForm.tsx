@@ -112,6 +112,26 @@ export function DynamicReportForm({
             />
           )}
 
+          {/* Static multi-select */}
+          {input.type === "multi-select" && (
+            <Controller
+              name={input.key}
+              control={control}
+              rules={{
+                required: "Vui lòng chọn ít nhất một tùy chọn",
+                validate: (v) => (Array.isArray(v) && v.length > 0) || "Vui lòng chọn ít nhất một tùy chọn",
+              }}
+              render={({ field }) => (
+                <CustomMultiSelect
+                  options={input.options?.map((o) => ({ label: o.label, value: o.value })) ?? []}
+                  value={field.value || []}
+                  onChange={field.onChange}
+                  placeholder="— Chọn một hoặc nhiều tùy chọn —"
+                />
+              )}
+            />
+          )}
+
           {/* Select member */}
           {input.type === "select-member" && (
             <Controller
