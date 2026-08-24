@@ -18,6 +18,7 @@ import ExecutiveDashboardPage from "@/pages/ExecutiveDashboardPage";
 import PublicExecutiveDashboardPage from "@/pages/PublicExecutiveDashboardPage";
 import ProgramsPage from "@/pages/ProgramsPage";
 import ProgramDetailPage from "@/pages/ProgramDetailPage";
+import PendingProgramApprovalsPage from "@/pages/PendingProgramApprovalsPage";
 
 export const publicRoutes = [
   { path: "/login", element: <LoginPage /> },
@@ -39,6 +40,7 @@ export const privateRoutes = [
   { path: "/scores", element: <ScorePage /> },
   { path: "/attendance-activity", element: <AttendanceActivityPage /> },
   { path: "/pending-approvals", element: <PendingApprovalsPage /> },
+  { path: "/pending-program-approvals", element: <PendingProgramApprovalsPage /> },
   { path: "/report-center", element: <ReportCenterPage /> },
   { path: "/programs", element: <ProgramsPage /> },
   { path: "/programs/:programId", element: <ProgramDetailPage /> },

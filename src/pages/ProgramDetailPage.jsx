@@ -651,15 +651,17 @@ export default function ProgramDetailPage() {
                                       </Button>
 
                                       {/* Delete */}
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50"
-                                        onClick={() => setDeleteLesson(lesson)}
-                                        title="Xóa bài học"
-                                      >
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                      </Button>
+                                      {!["APPROVED", "PUBLISHED"].includes(program.status) && (
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-7 w-7 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50"
+                                          onClick={() => setDeleteLesson(lesson)}
+                                          title="Xóa bài học"
+                                        >
+                                          <Trash2 className="h-3.5 w-3.5" />
+                                        </Button>
+                                      )}
                                     </>
                                   ) : (
                                     <span className="text-[11px] text-slate-400 font-medium">

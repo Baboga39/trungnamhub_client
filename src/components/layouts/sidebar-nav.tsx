@@ -47,7 +47,7 @@ export function Sidebar({ isCollapsed = false, onNavigate }) {
       }
 
       // Giữ logic cũ: Programs luôn được phép
-      if (item.href === "/programs") {
+      if (item.href === "/programs" || item.href === "/pending-program-approvals") {
         return true
       }
 

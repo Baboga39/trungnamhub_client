@@ -330,22 +330,24 @@ export default function ProgramsPage() {
                                 e.stopPropagation();
                                 navigate(`/programs/${prog.id}`);
                               }}
-                              title="Chỉnh sửa chương trình"
+                              title="Xem và chỉnh sửa chi tiết"
                             >
                               <Pencil className="h-3.5 w-3.5" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeleteTarget(prog);
-                              }}
-                              title="Xóa chương trình"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
+                            {!["APPROVED", "PUBLISHED"].includes(prog.status) && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteTarget(prog);
+                                }}
+                                title="Xóa chương trình"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
                           </>
                         ) : (
                           <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-medium">

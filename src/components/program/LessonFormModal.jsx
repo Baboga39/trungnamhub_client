@@ -357,18 +357,35 @@ export default function LessonFormModal({
 
           {/* Row 2: Lesson Text */}
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5 text-slate-400" />
-              Bài học <span className="text-red-500">*</span>
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <BookOpen className="h-3.5 w-3.5 text-slate-400" />
+                Bài học <span className="text-red-500">*</span>
+              </Label>
+              {isEdit && ["APPROVED", "PUBLISHED"].includes(program?.status) && (
+                <span className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-md font-medium">
+                  Đã duyệt (Khóa tên bài)
+                </span>
+              )}
+            </div>
             <Textarea
               value={lessonText}
               onChange={(e) => setLessonText(e.target.value)}
               placeholder="Nhập nội dung bài học (Ví dụ: Đọc Kinh Hôm - Các cách lạy; Nghi thức đánh lễ Đức Chí Tôn)..."
               rows={3}
               required
-              className="rounded-xl border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm"
+              disabled={isEdit && ["APPROVED", "PUBLISHED"].includes(program?.status)}
+              className={`rounded-xl border-gray-200 focus:ring-2 focus:ring-blue-500 text-sm ${
+                isEdit && ["APPROVED", "PUBLISHED"].includes(program?.status)
+                  ? "bg-slate-100 text-slate-600 cursor-not-allowed border-dashed"
+                  : ""
+              }`}
             />
+            {isEdit && ["APPROVED", "PUBLISHED"].includes(program?.status) && (
+              <p className="text-[11px] text-amber-600">
+                Chương trình Quý đã được phê duyệt nên tên bài học bị khóa để đảm bảo tính toàn vẹn. Bạn vẫn có thể chỉnh sửa các thông tin khác (ngày giờ, người phụ trách, ghi chú, đính kèm file...).
+              </p>
+            )}
           </div>
 
           {/* Row 3: Prepared Checkbox */}

@@ -58,6 +58,8 @@ const programApi = {
     programAxiosInstance.get("/program-approvals/detail", { params: { token } }),
   getProgramApprovalHistory: (id) =>
     programAxiosInstance.get(`/programs/${id}/approval-history`),
+  getPendingProgramApprovals: () =>
+    programAxiosInstance.get("/program-approvals/pending"),
 
   // Attendance Integration
   ensureSession: (lessonId) =>

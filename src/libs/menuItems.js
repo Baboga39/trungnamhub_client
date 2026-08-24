@@ -103,6 +103,12 @@ export const getMenuItems = (user) => {
       href: "/pending-approvals",
       category: "Phê duyệt",
     },
+    {
+      icon: CalendarCheck,
+      label: "Chương trình chờ duyệt",
+      href: "/pending-program-approvals",
+      category: "Phê duyệt",
+    },
 
     {
       icon: UserCog,
@@ -143,6 +149,12 @@ export const menuItems = [
     icon: ClipboardList,
     label: "Tài liệu chờ duyệt",
     href: "/pending-approvals",
+    category: "Phê duyệt",
+  },
+  {
+    icon: CalendarCheck,
+    label: "Chương trình chờ duyệt",
+    href: "/pending-program-approvals",
     category: "Phê duyệt",
   },
   { icon: UserCog, label: "Người dùng", href: "/users", category: "Trưởng" },
