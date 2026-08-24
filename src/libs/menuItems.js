@@ -13,6 +13,7 @@ import {
   FileBarChart,
   CalendarClock,
   CalendarDays,
+  SlidersHorizontal,
 } from "lucide-react";
 
 const baseModules = [
@@ -45,6 +46,11 @@ const baseModules = [
     icon: BarChart3,
     label: "Điểm số",
     href: "/scores",
+  },
+  {
+    icon: SlidersHorizontal,
+    label: "Cấu hình điểm",
+    href: "/score-config",
   },
   {
     icon: Activity,

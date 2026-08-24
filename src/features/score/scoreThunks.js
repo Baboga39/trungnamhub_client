@@ -17,10 +17,34 @@ export const getAllThunk = createAsyncThunk(
 
 export const getCategoriesThunk = createAsyncThunk(
   "grades/getAllCategories",
-  async (_, { rejectWithValue }) => {
+  async (includeInactive = false, { rejectWithValue }) => {
     try {
-      const res = await scoreApi.getAllCategories();
+      const res = await scoreApi.getAllCategories(includeInactive);
       return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const upsertCategoryThunk = createAsyncThunk(
+  "grades/upsertCategory",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await scoreApi.upsertCategory(data);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const deleteCategoryThunk = createAsyncThunk(
+  "grades/deleteCategory",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await scoreApi.deleteCategory(id);
+      return { id, data: res.data };
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }

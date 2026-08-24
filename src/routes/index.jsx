@@ -8,6 +8,7 @@ import AttendanceCalendarPage from "@/pages/AttendanceCalendarPage";
 import UserPage from "@/pages/UserPage";
 import ActivityPage from "@/pages/ActivityPage";
 import ScorePage from "@/pages/Score";
+import ScoreConfigPage from "@/pages/ScoreConfigPage";
 import AttendanceActivityPage from "@/pages/ActivityAttendancePage";
 import DocumentPage from "@/pages/DocumentPage";
 import ApproveDocumentPage from "@/pages/ApproveDocumentPage";
@@ -38,6 +39,7 @@ export const privateRoutes = [
   { path: "/users", element: <UserPage /> },
   { path: "/activity", element: <ActivityPage /> },
   { path: "/scores", element: <ScorePage /> },
+  { path: "/score-config", element: <ScoreConfigPage /> },
   { path: "/attendance-activity", element: <AttendanceActivityPage /> },
   { path: "/pending-approvals", element: <PendingApprovalsPage /> },
   { path: "/pending-program-approvals", element: <PendingProgramApprovalsPage /> },

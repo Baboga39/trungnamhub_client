@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, SlidersHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/common/data-table";
 import type { Column, DataTableAction } from "@/components/common/data-table";
@@ -10,8 +11,9 @@ import { ScoreFormDialog } from "@/components/score/score-form-dialog";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import type { Score, ScoreFormData } from "@/types/score";
 import { fetchMembersThunk } from "@/features/members/memberThunks";
-import { getRank, getRankColor } from "@/libs/score-utils";
+import { calculateTotalScoreDynamic, getRank, getRankColor } from "@/libs/score-utils";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import {
   getCategoriesThunk,
   getAllThunk,
@@ -24,8 +26,9 @@ import { getScoreFilterOptions } from "../filterOptions/scoreFilterOptions";
 
 export default function ScoresTable() {
   const dispatch = useDispatch();
-  const { grades, categories, loading } = useSelector((state) => state.grades);
-  const { members } = useSelector((state) => state.members);
+  const navigate = useNavigate();
+  const { grades, categories, loading } = useSelector((state: any) => state.grades);
+  const { members } = useSelector((state: any) => state.members);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingScore, setEditingScore] = useState<Score | null>(null);
@@ -67,41 +70,59 @@ export default function ScoresTable() {
     });
   }, [grades]);
 
-  const calculateDynamicTotal = (score, categories) => {
-    let totalWeighted = 0;
-    let sumWeight = 0;
+  // Xác định các cột điểm thực tế được đánh giá trong từng Quý
+  const quarterCategoriesMap = useMemo(() => {
+    const map: Record<string, any[]> = {};
 
-    categories.forEach((c) => {
-      if (c.name === "Thưởng" || c.name === "Phạt") return;
-
-      const key = normalizeKey(c.name);
-      const value = Number(score[key]) || 0;
-
-      totalWeighted += value * c.weight;
-      sumWeight += c.weight;
+    grades.forEach((g: any) => {
+      const termKey = `${g.quarter}_${g.year}`;
+      if (!map[termKey]) {
+        map[termKey] = [];
+      }
+      if (g.scores) {
+        Object.keys(g.scores).forEach((catKey) => {
+          const matchingCat = categories.find(
+            (c: any) =>
+              normalizeKey(c.name) === catKey &&
+              c.name !== "Thưởng" &&
+              c.name !== "Phạt"
+          );
+          if (matchingCat && !map[termKey].some((c) => c.id === matchingCat.id)) {
+            map[termKey].push(matchingCat);
+          }
+        });
+      }
     });
 
-    return sumWeight > 0 ? totalWeighted / sumWeight : 0;
-  };
+    return map;
+  }, [grades, categories]);
 
-  const processedScores = scores.map((s: any) => {
-    const baseScore = calculateDynamicTotal(s, categories);
+  const processedScores = useMemo(() => {
+    return scores.map((s: any) => {
+      const termKey = `${s.quarter}_${s.year}`;
+      // Lấy danh sách các môn được tổ chức thi/chấm trong quý đó
+      const quarterCategories =
+        quarterCategoriesMap[termKey] && quarterCategoriesMap[termKey].length > 0
+          ? quarterCategoriesMap[termKey]
+          : categories.filter((c: any) => c.name !== "Thưởng" && c.name !== "Phạt");
 
-    const bonus = Number(s[normalizeKey("Thưởng")] || 0);
-    const penalty = Number(s[normalizeKey("Phạt")] || 0);
-    const activity = Number(s.activityBonus || 0);
+      const baseScore = calculateTotalScoreDynamic(s, quarterCategories);
 
-    const totalScore = baseScore + bonus - penalty + activity;
+      const bonus = Number(s[normalizeKey("Thưởng")] || 0);
+      const penalty = Number(s[normalizeKey("Phạt")] || 0);
+      const activity = Number(s.activityBonus || 0);
 
-    const rank = getRank(totalScore);
+      const totalScore = baseScore + bonus - penalty + activity;
+      const rank = getRank(totalScore);
 
-    return {
-      ...s,
-      totalScore,
-      rank,
-      term: `${s.quarter}_${s.year}`,
-    };
-  });
+      return {
+        ...s,
+        totalScore,
+        rank,
+        term: termKey,
+      };
+    });
+  }, [scores, quarterCategoriesMap, categories]);
 
   const filterOptions = getScoreFilterOptions(processedScores);
 
@@ -203,13 +224,14 @@ export default function ScoresTable() {
 
       <DataTable
         title="Bảng điểm thi đua"
-        description="Điểm được tính theo công thức: Σ(Điểm × Hệ số)"
+        description="Điểm được tính theo công thức: [Σ(Điểm × Hệ số) / Σ Hệ số] + Thưởng - Phạt + Hoạt động"
         columns={columns}
         data={processedScores}
         actions={actions}
         key={columns.map((c) => c.key).join("-")}
         filterOptions={filterOptions}
         keyExtractor={(item) => item.id}
+       
         onAdd={() => setIsDialogOpen(true)}
         addButtonText="Thêm điểm"
         searchPlaceholder="Tìm kiếm theo tên..."

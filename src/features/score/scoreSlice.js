@@ -3,6 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   getAllThunk,
   getCategoriesThunk,
+  upsertCategoryThunk,
+  deleteCategoryThunk,
   upsertScoreThunk,
   deleteScoreThunk,
 } from "./scoreThunks";
@@ -48,6 +50,31 @@ const gradeSlice = createSlice({
       .addCase(getCategoriesThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // ✅ Upsert Category
+      .addCase(upsertCategoryThunk.fulfilled, (state, action) => {
+        const updatedCat = action.payload;
+        if (updatedCat) {
+          const index = state.categories.findIndex((c) => c.id === updatedCat.id);
+          if (index !== -1) {
+            if (updatedCat.active === false) {
+              state.categories.splice(index, 1);
+            } else {
+              state.categories[index] = updatedCat;
+            }
+          } else if (updatedCat.active !== false) {
+            state.categories.push(updatedCat);
+          }
+        }
+      })
+
+      // ✅ Delete Category
+      .addCase(deleteCategoryThunk.fulfilled, (state, action) => {
+        const deletedId = action.payload?.id;
+        if (deletedId) {
+          state.categories = state.categories.filter((c) => c.id !== Number(deletedId));
+        }
       })
 
       // ✅ Upsert (Thêm hoặc Cập nhật điểm)

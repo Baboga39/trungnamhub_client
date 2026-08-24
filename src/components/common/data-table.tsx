@@ -80,6 +80,7 @@ interface DataTableProps<T> {
   addButtonText?: string;
   keyExtractor: (item: T) => string | number;
   filterOptions?: FilterOption[];
+  extraHeaderActions?: ReactNode;
 }
 
 export function DataTable<T>({
@@ -98,6 +99,7 @@ export function DataTable<T>({
   addButtonText = "Thêm mới",
   keyExtractor,
   filterOptions = [],
+  extraHeaderActions,
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -331,6 +333,9 @@ export function DataTable<T>({
 
               </Sheet>
             )}
+
+            {/* Hành động mở rộng tùy biến */}
+            {extraHeaderActions}
 
             {/* Nút thêm mới */}
             {showAdd && (
