@@ -20,6 +20,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { format, parseISO, isValid } from "date-fns";
+import { vi } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import programApi from "@/api/programApi";
 import {
   Calendar,
@@ -312,18 +321,66 @@ export default function LessonFormModal({
                 <Calendar className="h-3.5 w-3.5 text-slate-400" />
                 Ngày học <span className="text-red-500">*</span>
               </Label>
-              <Input
-                type="date"
-                value={date}
-                min={bounds.min}
-                max={bounds.max}
-                onChange={(e) => setDate(e.target.value)}
-                required
-                className="rounded-xl border-gray-200 focus:ring-2 focus:ring-blue-500"
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal rounded-xl border-gray-200 h-10 px-3 hover:bg-slate-50 focus:ring-2 focus:ring-blue-500 shadow-none",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <Calendar className="mr-2.5 h-4 w-4 text-blue-600" />
+                    {date && isValid(parseISO(date)) ? (
+                      <span className="font-medium text-slate-800">
+                        {format(parseISO(date), "dd/MM/yyyy")}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400">Chọn ngày (dd/mm/yyyy)...</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 rounded-2xl shadow-xl border-slate-200 z-[100]" align="start">
+                  <CalendarPicker
+                    mode="single"
+                    selected={date && isValid(parseISO(date)) ? parseISO(date) : undefined}
+                    defaultMonth={
+                      date && isValid(parseISO(date))
+                        ? parseISO(date)
+                        : bounds.min
+                        ? parseISO(bounds.min)
+                        : new Date()
+                    }
+                    onSelect={(d) => {
+                      if (d) {
+                        setDate(format(d, "yyyy-MM-dd"));
+                      }
+                    }}
+                    disabled={(d) => {
+                      if (bounds.min && d < parseISO(bounds.min)) return true;
+                      if (bounds.max) {
+                        const maxD = parseISO(bounds.max);
+                        maxD.setHours(23, 59, 59, 999);
+                        if (d > maxD) return true;
+                      }
+                      return false;
+                    }}
+                    locale={vi}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
               {bounds.min && bounds.max && (
                 <p className="text-[11px] text-slate-400">
-                  Hợp lệ: {bounds.min} đến {bounds.max}
+                  Hợp lệ trong Quý {program?.quarter}/{program?.year}:{" "}
+                  <span className="font-medium text-slate-600">
+                    {format(parseISO(bounds.min), "dd/MM/yyyy")}
+                  </span>{" "}
+                  đến{" "}
+                  <span className="font-medium text-slate-600">
+                    {format(parseISO(bounds.max), "dd/MM/yyyy")}
+                  </span>
                 </p>
               )}
             </div>
