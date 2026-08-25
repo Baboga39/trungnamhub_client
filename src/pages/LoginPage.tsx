@@ -47,7 +47,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-     programApi.getHealthCheck().catch((err) => {
+    programApi.getHealthCheck().catch((err) => {
     console.warn("Program server wake-up failed:", err.message);
   });
 
