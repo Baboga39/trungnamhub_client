@@ -7,6 +7,7 @@ import { Sidebar } from "./sidebar-nav";
 import { Footer } from "./footer";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../ui/button";
+import { AiChatDrawer } from "@/components/ai-assistant/AiChatDrawer";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -95,6 +96,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <Footer />
         </main>
       </div>
+
+      {/* Global AI Assistant Chat Drawer */}
+      <AiChatDrawer />
     </div>
   );
 }
