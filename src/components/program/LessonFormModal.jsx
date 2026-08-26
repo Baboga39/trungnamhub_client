@@ -30,6 +30,7 @@ import { format, parseISO, isValid } from "date-fns";
 import { vi } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import programApi from "@/api/programApi";
+import memberApi from "@/api/memberApi";
 import {
   Calendar,
   UserCheck,
@@ -60,7 +61,7 @@ export default function LessonFormModal({
   const [lessonText, setLessonText] = useState("");
   const [prepared, setPrepared] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState("90");
-  const [plannedParticipantCount, setPlannedParticipantCount] = useState("15");
+  const [plannedParticipantCount, setPlannedParticipantCount] = useState("0");
   const [actualParticipantCount, setActualParticipantCount] = useState(0);
   const [commonProgramCode, setCommonProgramCode] = useState("");
   const [locationCode, setLocationCode] = useState("");
@@ -73,6 +74,7 @@ export default function LessonFormModal({
   const [commonPrograms, setCommonPrograms] = useState([]);
   const [locations, setLocations] = useState([]);
   const [existingFiles, setExistingFiles] = useState([]);
+  const [branchActiveCount, setBranchActiveCount] = useState(null);
 
   // Uploading state
   const [fileToUpload, setFileToUpload] = useState(null);
@@ -123,7 +125,7 @@ export default function LessonFormModal({
         setLessonText("");
         setPrepared(false);
         setDurationMinutes("90");
-        setPlannedParticipantCount("15");
+        setPlannedParticipantCount(branchActiveCount !== null ? String(branchActiveCount) : "0");
         setActualParticipantCount(0);
         setCommonProgramCode("NGHI_LE");
         setLocationCode("TRAI_DUONG");
@@ -134,20 +136,49 @@ export default function LessonFormModal({
         setFileToUpload(null);
       }
     }
-  }, [open, lesson]);
+  }, [open, lesson, branchActiveCount]);
 
   const loadMasterData = async () => {
     try {
       const branchId = program?.branch?.id || program?.branchId;
-      const [usersRes, commonRes, locRes] = await Promise.all([
+      const branchName = program?.branch?.name || program?.branch?.code || program?.branchId || "";
+
+      const [usersRes, commonRes, locRes, membersRes] = await Promise.allSettled([
         programApi.getProgramUsers(branchId),
         programApi.getCommonPrograms(),
         programApi.getLocations(),
+        memberApi.getMembersActive(),
       ]);
 
-      setBranchUsers(usersRes.data || usersRes || []);
-      setCommonPrograms(commonRes.data || commonRes || []);
-      setLocations(locRes.data || locRes || []);
+      if (usersRes.status === "fulfilled") {
+        setBranchUsers(usersRes.value?.data || usersRes.value || []);
+      }
+      if (commonRes.status === "fulfilled") {
+        setCommonPrograms(commonRes.value?.data || commonRes.value || []);
+      }
+      if (locRes.status === "fulfilled") {
+        setLocations(locRes.value?.data || locRes.value || []);
+      }
+
+      if (membersRes.status === "fulfilled") {
+        const rawMembers = membersRes.value?.data?.data || membersRes.value?.data || membersRes.value || [];
+        const filtered = Array.isArray(rawMembers)
+          ? rawMembers.filter((m) => {
+              if (!branchName) return true;
+              const mBranch = (m.branch || "").toLowerCase().trim();
+              const target = String(branchName).toLowerCase().trim();
+              return mBranch === target || target.includes(mBranch) || mBranch.includes(target);
+            })
+          : [];
+
+        const activeCount = filtered.length > 0 ? filtered.length : (Array.isArray(rawMembers) && rawMembers.length > 0 ? rawMembers.length : 0);
+        setBranchActiveCount(activeCount);
+
+        // Auto pre-fill if creating a new lesson
+        if (!lesson) {
+          setPlannedParticipantCount(String(activeCount));
+        }
+      }
     } catch (err) {
       console.error("Failed to load master data for lesson form:", err);
     }
@@ -502,18 +533,24 @@ export default function LessonFormModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Planned Count */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5 text-slate-400" />
-                Số lượng ĐS dự kiến
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <Users className="h-3.5 w-3.5 text-slate-400" />
+                  Số lượng ĐS dự kiến
+                </Label>
+              
+              </div>
               <Input
                 type="number"
                 value={plannedParticipantCount}
                 onChange={(e) => setPlannedParticipantCount(e.target.value)}
-                placeholder="15"
+                placeholder={branchActiveCount !== null ? String(branchActiveCount) : "0"}
                 min="0"
                 className="rounded-xl border-gray-200 focus:ring-2 focus:ring-blue-500"
               />
+              <p className="text-[11px] text-slate-400">
+                Tự động lấy theo số lượng đoàn sinh active của ngành, có thể chỉnh sửa tùy ý.
+              </p>
             </div>
 
             {/* Actual Count (READ ONLY) */}
