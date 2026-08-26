@@ -45,11 +45,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 flex flex-col w-full">
       {/* ✅ Navbar chỉ hiện khi login */}
       <Navbar onMenuClick={() => setMobileSidebarOpen(true)} />
 
-      <div className="flex flex-1 relative w-full max-w-full min-w-0">
+      <div className="flex flex-1 relative w-full min-w-0">
         {/* Mobile overlay */}
         {mobileSidebarOpen && (
           <div
