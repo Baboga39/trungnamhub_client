@@ -22,33 +22,27 @@ interface ApiItem {
 const podiumConfigs = {
   1: {
     rankNum: 1,
-    height: "h-60 sm:h-64 md:h-72",
+    height: "h-52 sm:h-64 md:h-72",
     icon: Crown,
     iconColor: "text-amber-500",
-    iconBg:
-      "bg-white ring-4 ring-amber-300/80 shadow-xl",
-    gradient:
-      "bg-gradient-to-b from-amber-400 via-amber-500 to-yellow-600",
+    iconBg: "bg-white ring-4 ring-amber-300/80 shadow-xl",
+    gradient: "bg-gradient-to-b from-amber-400 via-amber-500 to-yellow-600",
   },
   2: {
     rankNum: 2,
-    height: "h-52 sm:h-56 md:h-64",
+    height: "h-44 sm:h-56 md:h-64",
     icon: Medal,
     iconColor: "text-blue-600",
-    iconBg:
-      "bg-white ring-4 ring-blue-200/90 shadow-lg",
-    gradient:
-      "bg-gradient-to-b from-blue-500 via-blue-600 to-indigo-700",
+    iconBg: "bg-white ring-4 ring-blue-200/90 shadow-lg",
+    gradient: "bg-gradient-to-b from-blue-500 via-blue-600 to-indigo-700",
   },
   3: {
     rankNum: 3,
-    height: "h-44 sm:h-48 md:h-56",
+    height: "h-36 sm:h-48 md:h-56",
     icon: Medal,
     iconColor: "text-orange-500",
-    iconBg:
-      "bg-white ring-4 ring-orange-200/90 shadow-lg",
-    gradient:
-      "bg-gradient-to-b from-orange-400 via-orange-500 to-rose-600",
+    iconBg: "bg-white ring-4 ring-orange-200/90 shadow-lg",
+    gradient: "bg-gradient-to-b from-orange-400 via-orange-500 to-rose-600",
   },
 };
 
@@ -172,8 +166,8 @@ export function Top3Ranking() {
     <div className="rounded-3xl bg-gradient-to-br from-blue-50/90 via-purple-50/60 to-pink-50/80 p-5 sm:p-6 shadow-lg border border-indigo-100/60">
       {renderHeader()}
 
-      {/* Podium */}
-      <div className="flex items-end justify-center gap-2 sm:gap-4 md:gap-6 max-w-2xl mx-auto pt-5 sm:pt-7">
+      {/* Podium — pt-8 để medal nhô ra không bị clip */}
+      <div className="flex items-end justify-center gap-2 sm:gap-4 md:gap-6 max-w-2xl mx-auto pt-8 sm:pt-10 pb-1">
         {orderedPerformers.map((item) => {
           const config = item.config;
           const IconComponent = config.icon;
@@ -187,6 +181,7 @@ export function Top3Ranking() {
                 flex-col
                 items-center
                 w-[31%]
+                max-w-[130px]
                 min-w-0
                 transition-transform
                 duration-200
