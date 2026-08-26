@@ -77,22 +77,22 @@ export default function DashboardPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 w-full max-w-full min-w-0">
         {/* Executive Banner */}
         <div
           onClick={() => navigate("/executive-dashboard")}
-          className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-5 text-white shadow-lg flex items-center justify-between cursor-pointer hover:opacity-95 transition-all"
+          className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-4 sm:p-5 text-white shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 cursor-pointer hover:opacity-95 transition-all w-full min-w-0"
         >
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-amber-500/20 text-amber-300 rounded-xl border border-amber-400/30">
-              <Shield className="w-6 h-6 text-amber-400" />
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2.5 sm:p-3 bg-amber-500/20 text-amber-300 rounded-xl border border-amber-400/30 shrink-0">
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
             </div>
-            <div>
-              <h2 className="text-lg font-extrabold text-white">Executive Dashboard — Quý Trưởng Đoàn</h2>
-              <p className="text-xs text-slate-300">Xem ngay báo cáo tổng quan đa chiều, so sánh các Ngành & Cảnh báo nguy cơ</p>
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-extrabold text-white truncate">Executive Dashboard — Quý Trưởng Đoàn</h2>
+              <p className="text-xs text-slate-300 line-clamp-1 sm:line-clamp-none">Xem báo cáo tổng quan đa chiều, so sánh Ngành & Cảnh báo nguy cơ</p>
             </div>
           </div>
-          <div className="flex items-center gap-1 text-xs font-bold bg-white/10 px-3 py-2 rounded-xl hover:bg-white/20 transition-colors">
+          <div className="flex items-center gap-1 text-xs font-bold bg-white/10 px-3 py-2 rounded-xl hover:bg-white/20 transition-colors shrink-0 self-end sm:self-auto">
             <span>Mở Executive Cockpit</span>
             <ChevronRight className="w-4 h-4" />
           </div>
@@ -170,22 +170,20 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid gap-6 lg:grid-cols-3 w-full max-w-full min-w-0">
+          <div className="lg:col-span-2 space-y-6 w-full max-w-full min-w-0">
             <Top3Ranking />
             <SmartKpiCards />
             <EnhancedRankingTable />
             <GradeTrendTimeline />
-           
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 w-full max-w-full min-w-0">
             <QuickActions title="Thao tác nhanh" actions={quickActions} />
             <AttendanceStreak />
             <RiskMembers />
             <QuarterlyBirthdays />
           </div>
-
         </div>
       </div>
     </AdminLayout>

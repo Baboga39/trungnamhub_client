@@ -205,9 +205,9 @@ export function AiChatDrawer() {
     }
   }, [messages, loading, isOpen]);
 
-  // Auto focus input when opened
+  // Auto focus input when opened (chỉ auto focus trên desktop, tránh tự động bung bàn phím trên mobile)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && window.innerWidth >= 768) {
       setTimeout(() => inputRef.current?.focus(), 150);
     }
   }, [isOpen]);
@@ -303,7 +303,7 @@ export function AiChatDrawer() {
       {/* CHAT DRAWER / POPUP PANEL                                      */}
       {/* ───────────────────────────────────────────────────────────── */}
       {isOpen && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[460px] h-[620px] max-h-[90vh] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed inset-x-3 bottom-3 sm:inset-auto sm:bottom-6 sm:right-6 z-50 w-auto sm:w-[460px] h-[560px] sm:h-[620px] max-h-[85vh] sm:max-h-[90vh] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
           {/* Header */}
           <div className="p-3.5 px-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white flex items-center justify-between border-b border-indigo-900/50 select-none">
             <div className="flex items-center gap-2.5">
@@ -467,7 +467,7 @@ export function AiChatDrawer() {
                 onKeyDown={handleKeyDown}
                 placeholder="Hỏi về điểm số, chuyên cần, xếp hạng..."
                 rows={1}
-                className="flex-1 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none max-h-24"
+                className="flex-1 text-base sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none max-h-24"
               />
               <Button
                 size="sm"

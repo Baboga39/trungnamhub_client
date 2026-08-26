@@ -73,17 +73,17 @@ export function EnhancedRankingTable() {
   const maxScore = ranking[0]?.totalScore || 1
 
   return (
-    <Card className="p-6 bg-white/70 backdrop-blur-xl shadow-2xl rounded-2xl">
+    <Card className="p-4 sm:p-6 bg-white/70 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden w-full max-w-full min-w-0">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
-          <Trophy className="h-6 w-6 text-white" />
+        <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shrink-0">
+          <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
         </div>
-        <h3 className="text-2xl font-bold bg-gradient-to-r from-amber-500 to-red-500 bg-clip-text text-transparent">
+        <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-amber-500 to-red-500 bg-clip-text text-transparent">
           Bảng xếp hạng thi đua
         </h3>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {ranking.map((item, index) => {
           const percent = (item.totalScore / maxScore) * 100
 
@@ -93,22 +93,23 @@ export function EnhancedRankingTable() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.08 }}
-              className={`relative p-4 rounded-xl border bg-gradient-to-r from-white to-gray-50
+              className={`relative p-3 sm:p-4 rounded-xl border bg-gradient-to-r from-white to-gray-50
               ${item.trend === "up" ? "ring-2 ring-green-300/50 shadow-green-200" : ""}
-              ${index === 0 ? "shadow-2xl scale-[1.02]" : "shadow-md"}
+              ${index === 0 ? "shadow-lg sm:scale-[1.01]" : "shadow-sm"}
+              overflow-hidden min-w-0
               `}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                 {/* Rank / Medal */}
-                <div className="w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold
-                  bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-base sm:text-lg font-bold
+                  bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow shrink-0">
                   {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : item.rank}
                 </div>
 
                 {/* Info */}
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-900">{item.memberName}</div>
-                  <div className="text-sm text-gray-500">{item.holyName}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm sm:text-base text-gray-900 truncate">{item.memberName}</div>
+                  <div className="text-xs sm:text-sm text-gray-500 truncate">{item.holyName}</div>
 
                   {/* Progress bar */}
                   <div className="mt-2 h-2 w-full bg-gray-200 rounded-full overflow-hidden">

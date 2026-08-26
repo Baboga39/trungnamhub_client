@@ -22,7 +22,7 @@ interface ApiItem {
 const podiumConfigs = {
   1: {
     rankNum: 1,
-    height: "h-52 sm:h-64 md:h-72",
+    height: "h-48 sm:h-64 md:h-72",
     icon: Crown,
     iconColor: "text-amber-500",
     iconBg: "bg-white ring-4 ring-amber-300/80 shadow-xl",
@@ -30,7 +30,7 @@ const podiumConfigs = {
   },
   2: {
     rankNum: 2,
-    height: "h-44 sm:h-56 md:h-64",
+    height: "h-40 sm:h-56 md:h-64",
     icon: Medal,
     iconColor: "text-blue-600",
     iconBg: "bg-white ring-4 ring-blue-200/90 shadow-lg",
@@ -38,7 +38,7 @@ const podiumConfigs = {
   },
   3: {
     rankNum: 3,
-    height: "h-36 sm:h-48 md:h-56",
+    height: "h-34 sm:h-48 md:h-56",
     icon: Medal,
     iconColor: "text-orange-500",
     iconBg: "bg-white ring-4 ring-orange-200/90 shadow-lg",
@@ -163,11 +163,11 @@ export function Top3Ranking() {
   ].filter(Boolean) as typeof performers;
 
   return (
-    <div className="rounded-3xl bg-gradient-to-br from-blue-50/90 via-purple-50/60 to-pink-50/80 p-5 sm:p-6 shadow-lg border border-indigo-100/60">
+    <div className="rounded-3xl bg-gradient-to-br from-blue-50/90 via-purple-50/60 to-pink-50/80 p-4 sm:p-6 shadow-lg border border-indigo-100/60 overflow-hidden w-full max-w-full min-w-0">
       {renderHeader()}
 
-      {/* Podium — pt-8 để medal nhô ra không bị clip */}
-      <div className="flex items-end justify-center gap-2 sm:gap-4 md:gap-6 max-w-2xl mx-auto pt-8 sm:pt-10 pb-1">
+      {/* Podium */}
+      <div className="flex items-end justify-center gap-1.5 sm:gap-4 md:gap-6 max-w-2xl mx-auto pt-7 sm:pt-10 pb-1 w-full min-w-0">
         {orderedPerformers.map((item) => {
           const config = item.config;
           const IconComponent = config.icon;
@@ -180,7 +180,7 @@ export function Top3Ranking() {
                 flex
                 flex-col
                 items-center
-                w-[31%]
+                flex-1
                 max-w-[130px]
                 min-w-0
                 transition-transform
@@ -193,13 +193,13 @@ export function Top3Ranking() {
                 className={`
                   relative
                   z-20
-                  w-11 h-11
+                  w-10 h-10
                   sm:w-14 sm:h-14
                   rounded-xl sm:rounded-2xl
                   flex items-center justify-center
                   ${config.iconBg}
                   ${item.rank === 1 ? "scale-105 sm:scale-110" : ""}
-                  mb-[-20px] sm:mb-[-24px]
+                  mb-[-18px] sm:mb-[-24px]
                 `}
               >
                 <IconComponent
@@ -216,13 +216,13 @@ export function Top3Ranking() {
                     absolute
                     -top-1.5
                     -right-1.5
-                    w-5 h-5
+                    w-4 h-4
                     sm:w-6 sm:h-6
                     rounded-full
                     bg-white
                     border border-slate-200
                     shadow-md
-                    text-[9px] sm:text-[10px]
+                    text-[8px] sm:text-[10px]
                     font-black
                     text-slate-700
                     flex items-center justify-center
@@ -237,12 +237,13 @@ export function Top3Ranking() {
                 className={`
                   relative
                   w-full
+                  min-w-0
                   ${config.height}
                   ${config.gradient}
                   rounded-2xl sm:rounded-3xl
-                  px-2.5 sm:px-4
-                  pt-8 sm:pt-10
-                  pb-4 sm:pb-5
+                  px-1.5 sm:px-4
+                  pt-7 sm:pt-10
+                  pb-3 sm:pb-5
                   flex
                   flex-col
                   items-center
@@ -267,11 +268,11 @@ export function Top3Ranking() {
                 />
 
                 {/* Member */}
-                <div className="relative z-10 w-full text-center">
+                <div className="relative z-10 w-full text-center min-w-0 px-0.5">
                   <p
                     className="
                       font-bold
-                      text-xs sm:text-sm md:text-base
+                      text-[11px] sm:text-sm md:text-base
                       leading-tight
                       truncate
                     "
@@ -284,9 +285,9 @@ export function Top3Ranking() {
                     <p
                       className="
                         text-white/75
-                        text-[10px] sm:text-xs
+                        text-[9px] sm:text-xs
                         font-medium
-                        mt-1
+                        mt-0.5 sm:mt-1
                         truncate
                       "
                       title={item.member.parish}
@@ -300,7 +301,7 @@ export function Top3Ranking() {
                 <div className="relative z-10 text-center">
                   <p
                     className="
-                      text-2xl
+                      text-xl
                       sm:text-3xl
                       md:text-4xl
                       font-black
@@ -314,11 +315,11 @@ export function Top3Ranking() {
                   <p
                     className="
                       text-white/70
-                      text-[9px]
+                      text-[8px]
                       sm:text-[10px]
                       font-bold
                       tracking-[0.18em]
-                      mt-1
+                      mt-0.5 sm:mt-1
                     "
                   >
                     ĐIỂM
