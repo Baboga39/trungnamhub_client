@@ -70,7 +70,7 @@ export function ParishChart() {
           <Church className="h-5 w-5 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Phân bố theo giáo xứ</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Phân bố theo Xã đạo</h3>
           <p className="text-sm text-gray-500">Tổng số đoàn sinh theo địa phương</p>
         </div>
       </div>

@@ -18,7 +18,7 @@ export const selectActiveMembers = (state) => {
   return state.members.members.filter((member) => member.active === true).length;
 };
 
-// Số đoàn sinh theo giáo xứ đông nhất
+// Số đoàn sinh theo Xã đạo đông nhất
 export const selectMaxParish = (state) => {
   const parishCount = {};
 

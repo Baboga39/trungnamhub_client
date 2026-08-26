@@ -71,7 +71,7 @@ export const generateSingleMemberPDF = (memberData) => {
   doc.setFontSize(10);
   doc.text(`Họ và tên: ${memberData.member.name}`, margin, 155);
   doc.text(`Ngày sinh: ${formatDateString(memberData.member.birthDate)}`, margin, 170);
-  doc.text(`Giáo xứ/Xã đạo: ${memberData.member.parish}`, margin, 185);
+  doc.text(`Xã đạo/Xã đạo: ${memberData.member.parish}`, margin, 185);
   doc.text(`Năm vào đoàn: ${memberData.member.startYear}`, margin, 200);
 
   // Cột bên phải: Tóm tắt kết quả (KPIs)
