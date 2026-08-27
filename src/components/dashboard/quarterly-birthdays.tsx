@@ -9,6 +9,7 @@ import { fetchQuarterlyBirthdays } from "@/features/dashboard/dashboardThunks"
 
 type BirthdayMember = {
   id: number
+  userId?: number
   fullName: string
   birthDate: string
   birthDay: number
@@ -21,6 +22,8 @@ type BirthdayMember = {
   branch: string
   group: string
   gender: string
+  isLeader?: boolean
+  role?: string
   isToday: boolean
   isThisMonth: boolean
 }
@@ -52,6 +55,8 @@ export function QuarterlyBirthdays() {
       : allMembers.filter((m) => m.birthMonth === selectedMonth)
 
   const todayCount = allMembers.filter((m) => m.isToday).length
+  const leaderCount = allMembers.filter((m) => m.isLeader).length
+  const memberCount = allMembers.length - leaderCount
 
   return (
     <Card className="shadow-lg border-0 bg-gradient-to-br from-rose-50 via-pink-50/70 to-amber-50/60 overflow-hidden">
@@ -71,7 +76,7 @@ export function QuarterlyBirthdays() {
                 )}
               </CardTitle>
               <CardDescription className="text-xs text-slate-500">
-                Mừng tuổi mới đoàn sinh trong ngành
+                Mừng tuổi mới đoàn sinh &amp; quý Trưởng
               </CardDescription>
             </div>
           </div>
@@ -79,7 +84,9 @@ export function QuarterlyBirthdays() {
             variant="secondary"
             className="bg-pink-100/90 text-pink-700 hover:bg-pink-100 font-semibold px-2.5 py-1 text-xs rounded-full border border-pink-200"
           >
-            {allMembers.length} đoàn sinh
+            {leaderCount > 0
+              ? `${memberCount} đoàn sinh • ${leaderCount} Trưởng`
+              : `${allMembers.length} thành viên`}
           </Badge>
         </div>
 
@@ -142,6 +149,8 @@ export function QuarterlyBirthdays() {
                 className={`p-3 rounded-xl bg-white/95 backdrop-blur-sm border transition-all duration-200 hover:shadow-md flex items-center justify-between ${
                   member.isToday
                     ? "border-rose-300 ring-2 ring-rose-400/40 bg-gradient-to-r from-rose-50/80 to-white"
+                    : member.isLeader
+                    ? "border-indigo-200 bg-gradient-to-r from-indigo-50/40 via-white to-white shadow-xs"
                     : member.isThisMonth
                     ? "border-pink-200/90 shadow-sm"
                     : "border-slate-100/90 hover:border-pink-200"
@@ -153,6 +162,8 @@ export function QuarterlyBirthdays() {
                     className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 shadow-sm ${
                       member.isToday
                         ? "bg-gradient-to-br from-rose-500 to-pink-600 text-white animate-pulse"
+                        : member.isLeader
+                        ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white border border-indigo-300"
                         : member.isThisMonth
                         ? "bg-pink-100 text-pink-700 border border-pink-200"
                         : "bg-slate-100 text-slate-600 border border-slate-200/60"
@@ -170,6 +181,14 @@ export function QuarterlyBirthdays() {
                       <span className="font-bold text-sm text-slate-800 truncate">
                         {member.fullName}
                       </span>
+                      {member.isLeader && (
+                        <Badge
+                          variant="secondary"
+                          className="px-1.5 py-0.2 text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200"
+                        >
+                          {member.role || "Trưởng"}
+                        </Badge>
+                      )}
                       {member.isToday && (
                         <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-rose-500 text-white shadow-xs animate-bounce">
                           🎉 Hôm nay
@@ -177,14 +196,18 @@ export function QuarterlyBirthdays() {
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5 truncate">
-                      {member.parish ? (
+                      {member.isLeader ? (
+                        <span className="text-indigo-600 font-medium">
+                          {member.branch ? `Ngành ${member.branch}` : "Ban Quản Trị"}
+                        </span>
+                      ) : member.parish ? (
                         <span className="text-slate-600 font-medium">{member.parish}</span>
                       ) : member.church ? (
                         <span>{member.church}</span>
                       ) : (
                         <span className="text-slate-400">Đoàn sinh</span>
                       )}
-                      {member.group && (
+                      {member.group && !member.isLeader && (
                         <>
                           <span className="text-slate-300">•</span>
                           <span className="text-slate-500">{member.group}</span>
@@ -221,10 +244,10 @@ export function QuarterlyBirthdays() {
               <p className="text-sm font-semibold text-slate-700">
                 {selectedMonth === "ALL"
                   ? `Chưa có sinh nhật trong Quý ${quarter}`
-                  : `Không có đoàn sinh sinh vào Tháng ${selectedMonth}`}
+                  : `Không có ai sinh vào Tháng ${selectedMonth}`}
               </p>
               <p className="text-xs text-slate-400 mt-0.5">
-                Các em có ngày sinh trong ngành sẽ được hiển thị tại đây
+                Các đoàn sinh và Trưởng có ngày sinh trong Quý sẽ được hiển thị tại đây
               </p>
             </div>
           </div>
