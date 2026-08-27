@@ -28,6 +28,7 @@ const ColorMap: any = {
 const CategoryBadgeColors: any = {
   "Đoàn sinh": { bg: "bg-blue-50 text-blue-700 border-blue-200", dot: "bg-blue-500" },
   "Chuyên cần": { bg: "bg-teal-50 text-teal-700 border-teal-200", dot: "bg-teal-500" },
+  "Chương trình": { bg: "bg-indigo-50 text-indigo-700 border-indigo-200", dot: "bg-indigo-500" },
   "Khác": { bg: "bg-slate-50 text-slate-700 border-slate-200", dot: "bg-slate-500" },
 };
 
