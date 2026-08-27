@@ -157,6 +157,11 @@ export default function ProgramDetailPage() {
       fetchProgram(true);
     } catch (err) {
       console.error("Sync attendance error:", err);
+      const errorMsg =
+        err.response?.data?.message ||
+        err.message ||
+        "Chưa có dữ liệu điểm danh của ngành vào ngày này!";
+      toast.error(errorMsg);
     } finally {
       setSyncingLessonId(null);
     }
