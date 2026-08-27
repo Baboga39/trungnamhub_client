@@ -122,7 +122,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
         {/* Actions */}
         <div className="flex items-center gap-2 lg:gap-3">
           {/* Notifications */}
-          <Popover>
+          <Popover modal={false}>
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
@@ -204,7 +204,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           </Button>
 
           {/* User Menu */}
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"

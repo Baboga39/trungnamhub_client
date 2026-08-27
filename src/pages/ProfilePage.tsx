@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "react-toastify";
+import { format, parse } from "date-fns";
+import { vi } from "date-fns/locale";
 import { AdminLayout } from "@/components/layouts/admin-layout";
 import {
   Card,
@@ -18,7 +20,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Lock, Save } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { User, Lock, Save, Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/libs/utils";
 import ProfileSidebar from "@/components/profile/ProfileSidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
@@ -62,6 +67,8 @@ export default function ProfilePage() {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
     reset,
   } = useForm<ProfileFormData>({
@@ -73,6 +80,21 @@ export default function ProfilePage() {
       birthDate: "",
     },
   });
+
+  const birthDateValue = watch("birthDate");
+
+  let birthDateObj: Date | null = null;
+  if (birthDateValue) {
+    const parsed = parse(birthDateValue, "dd/MM/yyyy", new Date());
+    if (!isNaN(parsed.getTime())) {
+      birthDateObj = parsed;
+    } else {
+      const d = new Date(birthDateValue);
+      if (!isNaN(d.getTime())) {
+        birthDateObj = d;
+      }
+    }
+  }
 
   // Đồng bộ dữ liệu Redux vào form khi load
   useEffect(() => {
@@ -232,12 +254,51 @@ export default function ProfilePage() {
 
                         <div className="space-y-2 sm:col-span-1">
                           <Label htmlFor="birthDate">Ngày sinh</Label>
-                          <Input
-                            id="birthDate"
-                            placeholder="DD/MM/YYYY (ví dụ: 15/08/1995)"
-                            {...register("birthDate")}
-                            className={errors.birthDate ? "border-destructive" : ""}
-                          />
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                id="birthDate"
+                                type="button"
+                                variant="outline"
+                                className={cn(
+                                  "w-full h-10 rounded-md border justify-start text-left font-normal transition-all",
+                                  !birthDateObj && "text-muted-foreground",
+                                  errors.birthDate && "border-destructive ring-1 ring-destructive"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                                {birthDateObj
+                                  ? format(birthDateObj, "dd/MM/yyyy", { locale: vi })
+                                  : "Chọn ngày sinh"}
+                              </Button>
+                            </PopoverTrigger>
+
+                            <PopoverContent className="w-auto p-0 rounded-lg" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={birthDateObj || undefined}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    setValue("birthDate", format(date, "dd/MM/yyyy"), {
+                                      shouldValidate: true,
+                                      shouldDirty: true,
+                                    });
+                                  } else {
+                                    setValue("birthDate", "", {
+                                      shouldValidate: true,
+                                      shouldDirty: true,
+                                    });
+                                  }
+                                }}
+                                captionLayout="dropdown"
+                                fromYear={1950}
+                                toYear={new Date().getFullYear()}
+                                defaultMonth={birthDateObj || new Date(2000, 0, 1)}
+                                initialFocus
+                                locale={vi}
+                              />
+                            </PopoverContent>
+                          </Popover>
                           {errors.birthDate && (
                             <p className="text-sm text-destructive">
                               {errors.birthDate.message}
