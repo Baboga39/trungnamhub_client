@@ -22,10 +22,12 @@ interface User {
   name: string;
   email: string;
   password?: string;
+  phone?: string;
+  birthDate?: string;
   startYear: string;
   sumEvent: number;
   role: string;
-  branch: string; // thêm
+  branch: string;
   createdAt: string;
   Member: any[];
 }
@@ -63,6 +65,20 @@ export default function UsersTable() {
       type: "email",
       placeholder: "Nhập địa chỉ email",
       required: true,
+    },
+    {
+      name: "phone",
+      label: "Số điện thoại",
+      type: "text",
+      placeholder: "Nhập số điện thoại (VD: 0912345678)",
+      required: false,
+    },
+    {
+      name: "birthDate",
+      label: "Ngày sinh",
+      type: "date",
+      placeholder: "Chọn ngày sinh",
+      required: false,
     },
     {
       name: "password",

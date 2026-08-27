@@ -3,7 +3,7 @@ const BRANCH_MAPPING = [
   { id: "2", names: ["2", "ngành thiếu", "thiếu", "thieu", "nganh thieu"] },
   { id: "3", names: ["3", "ngành nghĩa", "nghĩa", "nghia", "nganh nghia"] },
   { id: "4", names: ["4", "ngành hiệp", "hiệp", "hiep", "nganh hiep"] },
-  { id: "5", names: ["5", "ban huynh trưởng", "huynh trưởng", "huynh truong", "bht"] },
+  { id: "5", names: ["5", "ban trưởng", "trưởng", "huynh truong", "bht"] },
 ];
 
 export function normalizeBranchId(branchVal) {

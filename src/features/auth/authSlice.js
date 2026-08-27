@@ -16,6 +16,8 @@ if (token) {
       name: decoded.name,
       role: decoded.role,
       branch: decoded.branch,
+      phone: decoded.phone || "",
+      birthDate: decoded.birthDate || "",
       startYear: decoded.startYear,
       sumEvent: decoded.sumEvent,
     };

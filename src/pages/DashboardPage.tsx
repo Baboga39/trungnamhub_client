@@ -114,7 +114,7 @@ export default function DashboardPage() {
           />
 
           <StatsCard
-            title="Huynh trưởng"
+            title="trưởng"
             value={loading ? "..." : stats?.totalManagers?.value?.toString() || "0"}
             subtitle="So với tháng trước"
             icon={GraduationCap}

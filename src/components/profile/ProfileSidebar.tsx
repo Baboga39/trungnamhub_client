@@ -14,12 +14,18 @@ import {
   Camera,
   Clock,
   Award,
+  Phone,
+  Cake,
+  Layers,
 } from "lucide-react";
 
 interface ProfileSidebarProps {
   name: string;
   email: string;
+  phone?: string;
+  birthDate?: string;
   role: string;
+  branch?: string;
   startYear: string; // dạng DD/MM/YYYY
   status: "active" | "inactive";
   profileCompletion?: number;
@@ -45,39 +51,47 @@ function calculateDaysActive(startYear: string): number {
 function calculateProfileCompletion(user: {
   name?: string;
   email?: string;
+  phone?: string;
+  birthDate?: string;
   role?: string;
   startYear?: string;
   avatar?: string;
   sumEvent?: number;
 }) {
   let score = 0;
-  if (user.name) score += 20;
-  if (user.email) score += 20;
+  if (user.name) score += 15;
+  if (user.email) score += 15;
+  if (user.phone) score += 15;
+  if (user.birthDate) score += 15;
   if (user.role) score += 10;
-  if (user.startYear) score += 20;
-  if (user.avatar) score += 20;
-  if (user.sumEvent && user.sumEvent > 0) score += 10;
-  return score;
+  if (user.startYear) score += 15;
+  if (user.avatar) score += 10;
+  if (user.sumEvent && user.sumEvent > 0) score += 5;
+  return Math.min(score, 100);
 }
-
 
 export default function ProfileSidebar({
   name,
   email,
+  phone,
+  birthDate,
   role,
+  branch,
   startYear,
   status,
   sumEvent,
   onUploadAvatar,
 }: ProfileSidebarProps) {
   const daysActive = calculateDaysActive(startYear);
-    const profileCompletion = calculateProfileCompletion({
+  const profileCompletion = calculateProfileCompletion({
     name,
     email,
+    phone,
+    birthDate,
     role,
     startYear,
     sumEvent,
-    avatar: "/placeholder-user.jpg", // tạm thời vì chưa có upload thực
+    avatar: "/placeholder-user.jpg",
   });
 
   return (
@@ -109,12 +123,19 @@ export default function ProfileSidebar({
             <div className="space-y-2 w-full">
               <h3 className="font-bold text-xl">{name}</h3>
               <p className="text-sm text-muted-foreground">{email}</p>
-              <Badge
-                variant="secondary"
-                className="mt-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0"
-              >
-                <Shield className="mr-1 h-3 w-3" /> {role}
-              </Badge>
+              <div className="flex flex-wrap justify-center gap-1.5 mt-2">
+                <Badge
+                  variant="secondary"
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0"
+                >
+                  <Shield className="mr-1 h-3 w-3" /> {role}
+                </Badge>
+                {branch && (
+                  <Badge variant="outline" className="font-bold border-indigo-200 text-indigo-700 bg-indigo-50">
+                    <Layers className="mr-1 h-3 w-3" /> Ngành {branch}
+                  </Badge>
+                )}
+              </div>
             </div>
 
             {/* Profile Completion Progress */}
@@ -138,12 +159,32 @@ export default function ProfileSidebar({
                 </span>
                 <span className="font-medium text-green-600">Đã xác thực</span>
               </div>
+
+              {phone && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground flex items-center gap-2">
+                    <Phone className="h-4 w-4" /> Điện thoại
+                  </span>
+                  <span className="font-medium">{phone}</span>
+                </div>
+              )}
+
+              {birthDate && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground flex items-center gap-2">
+                    <Cake className="h-4 w-4" /> Ngày sinh
+                  </span>
+                  <span className="font-medium">{birthDate}</span>
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground flex items-center gap-2">
                   <Calendar className="h-4 w-4" /> Tham gia
                 </span>
-                <span className="font-medium">{startYear}</span>
+                <span className="font-medium">{startYear || "—"}</span>
               </div>
+
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground flex items-center gap-2">
                   <Activity className="h-4 w-4" /> Hoạt động

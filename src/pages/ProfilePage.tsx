@@ -34,6 +34,8 @@ const profileSchema = z.object({
     .min(2, "Tên phải có ít nhất 2 ký tự")
     .max(100, "Tên không được quá 100 ký tự"),
   email: z.string().email("Email không hợp lệ"),
+  phone: z.string().optional().or(z.literal("")),
+  birthDate: z.string().optional().or(z.literal("")),
 });
 
 // Schema validation cho form đổi mật khẩu
@@ -67,6 +69,8 @@ export default function ProfilePage() {
     defaultValues: {
       name: "",
       email: "",
+      phone: "",
+      birthDate: "",
     },
   });
 
@@ -74,8 +78,10 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       reset({
-        name: user.name,
-        email: user.email,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        birthDate: user.birthDate || "",
       });
     }
   }, [user, reset]);
@@ -94,7 +100,7 @@ export default function ProfilePage() {
   const onSubmitProfile = async (data: ProfileFormData) => {
     setIsUpdatingProfile(true);
     try {
-      const resultAction = await dispatch(changeProfileThunk(data));
+      const resultAction: any = await dispatch(changeProfileThunk(data));
       if (!resultAction.error) {
         toast.success("Cập nhật thông tin thành công!");
       }
@@ -110,10 +116,10 @@ export default function ProfilePage() {
   const onSubmitPassword = async (data: PasswordFormData) => {
     setIsUpdatingPassword(true);
     try {
-      const resultAction = await dispatch(resetPasswordThunk(data));
-      console.log(resultAction.payload.error);
-      if (!resultAction.payload.error) {
-        toast.success(resultAction.payload.message);
+      const resultAction: any = await dispatch(resetPasswordThunk(data));
+      console.log(resultAction.payload?.error);
+      if (!resultAction.payload?.error) {
+        toast.success(resultAction.payload?.message || "Đổi mật khẩu thành công!");
       }
 
       resetPassword();
@@ -138,11 +144,14 @@ export default function ProfilePage() {
         <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
           {/* Sidebar */}
           <ProfileSidebar
-            email={user.email}
-            name={user.name}
-            role={user.role}
-            startYear={user.startYear}
-            sumEvent={user.sumEvent}
+            email={user?.email || ""}
+            name={user?.name || ""}
+            phone={user?.phone || ""}
+            birthDate={user?.birthDate || ""}
+            role={user?.role || ""}
+            branch={user?.branch || ""}
+            startYear={user?.startYear || ""}
+            sumEvent={user?.sumEvent || 0}
             status="active"
           />
 
@@ -166,7 +175,7 @@ export default function ProfilePage() {
                   <CardHeader>
                     <CardTitle>Cập Nhật Thông Tin</CardTitle>
                     <CardDescription>
-                      Thay đổi tên hiển thị và email của bạn
+                      Thay đổi thông tin liên hệ và hồ sơ cá nhân của bạn
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -202,6 +211,36 @@ export default function ProfilePage() {
                           {errors.email && (
                             <p className="text-sm text-destructive">
                               {errors.email.message}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="space-y-2 sm:col-span-1">
+                          <Label htmlFor="phone">Số điện thoại</Label>
+                          <Input
+                            id="phone"
+                            placeholder="Nhập số điện thoại"
+                            {...register("phone")}
+                            className={errors.phone ? "border-destructive" : ""}
+                          />
+                          {errors.phone && (
+                            <p className="text-sm text-destructive">
+                              {errors.phone.message}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="space-y-2 sm:col-span-1">
+                          <Label htmlFor="birthDate">Ngày sinh</Label>
+                          <Input
+                            id="birthDate"
+                            placeholder="DD/MM/YYYY (ví dụ: 15/08/1995)"
+                            {...register("birthDate")}
+                            className={errors.birthDate ? "border-destructive" : ""}
+                          />
+                          {errors.birthDate && (
+                            <p className="text-sm text-destructive">
+                              {errors.birthDate.message}
                             </p>
                           )}
                         </div>

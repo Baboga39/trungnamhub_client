@@ -5,6 +5,8 @@ interface User {
   id: number
   name: string
   email: string
+  phone?: string
+  birthDate?: string
   startYear: string
   sumEvent: number
   role: string
@@ -41,10 +43,28 @@ export const userColumns: Column<User>[] = [
     render: (user) => <div className="text-slate-600">{user.email}</div>,
   },
   {
+    key: "phone",
+    label: "Số điện thoại",
+    sortable: true,
+    render: (user) => <div className="text-slate-600">{user.phone || "—"}</div>,
+  },
+  {
+    key: "birthDate",
+    label: "Ngày sinh",
+    sortable: true,
+    render: (user) => <div className="text-slate-600">{user.birthDate || "—"}</div>,
+  },
+  {
     key: "role",
     label: "Vai trò",
     sortable: true,
     render: (user) => <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>,
+  },
+  {
+    key: "branch",
+    label: "Ngành",
+    sortable: true,
+    render: (user) => <div className="text-slate-600 font-medium">{user.branch || "—"}</div>,
   },
   {
     key: "startYear",
@@ -64,10 +84,4 @@ export const userColumns: Column<User>[] = [
     sortable: true,
     render: (user) => <div className="text-slate-500 text-sm">{user.createdAt}</div>,
   },
-  {
-    key: "branch",
-    label: "Ngành",
-    sortable: true,
-    render: (user) => <div className="text-slate-600">{user.branch}</div>,
-  }
 ]
