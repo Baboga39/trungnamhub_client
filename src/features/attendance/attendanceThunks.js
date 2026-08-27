@@ -16,9 +16,9 @@ export const markAttendanceThunk = createAsyncThunk(
 
 export const getAllAttendanceThunk = createAsyncThunk(
   "attendance/getAll",
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const res = await attendanceApi.getAll();
+      const res = await attendanceApi.getAll(params);
       return res.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

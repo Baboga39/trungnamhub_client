@@ -86,6 +86,11 @@ export default function UsersTable() {
         { value: "Thanh Trưởng", label: "Thanh Trưởng" },
         { value: "Thanh Phó", label: "Thanh Phó" },
         { value: "Vườn trưởng", label: "Vườn trưởng" },
+        { value: "Trưởng ban hướng dẫn", label: "Trưởng ban hướng dẫn" },
+        { value: "Phó ban sinh hoạt", label: "Phó ban sinh hoạt" },
+        { value: "Phó ban giáo lý", label: "Phó ban giáo lý" },
+        { value: "Thư ký", label: "Thư ký" },
+        { value: "Thủ quỹ", label: "Thủ quỹ" },
         { value: "Vườn phó", label: "Vườn phó" },
         { value: "Admin", label: "Admin - Toàn quyền" },
         { value: "User", label: "User - Người dùng" },
@@ -100,6 +105,7 @@ export default function UsersTable() {
         { value: "Thanh", label: "Ngành Thanh" },
         { value: "Thiếu", label: "Ngành Thiếu" },
         { value: "Đồng", label: "Ngành Đồng" },
+        { value: "Ban hướng dẫn", label: "Ban hướng dẫn" }
       ],
     },
     {

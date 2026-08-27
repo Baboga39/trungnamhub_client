@@ -3,7 +3,7 @@ import axiosInstance from "../libs/axiosInstance";
 
 const attendanceApi = {
   mark: (records) => axiosInstance.post("/attendance/mark", records ),
-  getAll: () => axiosInstance.get("/attendance/all"),
+  getAll: (params) => axiosInstance.get("/attendance/all", { params }),
 };
 
 export default attendanceApi;
