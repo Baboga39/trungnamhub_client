@@ -1,25 +1,27 @@
-import LoginPage from "../pages/LoginPage";
-import DashboardPage from "../pages/DashboardPage";
-import ReportCenterPage from "../pages/ReportCenterPage";
-import StudentPage from "../pages/studentPage";
-import ProfilePage from "@/pages/ProfilePage";
-import AttendancePage from "@/pages/AttendancePage";
-import AttendanceCalendarPage from "@/pages/AttendanceCalendarPage";
-import UserPage from "@/pages/UserPage";
-import ActivityPage from "@/pages/ActivityPage";
-import ScorePage from "@/pages/Score";
-import ScoreConfigPage from "@/pages/ScoreConfigPage";
-import AttendanceActivityPage from "@/pages/ActivityAttendancePage";
-import DocumentPage from "@/pages/DocumentPage";
-import ApproveDocumentPage from "@/pages/ApproveDocumentPage";
-import ApproveProgramPage from "@/pages/ApproveProgramPage";
-import PendingApprovalsPage from "@/pages/PendingApprovalsPage";
-import ReportSchedulePage from "@/pages/ReportSchedulePage";
-import ExecutiveDashboardPage from "@/pages/ExecutiveDashboardPage";
-import PublicExecutiveDashboardPage from "@/pages/PublicExecutiveDashboardPage";
-import ProgramsPage from "@/pages/ProgramsPage";
-import ProgramDetailPage from "@/pages/ProgramDetailPage";
-import PendingProgramApprovalsPage from "@/pages/PendingProgramApprovalsPage";
+import { lazy } from "react";
+
+const LoginPage = lazy(() => import("../pages/LoginPage"));
+const DashboardPage = lazy(() => import("../pages/DashboardPage"));
+const ReportCenterPage = lazy(() => import("../pages/ReportCenterPage"));
+const StudentPage = lazy(() => import("../pages/studentPage"));
+const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
+const AttendancePage = lazy(() => import("@/pages/AttendancePage"));
+const AttendanceCalendarPage = lazy(() => import("@/pages/AttendanceCalendarPage"));
+const UserPage = lazy(() => import("@/pages/UserPage"));
+const ActivityPage = lazy(() => import("@/pages/ActivityPage"));
+const ScorePage = lazy(() => import("@/pages/Score"));
+const ScoreConfigPage = lazy(() => import("@/pages/ScoreConfigPage"));
+const AttendanceActivityPage = lazy(() => import("@/pages/ActivityAttendancePage"));
+const DocumentPage = lazy(() => import("@/pages/DocumentPage"));
+const ApproveDocumentPage = lazy(() => import("@/pages/ApproveDocumentPage"));
+const ApproveProgramPage = lazy(() => import("@/pages/ApproveProgramPage"));
+const PendingApprovalsPage = lazy(() => import("@/pages/PendingApprovalsPage"));
+const ReportSchedulePage = lazy(() => import("@/pages/ReportSchedulePage"));
+const ExecutiveDashboardPage = lazy(() => import("@/pages/ExecutiveDashboardPage"));
+const PublicExecutiveDashboardPage = lazy(() => import("@/pages/PublicExecutiveDashboardPage"));
+const ProgramsPage = lazy(() => import("@/pages/ProgramsPage"));
+const ProgramDetailPage = lazy(() => import("@/pages/ProgramDetailPage"));
+const PendingProgramApprovalsPage = lazy(() => import("@/pages/PendingProgramApprovalsPage"));
 
 export const publicRoutes = [
   { path: "/login", element: <LoginPage /> },

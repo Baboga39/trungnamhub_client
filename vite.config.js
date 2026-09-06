@@ -51,4 +51,19 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-react": ["react", "react-dom", "react-router-dom", "@reduxjs/toolkit", "react-redux"],
+          "vendor-ui": ["lucide-react", "clsx", "tailwind-merge"],
+          "vendor-3d": ["three", "@react-three/fiber", "@react-three/drei"],
+          "vendor-docs": ["xlsx", "jspdf", "jspdf-autotable", "pdfmake"],
+          "vendor-charts": ["recharts"],
+          "vendor-motion": ["framer-motion"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 });

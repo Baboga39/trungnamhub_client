@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 
 import NotFoundPage from "./components/common/not-found";
 import { publicRoutes, privateRoutes } from "./routes";
@@ -33,25 +33,27 @@ export default function App() {
   return (
     <LoadingProvider>
       <Router>
-        <Routes>
-          {publicRoutes.map(({ path, element }, idx) => (
-            <Route key={idx} path={path} element={element} />
-          ))}
+        <Suspense fallback={<GlobalLoading />}>
+          <Routes>
+            {publicRoutes.map(({ path, element }, idx) => (
+              <Route key={idx} path={path} element={element} />
+            ))}
 
-          {privateRoutes.map(({ path, element }, idx) => (
-            <Route
-              key={idx}
-              path={path}
-              element={
-                <PrivateRoute>
-                  <MainLayout>{element}</MainLayout>
-                </PrivateRoute>
-              }
-            />
-          ))}
+            {privateRoutes.map(({ path, element }, idx) => (
+              <Route
+                key={idx}
+                path={path}
+                element={
+                  <PrivateRoute>
+                    <MainLayout>{element}</MainLayout>
+                  </PrivateRoute>
+                }
+              />
+            ))}
 
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
 
         <ToastContainer position="top-right" autoClose={3000} theme="light" />
         <GlobalLoading />
