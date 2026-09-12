@@ -9,6 +9,8 @@ import { publicRoutes, privateRoutes } from "./routes";
 import MainLayout from "./layouts/MainLayout";
 import { LoadingProvider } from "./components/context/LoadingContext";
 import GlobalLoading from "./components/common/GlobalLoading";
+import PageLoadingFallback from "./components/common/PageLoadingFallback";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 import { fetchMembersThunk } from "./features/members/memberThunks";
 
 // PrivateRoute
@@ -23,41 +25,44 @@ function PrivateRoute({ children }) {
 export default function App() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const members = useSelector((state) => state.members.members);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && members.length === 0) {
       dispatch(fetchMembersThunk());
     }
-  }, [isAuthenticated, dispatch]);
+  }, [isAuthenticated, members.length, dispatch]);
 
   return (
-    <LoadingProvider>
-      <Router>
-        <Suspense fallback={<GlobalLoading />}>
-          <Routes>
-            {publicRoutes.map(({ path, element }, idx) => (
-              <Route key={idx} path={path} element={element} />
-            ))}
+    <ErrorBoundary>
+      <LoadingProvider>
+        <Router>
+          <Suspense fallback={<PageLoadingFallback />}>
+            <Routes>
+              {publicRoutes.map(({ path, element }, idx) => (
+                <Route key={idx} path={path} element={element} />
+              ))}
 
-            {privateRoutes.map(({ path, element }, idx) => (
-              <Route
-                key={idx}
-                path={path}
-                element={
-                  <PrivateRoute>
-                    <MainLayout>{element}</MainLayout>
-                  </PrivateRoute>
-                }
-              />
-            ))}
+              {privateRoutes.map(({ path, element }, idx) => (
+                <Route
+                  key={idx}
+                  path={path}
+                  element={
+                    <PrivateRoute>
+                      <MainLayout>{element}</MainLayout>
+                    </PrivateRoute>
+                  }
+                />
+              ))}
 
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Suspense>
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
 
-        <ToastContainer position="top-right" autoClose={3000} theme="light" />
-        <GlobalLoading />
-      </Router>
-    </LoadingProvider>
+          <ToastContainer position="top-right" autoClose={3000} theme="light" />
+          <GlobalLoading />
+        </Router>
+      </LoadingProvider>
+    </ErrorBoundary>
   );
 }
