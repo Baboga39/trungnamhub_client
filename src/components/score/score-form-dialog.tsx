@@ -213,12 +213,11 @@ export function ScoreFormDialog({
                       type="number"
                       min="0"
                       max="10"
-                      step="0.5"
+                      step="any"
                       disabled={isAttendance}
                       value={val === "" ? "" : val}
                       onChange={(e) => {
-                        const newScore =
-                          e.target.value === "" ? "" : Number(e.target.value);
+                        const newScore = e.target.value;
                         setFormData((prev) => ({
                           ...prev,
                           [cat.id]: newScore,
@@ -253,11 +252,10 @@ export function ScoreFormDialog({
                       id={`cat-${cat.id}`}
                       type="number"
                       min="0"
-                      step="0.5"
+                      step="any"
                       value={val === "" ? "" : val}
                       onChange={(e) => {
-                        const newScore =
-                          e.target.value === "" ? "" : Number(e.target.value);
+                        const newScore = e.target.value;
                         setFormData((prev) => ({
                           ...prev,
                           [cat.id]: newScore,
