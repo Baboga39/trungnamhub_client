@@ -76,3 +76,45 @@ export interface DashboardQueryParams {
   sortBy?: 'overall' | 'attendance' | 'score' | 'activity';
   limit?: number;
 }
+
+export interface ExecutiveBirthdayMember {
+  id: number | string;
+  userId?: number;
+  fullName: string;
+  birthDate: string;
+  birthDay: number;
+  birthMonth: number;
+  birthYear: number | null;
+  formattedDate: string;
+  age: number | null;
+  parish: string;
+  church: string;
+  branch: string;
+  group: string;
+  gender: string;
+  isLeader: boolean;
+  role: string;
+  isToday: boolean;
+  isThisMonth: boolean;
+}
+
+export interface ExecutiveBirthdaysMonthGroup {
+  month: number;
+  monthName: string;
+  count: number;
+  members: ExecutiveBirthdayMember[];
+}
+
+export interface ExecutiveBirthdaysData {
+  quarter: number;
+  year: number;
+  branch: string;
+  quarterMonths: number[];
+  total: number;
+  leaderCount: number;
+  memberCount: number;
+  todayCount: number;
+  byMonth: ExecutiveBirthdaysMonthGroup[];
+  members: ExecutiveBirthdayMember[];
+}
+

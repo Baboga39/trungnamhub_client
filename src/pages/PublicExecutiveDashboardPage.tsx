@@ -7,6 +7,7 @@ import { AttendanceTrendSection } from "@/components/executive-dashboard/Attenda
 import { ActivityParticipationSection } from "@/components/executive-dashboard/ActivityParticipationSection";
 import { RiskCenterSection } from "@/components/executive-dashboard/RiskCenterSection";
 import { Top3PodiumSection } from "@/components/executive-dashboard/Top3PodiumSection";
+import { ExecutiveBirthdaysSection } from "@/components/executive-dashboard/ExecutiveBirthdaysSection";
 
 import dashboardApi from "@/api/dashboardApi";
 import {
@@ -16,6 +17,7 @@ import {
   AttendanceTrendPoint,
   ExecutiveActivity,
   ExecutiveRiskMember,
+  ExecutiveBirthdaysData,
 } from "@/types/executiveDashboard";
 import {
   Select,
@@ -51,6 +53,7 @@ export default function PublicExecutiveDashboardPage() {
   const [trend, setTrend] = useState<AttendanceTrendPoint[]>([]);
   const [activities, setActivities] = useState<ExecutiveActivity[]>([]);
   const [riskMembers, setRiskMembers] = useState<ExecutiveRiskMember[]>([]);
+  const [birthdaysData, setBirthdaysData] = useState<ExecutiveBirthdaysData | null>(null);
 
   const [loadingOverview, setLoadingOverview] = useState<boolean>(true);
   const [loadingBranches, setLoadingBranches] = useState<boolean>(true);
@@ -58,6 +61,8 @@ export default function PublicExecutiveDashboardPage() {
   const [loadingTrend, setLoadingTrend] = useState<boolean>(true);
   const [loadingActivities, setLoadingActivities] = useState<boolean>(true);
   const [loadingRisks, setLoadingRisks] = useState<boolean>(true);
+  const [loadingBirthdays, setLoadingBirthdays] = useState<boolean>(true);
+
 
   const extractArray = (res: any) => {
     if (!res) return [];
@@ -69,6 +74,7 @@ export default function PublicExecutiveDashboardPage() {
 
   const extractObject = (res: any) => {
     if (!res) return null;
+    if (res.data?.data && typeof res.data.data === "object" && !Array.isArray(res.data.data)) return res.data.data;
     if (res.data && typeof res.data === "object" && !Array.isArray(res.data)) return res.data;
     return res;
   };
@@ -151,6 +157,19 @@ export default function PublicExecutiveDashboardPage() {
     }
   }, [year, quarter, branch]);
 
+  // Fetch Public Birthdays
+  const fetchBirthdays = useCallback(async () => {
+    try {
+      setLoadingBirthdays(true);
+      const res: any = await dashboardApi.getPublicExecutiveBirthdays({ year, quarter, branch });
+      setBirthdaysData(extractObject(res));
+    } catch (err) {
+      console.error("Failed to fetch public executive birthdays:", err);
+    } finally {
+      setLoadingBirthdays(false);
+    }
+  }, [year, quarter, branch]);
+
   const refreshAllData = () => {
     fetchOverview();
     fetchBranches();
@@ -158,11 +177,13 @@ export default function PublicExecutiveDashboardPage() {
     fetchTrend();
     fetchActivities();
     fetchRisks();
+    fetchBirthdays();
   };
 
   useEffect(() => {
     refreshAllData();
-  }, [fetchOverview, fetchBranches, fetchTopMembers, fetchTrend, fetchActivities, fetchRisks]);
+  }, [fetchOverview, fetchBranches, fetchTopMembers, fetchTrend, fetchActivities, fetchRisks, fetchBirthdays]);
+
 
   const handleShareLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -286,6 +307,15 @@ const years = Array.from({ length: 3 }, (_, i) => currentYear - i);
         {/* Branch Performance Grid */}
         <BranchPerformanceSection branches={branches} loading={loadingBranches} />
 
+        {/* Sinh Nhật Quý */}
+        <ExecutiveBirthdaysSection
+          data={birthdaysData}
+          loading={loadingBirthdays}
+          quarter={quarter}
+          year={year}
+          branch={branch}
+        />
+
         {/* Bảng Vàng Đoàn Sinh Xuất Sắc */}
         <TopMembersSection
           members={topMembers}
@@ -293,6 +323,7 @@ const years = Array.from({ length: 3 }, (_, i) => currentYear - i);
           onSortChange={setSortBy}
           currentSort={sortBy}
         />
+
 
         {/* Attendance Trend Line Chart */}
         <AttendanceTrendSection data={trend} loading={loadingTrend} />

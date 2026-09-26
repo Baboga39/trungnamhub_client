@@ -9,6 +9,7 @@ import { AttendanceTrendSection } from "@/components/executive-dashboard/Attenda
 import { ActivityParticipationSection } from "@/components/executive-dashboard/ActivityParticipationSection";
 import { RiskCenterSection } from "@/components/executive-dashboard/RiskCenterSection";
 import { Top3PodiumSection } from "@/components/executive-dashboard/Top3PodiumSection";
+import { ExecutiveBirthdaysSection } from "@/components/executive-dashboard/ExecutiveBirthdaysSection";
 
 import dashboardApi from "@/api/dashboardApi";
 import {
@@ -18,6 +19,7 @@ import {
   AttendanceTrendPoint,
   ExecutiveActivity,
   ExecutiveRiskMember,
+  ExecutiveBirthdaysData,
 } from "@/types/executiveDashboard";
 
 export default function ExecutiveDashboardPage() {
@@ -37,6 +39,7 @@ export default function ExecutiveDashboardPage() {
   const [trend, setTrend] = useState<AttendanceTrendPoint[]>([]);
   const [activities, setActivities] = useState<ExecutiveActivity[]>([]);
   const [riskMembers, setRiskMembers] = useState<ExecutiveRiskMember[]>([]);
+  const [birthdaysData, setBirthdaysData] = useState<ExecutiveBirthdaysData | null>(null);
 
   const [loadingOverview, setLoadingOverview] = useState<boolean>(true);
   const [loadingBranches, setLoadingBranches] = useState<boolean>(true);
@@ -44,6 +47,8 @@ export default function ExecutiveDashboardPage() {
   const [loadingTrend, setLoadingTrend] = useState<boolean>(true);
   const [loadingActivities, setLoadingActivities] = useState<boolean>(true);
   const [loadingRisks, setLoadingRisks] = useState<boolean>(true);
+  const [loadingBirthdays, setLoadingBirthdays] = useState<boolean>(true);
+
 
   const extractData = (res: any) => {
     if (!res) return null;
@@ -146,6 +151,20 @@ export default function ExecutiveDashboardPage() {
     }
   }, [year, quarter, branch]);
 
+  // Fetch Birthdays
+  const fetchBirthdays = useCallback(async () => {
+    try {
+      setLoadingBirthdays(true);
+      const res: any = await dashboardApi.getExecutiveBirthdays({ year, quarter, branch });
+      const data = extractData(res);
+      setBirthdaysData(data);
+    } catch (err) {
+      console.error("Failed to fetch executive birthdays:", err);
+    } finally {
+      setLoadingBirthdays(false);
+    }
+  }, [year, quarter, branch]);
+
   useEffect(() => {
     fetchOverview();
     fetchBranches();
@@ -153,7 +172,8 @@ export default function ExecutiveDashboardPage() {
     fetchTrend();
     fetchActivities();
     fetchRisks();
-  }, [fetchOverview, fetchBranches, fetchTopMembers, fetchTrend, fetchActivities, fetchRisks]);
+    fetchBirthdays();
+  }, [fetchOverview, fetchBranches, fetchTopMembers, fetchTrend, fetchActivities, fetchRisks, fetchBirthdays]);
 
   return (
     <AdminLayout>
@@ -192,8 +212,18 @@ export default function ExecutiveDashboardPage() {
           onSelectBranch={(b) => setBranch(b)}
         />
 
+        {/* Sinh Nhật Quý */}
+        <ExecutiveBirthdaysSection
+          data={birthdaysData}
+          loading={loadingBirthdays}
+          quarter={quarter}
+          year={year}
+          branch={branch}
+        />
+
         {/* Attendance Trend Chart */}
         <AttendanceTrendSection data={trend} loading={loadingTrend} />
+
 
         {/* Main Content Grid: Top Members & Activity Participation */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
