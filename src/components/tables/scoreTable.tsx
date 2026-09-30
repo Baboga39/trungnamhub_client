@@ -183,6 +183,7 @@ export default function ScoresTable() {
       };
 
       const scoresPayload = categories
+        .filter((cat: any) => cat.name !== "Chuyên cần")
         .map((cat: any) => {
           const normKey = normalizeKey(cat.name);
           const legacyKey = legacyKeyMap[cat.name];

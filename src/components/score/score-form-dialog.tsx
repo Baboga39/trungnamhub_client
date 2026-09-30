@@ -205,8 +205,13 @@ export function ScoreFormDialog({
 
                 return (
                   <div key={cat.id} className="space-y-2">
-                    <Label htmlFor={`cat-${cat.id}`} className="text-sm font-semibold">
-                      {cat.name} (HS{cat.weight})
+                    <Label htmlFor={`cat-${cat.id}`} className="text-sm font-semibold flex items-center justify-between">
+                      <span>{cat.name} (HS{cat.weight})</span>
+                      {isAttendance && (
+                        <span className="text-[11px] text-blue-600 font-normal">
+                          (Tự động tính từ điểm danh)
+                        </span>
+                      )}
                     </Label>
                     <Input
                       id={`cat-${cat.id}`}
