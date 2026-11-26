@@ -13,38 +13,30 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "../../libs/utils";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import notifyApi, { NotificationItem } from "../../api/notifyApi";
 
 // 🔹 Redux
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { logoutThunk } from "../../features/auth/authThunks";
 
-const notifications = [
-  {
-    id: 1,
-    title: "Điểm danh mới",
-    message: "Lớp 10A đã hoàn thành điểm danh",
-    time: "5 phút trước",
-    unread: true,
-  },
-  {
-    id: 2,
-    title: "Cập nhật điểm số",
-    message: "Điểm số học kỳ đã được cập nhật",
-    time: "1 giờ trước",
-    unread: true,
-  },
-  {
-    id: 3,
-    title: "Thông báo mới",
-    message: "Lịch họp phụ huynh đã được đăng",
-    time: "2 giờ trước",
-    unread: false,
-  },
-];
+function formatRelativeTime(isoDate: string): string {
+  const time = new Date(isoDate).getTime();
+  if (Number.isNaN(time)) return "";
+  const diffSec = Math.max(0, Math.floor((Date.now() - time) / 1000));
+  if (diffSec < 60) return "Vừa xong";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin} phút trước`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour} giờ trước`;
+  const diffDay = Math.floor(diffHour / 24);
+  return `${diffDay} ngày trước`;
+}
+
 interface NavbarProps {
   onMenuClick?: () => void;
 }
@@ -55,8 +47,69 @@ export function Navbar({ onMenuClick }: NavbarProps) {
   // 🔹 lấy user từ Redux
   const user = useSelector((state: RootState) => state.auth.user);
 
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const unreadCount = notifications.filter((n) => n.unread).length;
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    let isMounted = true;
+    notifyApi
+      .getNotifications(30)
+      .then((res) => {
+        if (isMounted && Array.isArray(res?.notifications)) {
+          setNotifications(res.notifications);
+        }
+      })
+      .catch(() => {
+        // Notify service may be offline in local dev; fail silently
+      });
+
+    const eventSource = new EventSource(notifyApi.getStreamUrl(token));
+    eventSource.addEventListener("notification", (event) => {
+      try {
+        const incoming: NotificationItem = JSON.parse((event as MessageEvent).data);
+        setNotifications((prev) => {
+          if (prev.some((item) => item.id === incoming.id)) return prev;
+          return [incoming, ...prev].slice(0, 50);
+        });
+
+        const toastContent = `${incoming.title}: ${incoming.message}`;
+        if (incoming.severity === "warning") toast.warning(toastContent);
+        else if (incoming.severity === "success") toast.success(toastContent);
+        else if (incoming.severity === "error") toast.error(toastContent);
+        else toast.info(toastContent);
+      } catch {
+        // ignore malformed SSE event
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      eventSource.close();
+    };
+  }, [user?.userId, user?.id]);
+
+  const handleNotificationClick = async (item: NotificationItem) => {
+    if (item.unread) {
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === item.id ? { ...n, unread: false } : n))
+      );
+      notifyApi.markAsRead(item.id).catch(() => {});
+    }
+    if (item.actionUrl) {
+      setPopoverOpen(false);
+      navigate(item.actionUrl);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    notifyApi.markAllAsRead().catch(() => {});
+  };
 
   // 🔹 logout
   const handleLogout = async () => {
@@ -122,7 +175,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
         {/* Actions */}
         <div className="flex items-center gap-2 lg:gap-3">
           {/* Notifications */}
-          <Popover modal={false}>
+          <Popover modal={false} open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
@@ -155,40 +208,51 @@ export function Navbar({ onMenuClick }: NavbarProps) {
               </div>
               {/* List */}
               <div className="max-h-[400px] overflow-y-auto divide-y divide-slate-100">
-                {notifications.map((n) => (
-                  <div
-                    key={n.id}
-                    className={cn(
-                      "px-4 py-3 cursor-pointer transition-all",
-                      "hover:bg-blue-50/70",
-                      n.unread ? "bg-blue-50/40" : "bg-white",
-                    )}
-                  >
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-sm text-slate-900 truncate">
-                          {n.title}
-                        </p>
-                        {n.unread && (
-                          <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-xs text-slate-600 line-clamp-2">
-                        {n.message}
-                      </p>
-                      <p className="text-xs text-slate-400 italic">{n.time}</p>
-                    </div>
+                {notifications.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-xs text-slate-400">
+                    Chưa có thông báo nào
                   </div>
-                ))}
+                ) : (
+                  notifications.map((n) => (
+                    <div
+                      key={n.id}
+                      onClick={() => handleNotificationClick(n)}
+                      className={cn(
+                        "px-4 py-3 cursor-pointer transition-all",
+                        "hover:bg-blue-50/70",
+                        n.unread ? "bg-blue-50/40" : "bg-white",
+                      )}
+                    >
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-sm text-slate-900 truncate">
+                            {n.title}
+                          </p>
+                          {n.unread && (
+                            <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-600 line-clamp-2">
+                          {n.message}
+                        </p>
+                        <p className="text-xs text-slate-400 italic">
+                          {formatRelativeTime(n.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
               {/* Footer */}
               <div className="px-4 py-2 border-t bg-slate-50 rounded-b-xl">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full text-xs text-blue-600 hover:bg-blue-100 hover:text-blue-700"
+                  onClick={handleMarkAllRead}
+                  disabled={unreadCount === 0}
+                  className="w-full text-xs text-blue-600 hover:bg-blue-100 hover:text-blue-700 disabled:opacity-50"
                 >
-                  Xem tất cả thông báo
+                  Đánh dấu tất cả đã đọc
                 </Button>
               </div>
             </PopoverContent>
